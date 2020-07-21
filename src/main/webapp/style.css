@@ -111,4 +111,48 @@ body{
   bottom: 0px;
 
   background: #BED4FF;
+  
 }
+
+.icon{
+  fill-opacity: 1;
+  float: left;
+  margin-right: 8%;
+  width:10vh;
+  height:10vh;
+  padding: 2%;
+}
+
+#about-content{
+  width:70%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+}
+
+.about-info-container{
+  padding-top: 2%;
+  height: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+
+.description-heading{
+  font-style: normal;
+  font-weight: bold;
+  font-size: 2vh;
+  overflow: hidden;
+}
+
+.description-body{
+  font-style: normal;
+  font-weight: normal;
+  font-size: 1.8vh;
+  overflow: hidden;
+}
+
+
+
