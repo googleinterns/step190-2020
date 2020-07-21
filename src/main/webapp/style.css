@@ -57,13 +57,9 @@ body{
   margin-top: 4.5%;
 }
 
-.justify-content-center{
-  margin-left: auto;
-  margin-right: auto;
-}
-
 #register-buttons div{
-  height: 10vh;
+  min-height: 10vh;
+  height:auto;
   font-style: normal;
   font-weight: bold;
   font-size: 3vh;
@@ -101,15 +97,15 @@ body{
 
 #content-padding{
   width: 100%;
-  margin-bottom: 20%;
+  margin-bottom: 100%;
 }
 
 #about-bar{
   position: fixed;
   width: 100%;
-  height: 20%;
+  min-height: 20%;
   bottom: 0px;
-
+  height: auto;
   background: #BED4FF;
   
 }
