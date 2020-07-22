@@ -54,7 +54,6 @@ public class ElectionServlet extends HttpServlet {
 
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
-            // conn.setRequestProperty("apikey", "AIzaSyBlNN_uUrbqY2uRaBpKTD-5Jbw6nk8n0_k");
             
             if (conn.getResponseCode() != 200) {
                 throw new RuntimeException("HTTP GET Request Failed with Error code : "
