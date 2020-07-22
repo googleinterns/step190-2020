@@ -10,7 +10,6 @@ body{
   font-family: Nunito Sans;
 }
 
-/* Header-Bar */
 #header-bar{
   position: fixed;
   width: 100%;
@@ -25,7 +24,6 @@ body{
   flex-direction: column;
 }
 
-/* Cool Site Name */
 #header-text{
   position: fixed;
   font-style: normal;
@@ -73,6 +71,10 @@ body{
   flex-direction: column;
 }
 
+#register-buttons div a{
+  text-decoration: none;
+}
+
 #turbo-vote-button{
   background: #DB6666;
   border: 1px solid #DB6666;
@@ -116,7 +118,8 @@ body{
   margin-right: 8%;
   width:10vh;
   height:10vh;
-  padding: 2%;
+  padding-top: 2%;
+  clear: both;
 }
 
 #about-content{
@@ -129,7 +132,7 @@ body{
 }
 
 .about-info-container{
-  padding-top: 2%;
+  padding-top: 2.5%;
   height: auto;
   margin-top: auto;
   margin-bottom: auto;
