@@ -96,7 +96,7 @@ body{
 
 #content-padding{
   width: 100%;
-  margin-bottom: 100%;
+  margin-bottom: 10%;
 }
 
 #about-bar{
@@ -169,4 +169,42 @@ body{
   padding: 0.8vh 1vh;
   cursor: pointer;
   outline:none;
+}
+
+#election-list-content {
+  margin: 2% 30%;
+}
+
+#election-list-content > h3 {
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 40px;
+}
+
+#election-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.election-quick-details p {
+  font-size: 2.5vh;
+}
+
+.learn-more-button {
+  background: #FFFFFF;
+  border: 1px solid #668EDB;
+  border-radius: 10px;
+  color: #668EDB;
+  font-weight: bold;
+  padding: 10px;
+  display: flex;
+  height: 50%;
+}
+
+.learn-more-button:hover {
+  background: #668EDB;
+  border: 1px solid #668EDB;
+  color: #FFFFFF;
+  cursor: pointer;
 }
