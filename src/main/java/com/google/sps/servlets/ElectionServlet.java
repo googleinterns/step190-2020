@@ -44,48 +44,48 @@ public class ElectionServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         StringBuilder strBuf = new StringBuilder();  
         
-        HttpURLConnection conn=null;
-        BufferedReader reader=null;
+        HttpURLConnection conn = null;
+        BufferedReader reader = null;
 
         try {  
-            //Declare the connection to civic information API url
-            URL url = new URL(baseURL + "AIzaSyBlNN_uUrbqY2uRaBpKTD-5Jbw6nk8n0_k");  
+            URL url = new URL(baseURL + "AIzaSyBlNN_uUrbqY2uRaBpKTD-5Jbw6nk8n0_k");
             conn = (HttpURLConnection) url.openConnection();  
 
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
             
-            if (conn.getResponseCode() != 200) {
+            if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("HTTP GET Request Failed with Error code : "
                               + conn.getResponseCode());
             }
             
-            //Read the content from the defined connection
-            //Using IO Stream with Buffer raise highly the efficiency of IO
+            // Read the content from the defined connection
+            // Using IO Stream with Buffer for increased efficiency 
 	        reader = new BufferedReader(new InputStreamReader(conn.getInputStream(),"utf-8"));
             String output = null;  
 
             while ((output = reader.readLine()) != null) {
                 strBuf.append(output);
             }                 
-        } catch(MalformedURLException e) {  
+        } catch(MalformedURLException e) {
             response.setContentType("text/html");
-            response.getWriter().println("URL invalid");
-            return;   
-        } catch(IOException e){  
+            response.getWriter().println("URL is incorrectly formatted");
+            return;
+        } catch(IOException e) {  
             response.setContentType("text/html");
-            response.getWriter().println("URL invalid");
-            return;   
+            response.getWriter().println("Cannot retrieve information from provided URL");
+            return;     
         } finally {
             if(reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
                     response.setContentType("text/html");
-                    response.getWriter().println("URL invalid");
+                    response.getWriter().println("Could not read contents found at URL");
                     return;
                 }
-            } if(conn != null) {
+            } 
+            if(conn != null) {
                 conn.disconnect();
             }
         }
@@ -95,6 +95,6 @@ public class ElectionServlet extends HttpServlet {
         String json = gson.toJson(elections);
 
         response.setContentType("application/json;");
-        response.getWriter().println(elections);
+        response.getWriter().println(json);
     }
 }
