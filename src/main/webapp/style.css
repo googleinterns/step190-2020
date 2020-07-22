@@ -39,16 +39,13 @@ body{
   width: 100%;
 }
 
-
-#site-description p{
+.page-title-text p {
   height: 35%;
   margin-top: 10%;
   font-style: normal;
   font-weight: normal;
   font-size: 5vh;
-  line-height: 100%;
-
-  color: #000000;
+  line-height: 120%;
 }
 
 #register-buttons{
@@ -109,7 +106,6 @@ body{
   bottom: 0px;
   height: auto;
   background: #BED4FF;
-  
 }
 
 .icon{
@@ -153,5 +149,24 @@ body{
   overflow: hidden;
 }
 
+#dropdown-title {
+  color: #668EDB;
+  font-weight: bold;
+}
 
+#state-dropdown {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  margin: 2vh 0;
+}
 
+#state-dropdown > select {
+  background-color: #FFFFFF;
+  border: 1px solid #C5C5C5;
+  border-radius: 20px;
+  font-size: 2vh;
+  padding: 0.8vh 1vh;
+  cursor: pointer;
+  outline:none;
+}
