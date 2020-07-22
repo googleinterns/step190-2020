@@ -2,4 +2,153 @@ html {
   height: 100%;
   margin: 0;
   padding: 0;
+
 }
+
+body{
+  width:100%;
+  font-family: Nunito Sans;
+}
+
+/* Header-Bar */
+#header-bar{
+  position: fixed;
+  width: 100%;
+  height: 3%;
+  min-height: 35px;
+  top: 0px;
+  background: #668EDB;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+}
+
+/* Cool Site Name */
+#header-text{
+  position: fixed;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 150%;
+  padding: 0.5%;
+  left: 5%;
+  line-height: 100%;
+  color: #FFFFFF;
+}
+
+#content{
+  width: 100%;
+}
+
+
+#site-description p{
+  height: 35%;
+  margin-top: 10%;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 5vh;
+  line-height: 100%;
+
+  color: #000000;
+}
+
+#register-buttons{
+  margin-top: 4.5%;
+}
+
+#register-buttons div{
+  min-height: 10vh;
+  height:auto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 3vh;
+  text-align: center;
+  color: #FFFFFF;
+  box-sizing: border-box;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+}
+
+#turbo-vote-button{
+  background: #DB6666;
+  border: 1px solid #DB6666;
+  
+}
+
+#turbo-vote-button:hover{
+  background: #FFFFFF;
+  color: #DB6666;
+
+}
+
+#show-elections-button{
+  background: #668EDB;
+  border: 1px solid #668EDB;
+}
+
+#show-elections-button:hover{
+  background: #FFFFFF;
+  color: #668EDB;
+}
+
+#content-padding{
+  width: 100%;
+  margin-bottom: 100%;
+}
+
+#about-bar{
+  position: fixed;
+  width: 100%;
+  min-height: 20%;
+  bottom: 0px;
+  height: auto;
+  background: #BED4FF;
+  
+}
+
+.icon{
+  fill-opacity: 1;
+  float: left;
+  margin-right: 8%;
+  width:10vh;
+  height:10vh;
+  padding: 2%;
+}
+
+#about-content{
+  width:70%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: column;
+}
+
+.about-info-container{
+  padding-top: 2%;
+  height: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+
+.description-heading{
+  font-style: normal;
+  font-weight: bold;
+  font-size: 2vh;
+  overflow: hidden;
+}
+
+.description-body{
+  font-style: normal;
+  font-weight: normal;
+  font-size: 1.8vh;
+  overflow: hidden;
+}
+
+
+
