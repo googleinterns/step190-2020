@@ -9,12 +9,13 @@ const STATE_CODE_LENGTH = 2;
  * to the state selected by the user.
  */
 function listElections() {
-  let selectedStateId = document.getElementById('select-state').value;
-  let selectedStateName = document.getElementById('select-state').innerHTML;
+  let dropdownSelection = document.getElementById('select-state');
+  let selectedStateId = dropdownSelection.options[dropdownSelection.selectedIndex].value;
+  let selectedStateName = dropdownSelection.options[dropdownSelection.selectedIndex].text;
   let nationalElections = [];
   let stateElections = [];
 
-  if (selectedStateId === null) {
+  if (selectedStateId === undefined) {
     return;
   }
 
@@ -23,36 +24,37 @@ function listElections() {
     .then((textResponse) => {
       let electionList = JSON.parse(textResponse).elections;
       electionList.forEach((election) => {
-        console.log(election.ocdDivisionId);
         let ocdId = election.ocdDivisionId;
         let stateId = ocdId.indexOf(OCD_STATE_TITLE);
         let districtId = ocdId.indexOf(OCD_DISTRICT_TITLE);
 
         if (stateId !== -1) {
-          if (ocdId.substring(stateId, OCD_STATE_TITLE.length + STATE_CODE_LENGTH) 
+          if (ocdId.substring(stateId, stateId + OCD_STATE_TITLE.length + STATE_CODE_LENGTH)
               == selectedStateId) {
-            stateElections.append(election);
+            stateElections.push(election);
           }
         } else if (districtId !== -1) {
-          if (ocdId.substring(districtId, OCD_DISTRICT_TITLE.length + STATE_CODE_LENGTH) 
+          if (ocdId.substring(districtId, districtId + OCD_DISTRICT_TITLE.length + STATE_CODE_LENGTH) 
               == selectedStateId) {
-            stateElections.append(election);
+            stateElections.push(election);
           }
         } else {
-          nationalElections.append(election);
+          nationalElections.push(election);
         }
       });
       
       const electionListContainerElement = document.getElementById('election-list-content');
+      electionListContainerElement.innerHTML = '';
       
       const electionsInStateHeadingElement = document.createElement('h3');
       electionsInStateHeadingElement.innerHTML = 'Elections coming up in ' + selectedStateName;
       electionListContainerElement.appendChild(electionsInStateHeadingElement);
 
       if (stateElections.length == 0) {
-        buildElectionListElements(electionListContainerElement, stateElections);
-      } else {
+        console.log('no elections for ' + selectedStateName);
         buildEmptyListText(electionListContainerElement);
+      } else {
+        buildElectionListElements(electionListContainerElement, stateElections);
       }
 
       const electionsInNationHeadingElement = document.createElement('h3');
@@ -60,9 +62,9 @@ function listElections() {
       electionListContainerElement.appendChild(electionsInNationHeadingElement);
 
       if (nationalElections.length == 0) {
-        buildElectionListElements(electionListContainerElement, nationalElections);
-      } else {
         buildEmptyListText(electionListContainerElement);
+      } else {
+        buildElectionListElements(electionListContainerElement, nationalElections);
       }
   });
 }
@@ -91,7 +93,7 @@ function buildElectionListElements(containerElement, elections) {
 
     const electionDateElement = document.createElement('p');
     const electionDateEmphasisElement = document.createElement('em');
-    electionDateEmphasisElement.innerHTML = formatDate(election.date);
+    electionDateEmphasisElement.innerHTML = formatDate(election.electionDay);
     electionDateElement.appendChild(electionDateEmphasisElement);
     electionDetailsElement.appendChild(electionDateElement);
 
@@ -128,6 +130,10 @@ function buildEmptyListText(containerElement) {
  * @return {String} the formatted date in the form Month DD, YYYY
  */
 function formatDate(apiDate) {
+  if (apiDate == undefined) {
+    return 'Invalid date';
+  }
+
   let dateParts = apiDate.split('-');
 
   if (dateParts.length !== 3) {
