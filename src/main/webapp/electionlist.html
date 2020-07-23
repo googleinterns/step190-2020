@@ -16,162 +16,161 @@
     <script src="script.js"></script>
   </head>
   <body>
-    <a href="index.html">
-      <div id="header-bar">
-        <p id="header-text">gVote</p>
+    <div id="page-wrapper">
+      <a href="index.html">
+        <div id="header-bar">
+          <p id="header-text">gVote</p>
+        </div>
+      </a>
+
+      <div class="container" id="content">
+        <div class="row page-title-text" id="dropdown-title">
+          <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
+            <b>To explore the upcoming elections you can vote in, select the state you live in:</b>
+          </p> 
+        </div>
+        <div class="row" id="state-dropdown">
+          <select id="select-state" name="states">
+            <option disabled selected><em>Please select a state</em></option>
+            <option value="state:ak">Alaska</option>
+            <option value="state:al">Alabama</option>
+            <option value="state:ar">Arkansas</option>
+            <option value="state:az">Arizona</option>
+            <option value="state:ca">California</option>
+            <option value="state:co">Colorado</option>
+            <option value="state:ct">Connecticut</option>
+            <option value="state:de">Delaware</option>
+            <option value="district:dc">District of Columbia</option>
+            <option value="state:fl">Florida</option>
+            <option value="state:ga">Georgia</option>
+            <option value="state:hi">Hawaii</option>
+            <option value="state:ia">Iowa</option>
+            <option value="state:id">Idaho</option>
+            <option value="state:il">Illinois</option>
+            <option value="state:in">Indiana</option>
+            <option value="state:ks">Kansas</option>
+            <option value="state:ky">Kentucky</option>
+            <option value="state:la">Louisiana</option>
+            <option value="state:ma">Massachusetts</option>
+            <option value="state:md">Maryland</option>
+            <option value="state:me">Maine</option>
+            <option value="state:mi">Michigan</option>
+            <option value="state:mn">Minnesota</option>
+            <option value="state:mo">Missouri</option>
+            <option value="state:ms">Mississippi</option>
+            <option value="state:mt">Montana</option>
+            <option value="state:nc">North Carolina</option>
+            <option value="state:nd">North Dakota</option>
+            <option value="state:ne">Nebraska</option>
+            <option value="state:nh">New Hampshire</option>
+            <option value="state:nj">New Jersey</option>
+            <option value="state:nm">New Mexico</option>
+            <option value="state:nv">Nevada</option>
+            <option value="state:ny">New York</option>
+            <option value="state:oh">Ohio</option>
+            <option value="state:ok">Oklahoma</option>
+            <option value="state:or">Oregon</option>
+            <option value="state:pa">Pennsylvania</option>
+            <option value="state:ri">Rhode Island</option>
+            <option value="state:sc">South Carolina</option>
+            <option value="state:sd">South Dakota</option>
+            <option value="state:tn">Tennessee</option>
+            <option value="state:tx">Texas</option>
+            <option value="state:ut">Utah</option>
+            <option value="state:va">Virginia</option>
+            <option value="state:vt">Vermont</option>
+            <option value="state:wa">Washington</option>
+            <option value="state:wi">Wisconsin</option>
+            <option value="state:wv">West Virginia</option>
+            <option value="state:wy">Wyoming</option> 
+          </select>
+        </div>
+        <div class="container-fluid" id="election-list-content">
+          <h3>Elections coming up in Washington</h3>
+          <ul class="list-group list-group-flush" id="election-list">
+            <li class="list-group-item" id="election-item">
+              <div class="election-quick-details">
+                <p>Washington State Primary Election</p>
+                <p><em>August 4, 2020</em></p>
+              </div>
+              <div class="learn-more-button">Learn more</div>
+            </li>
+            <li class="list-group-item" id="election-item">
+              <div class="election-quick-details">
+                <p>Other Election Title</p>
+                <p><em>August 40, 2020</em></p>
+              </div>
+              <div class="learn-more-button">Learn more</div>
+            </li>
+          </ul>
+          <h3>Elections coming up in the United States</h3>
+          <ul class="list-group list-group-flush" id="election-list">
+            <li class="list-group-item" id="election-item">
+              <div class="election-quick-details">
+                <p>Washington State Primary Election</p>
+                <p><em>August 4, 2020</em></p>
+              </div>
+              <div class="learn-more-button">Learn more</div>
+            </li>
+            <li class="list-group-item" id="election-item">
+              <div class="election-quick-details">
+                <p>Other Election Title</p>
+                <p><em>August 40, 2020</em></p>
+              </div>
+              <div class="learn-more-button">Learn more</div>
+            </li>
+          </ul>
+        </div>
+
       </div>
-    </a>
 
-    <div class="container" id="content">
-      <div class="row page-title-text" id="dropdown-title">
-        <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
-          <b>To explore the upcoming elections you can vote in, select the state you live in:</b>
-        </p> 
+
+      <div id="about-bar">
+        <div class="container" id="about-content">
+          <div class="row">
+            <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="find-elections-container">
+              <div class="image-wrapper">
+                <img src="icons/registerIcon.svg" class="icon" id="register-icon"/>
+              </div>
+              <div class="about-description">
+                <p class="description-heading">
+                  <b>Find Elections</b>
+                <p>
+                <p class="description-body">
+                  Find upcoming elections affecting your area by simply providing your address.
+                </p>
+              </div>  
+            </div>
+            <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="stay-informed-container">
+              <div class="image-wrapper">
+                <img src="icons/informIcon.svg" class="icon" id="register-icon"/>
+              </div>
+              <div class="about-description">
+                <p class="description-heading">
+                  <b>Stay Informed</b>
+                <p>
+                <p class="description-body">
+                  See what’s on the ballot for each election and get information and relevant links 
+                  for all positions, candidates, and propositions.
+                </p>
+              </div>  
+            </div>
+            <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="go-vote-container">
+              <div class="image-wrapper">
+                <img src="icons/mapIcon.svg" class="icon" id="register-icon"/>
+              </div>
+              <div class="about-description">
+                <p class="description-heading">
+                  <b>Go Vote</b>
+                <p>
+                <p class="description-body">Find polling places near your address along with mail-in 
+                  and in person voting deadlines for your area.
+                </p>
+              </div>  
+            </div>
+          </div>   
+        </div> 
       </div>
-      <div class="row" id="state-dropdown">
-        <select id="select-state" name="states">
-          <option disabled selected><em>Please select a state</em></option>
-          <option value="state:ak">Alaska</option>
-          <option value="state:al">Alabama</option>
-          <option value="state:ar">Arkansas</option>
-          <option value="state:az">Arizona</option>
-          <option value="state:ca">California</option>
-          <option value="state:co">Colorado</option>
-          <option value="state:ct">Connecticut</option>
-          <option value="state:de">Delaware</option>
-          <option value="district:dc">District of Columbia</option>
-          <option value="state:fl">Florida</option>
-          <option value="state:ga">Georgia</option>
-          <option value="state:hi">Hawaii</option>
-          <option value="state:ia">Iowa</option>
-          <option value="state:id">Idaho</option>
-          <option value="state:il">Illinois</option>
-          <option value="state:in">Indiana</option>
-          <option value="state:ks">Kansas</option>
-          <option value="state:ky">Kentucky</option>
-          <option value="state:la">Louisiana</option>
-          <option value="state:ma">Massachusetts</option>
-          <option value="state:md">Maryland</option>
-          <option value="state:me">Maine</option>
-          <option value="state:mi">Michigan</option>
-          <option value="state:mn">Minnesota</option>
-          <option value="state:mo">Missouri</option>
-          <option value="state:ms">Mississippi</option>
-          <option value="state:mt">Montana</option>
-          <option value="state:nc">North Carolina</option>
-          <option value="state:nd">North Dakota</option>
-          <option value="state:ne">Nebraska</option>
-          <option value="state:nh">New Hampshire</option>
-          <option value="state:nj">New Jersey</option>
-          <option value="state:nm">New Mexico</option>
-          <option value="state:nv">Nevada</option>
-          <option value="state:ny">New York</option>
-          <option value="state:oh">Ohio</option>
-          <option value="state:ok">Oklahoma</option>
-          <option value="state:or">Oregon</option>
-          <option value="state:pa">Pennsylvania</option>
-          <option value="state:ri">Rhode Island</option>
-          <option value="state:sc">South Carolina</option>
-          <option value="state:sd">South Dakota</option>
-          <option value="state:tn">Tennessee</option>
-          <option value="state:tx">Texas</option>
-          <option value="state:ut">Utah</option>
-          <option value="state:va">Virginia</option>
-          <option value="state:vt">Vermont</option>
-          <option value="state:wa">Washington</option>
-          <option value="state:wi">Wisconsin</option>
-          <option value="state:wv">West Virginia</option>
-          <option value="state:wy">Wyoming</option> 
-        </select>
-      </div>
-    </div>
-
-    <div class="container-fluid" id="election-list-content">
-      <h3>Elections coming up in Washington</h3>
-      <ul class="list-group list-group-flush" id="election-list">
-        <li class="list-group-item" id="election-item">
-          <div class="election-quick-details">
-            <p>Washington State Primary Election</p>
-            <p><em>August 4, 2020</em></p>
-          </div>
-          <div class="learn-more-button">Learn more</div>
-        </li>
-        <li class="list-group-item" id="election-item">
-          <div class="election-quick-details">
-            <p>Other Election Title</p>
-            <p><em>August 40, 2020</em></p>
-          </div>
-          <div class="learn-more-button">Learn more</div>
-        </li>
-      </ul>
-      <h3>Elections coming up in the United States</h3>
-      <ul class="list-group list-group-flush" id="election-list">
-        <li class="list-group-item" id="election-item">
-          <div class="election-quick-details">
-            <p>Washington State Primary Election</p>
-            <p><em>August 4, 2020</em></p>
-          </div>
-          <div class="learn-more-button">Learn more</div>
-        </li>
-        <li class="list-group-item" id="election-item">
-          <div class="election-quick-details">
-            <p>Other Election Title</p>
-            <p><em>August 40, 2020</em></p>
-          </div>
-          <div class="learn-more-button">Learn more</div>
-        </li>
-      </ul>
-    </div>
-
-    <div class="container-fluid" id="content-padding">
-      &nbsp;
-    </div>
-
-    <div id="about-bar">
-      <div class="container" id="about-content">
-        <div class="row">
-          <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="find-elections-container">
-            <div class="image-wrapper">
-              <img src="icons/registerIcon.svg" class="icon" id="register-icon"/>
-            </div>
-            <div class="about-description">
-              <p class="description-heading">
-                <b>Find Elections</b>
-              <p>
-              <p class="description-body">
-                Find upcoming elections affecting your area by simply providing your address.
-              </p>
-            </div>  
-          </div>
-          <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="stay-informed-container">
-            <div class="image-wrapper">
-              <img src="icons/informIcon.svg" class="icon" id="register-icon"/>
-            </div>
-            <div class="about-description">
-              <p class="description-heading">
-                <b>Stay Informed</b>
-              <p>
-              <p class="description-body">
-                See what’s on the ballot for each election and get information and relevant links 
-                for all positions, candidates, and propositions.
-              </p>
-            </div>  
-          </div>
-          <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="go-vote-container">
-            <div class="image-wrapper">
-              <img src="icons/mapIcon.svg" class="icon" id="register-icon"/>
-            </div>
-            <div class="about-description">
-              <p class="description-heading">
-                <b>Go Vote</b>
-              <p>
-              <p class="description-body">Find polling places near your address along with mail-in 
-                and in person voting deadlines for your area.
-              </p>
-            </div>  
-          </div>
-        </div>   
-      </div> 
     </div>
   </body>
 </html>

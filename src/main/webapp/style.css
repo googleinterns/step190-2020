@@ -10,6 +10,11 @@ body{
   font-family: Nunito Sans;
 }
 
+#page-wrapper{
+  position: relative;
+  min-height: 100%;
+}
+
 #header-bar{
   position: fixed;
   width: 100%;
@@ -37,6 +42,7 @@ body{
 
 #content{
   width: 100%;
+  padding-bottom: 11%; 
 }
 
 .page-title-text p {
@@ -44,7 +50,7 @@ body{
   margin-top: 10%;
   font-style: normal;
   font-weight: normal;
-  font-size: 5vh;
+  font-size: 5vmin;
   line-height: 120%;
 }
 
@@ -53,11 +59,11 @@ body{
 }
 
 #register-buttons div{
-  min-height: 10vh;
+  min-height: 10vmin;
   height:auto;
   font-style: normal;
   font-weight: bold;
-  font-size: 3vh;
+  font-size: 3vmin;
   text-align: center;
   color: #FFFFFF;
   box-sizing: border-box;
@@ -94,16 +100,11 @@ body{
   color: #668EDB;
 }
 
-#content-padding{
-  width: 100%;
-  margin-bottom: 10%;
-}
 
 #about-bar{
-  position: fixed;
   width: 100%;
   min-height: 20%;
-  bottom: 0px;
+  bottom: 0;
   height: auto;
   background: #BED4FF;
 }
@@ -112,8 +113,8 @@ body{
   fill-opacity: 1;
   float: left;
   margin-right: 8%;
-  width:10vh;
-  height:10vh;
+  width:10vmin;
+  height:10vmin;
   padding-top: 2%;
   clear: both;
 }
@@ -138,14 +139,14 @@ body{
 .description-heading{
   font-style: normal;
   font-weight: bold;
-  font-size: 2vh;
+  font-size: 2vmin;
   overflow: hidden;
 }
 
 .description-body{
   font-style: normal;
   font-weight: normal;
-  font-size: 1.8vh;
+  font-size: 1.8vmin;
   overflow: hidden;
 }
 
@@ -158,15 +159,15 @@ body{
   display: flex;
   justify-content: center;
   align-content: center;
-  margin: 2vh 0;
+  margin: 2vmin 0;
 }
 
 #state-dropdown > select {
   background-color: #FFFFFF;
   border: 1px solid #C5C5C5;
   border-radius: 20px;
-  font-size: 2vh;
-  padding: 0.8vh 1vh;
+  font-size: 2vmin;
+  padding: 0.8vmin 1vmin;
   cursor: pointer;
   outline:none;
 }
@@ -188,7 +189,7 @@ body{
 }
 
 .election-quick-details p {
-  font-size: 2.5vh;
+  font-size: 2.5vmin;
 }
 
 .learn-more-button {
