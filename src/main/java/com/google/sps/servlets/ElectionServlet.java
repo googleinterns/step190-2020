@@ -36,10 +36,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 @WebServlet("/election")
+
+/**
+ * This servlet is used to update the gVote database with information on the ongoing elections that
+ * an eligible voter can participate in on a given day.
+ */
 public class ElectionServlet extends HttpServlet {
 
   private static final String baseURL = "https://www.googleapis.com/civicinfo/v2/elections?key=";
 
+  // TODO(anooshree): Change GET to PUT and store retrieved information in the database
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         StringBuilder strBuf = new StringBuilder();  
@@ -54,29 +60,29 @@ public class ElectionServlet extends HttpServlet {
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
             
+            // TODO(anooshree): Update this exception upon change from GET to PUT
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new RuntimeException("HTTP GET Request Failed with Error code : "
                               + conn.getResponseCode());
             }
             
-            // Read the content from the defined connection
             // Using IO Stream with Buffer for increased efficiency 
-	        reader = new BufferedReader(new InputStreamReader(conn.getInputStream(),"utf-8"));
+	    reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
             String output = null;  
 
             while ((output = reader.readLine()) != null) {
                 strBuf.append(output);
             }                 
-        } catch(MalformedURLException e) {
+        } catch (MalformedURLException e) {
             response.setContentType("text/html");
             response.getWriter().println("URL is incorrectly formatted");
             return;
-        } catch(IOException e) {  
+        } catch (IOException e) {  
             response.setContentType("text/html");
             response.getWriter().println("Cannot retrieve information from provided URL");
             return;     
         } finally {
-            if(reader != null) {
+           if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
@@ -85,7 +91,7 @@ public class ElectionServlet extends HttpServlet {
                     return;
                 }
             } 
-            if(conn != null) {
+           if (conn != null) {
                 conn.disconnect();
             }
         }
@@ -94,6 +100,8 @@ public class ElectionServlet extends HttpServlet {
         Gson gson = new Gson();
         String json = gson.toJson(elections);
 
+        // TODO(anooshree): Store information in database instead of 
+        //                  printing to /elections page
         response.setContentType("application/json;");
         response.getWriter().println(json);
     }
