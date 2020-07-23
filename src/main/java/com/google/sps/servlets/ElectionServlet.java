@@ -37,6 +37,19 @@ import java.net.URLEncoder;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.sps.data.Election;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 @WebServlet("/election")
 
@@ -49,11 +62,20 @@ public class ElectionServlet extends HttpServlet {
   private static final String baseURL = "https://www.googleapis.com/civicinfo/v2/elections?key=";
   private static final Logger logger = Logger.getLogger(ElectionServlet.class.getName());
 
-  // TODO(anooshree): Change GET to PUT and store retrieved information in the database
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        // Deleting the queries from yesterday in the case that they are outdated
+        Query query = new Query("Election");
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        PreparedQuery results = datastore.prepare(query);
+
+        for (Entity entity : results.asIterable()) {
+            Key electionEntityKey = KeyFactory.createKey("Election", entity.getKey().getId());
+            datastore.delete(electionEntityKey);
+        }
+
         StringBuilder strBuf = new StringBuilder();  
-        
         HttpURLConnection conn = null;
         BufferedReader reader = null;
 
@@ -62,12 +84,11 @@ public class ElectionServlet extends HttpServlet {
             URL url = new URL(baseURL + System.getenv("GOOGLE_API_KEY"));
             conn = (HttpURLConnection) url.openConnection();  
 
-            conn.setRequestMethod("GET");
+            conn.setRequestMethod("PUT");
             conn.setRequestProperty("Accept", "application/json");
             
-            // TODO(anooshree): Update this exception upon change from GET to PUT
             if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new RuntimeException("HTTP GET Request Failed with Error code : "
+                throw new RuntimeException("HTTP PUT Request Failed with Error code : "
                               + conn.getResponseCode());
             }
             
@@ -98,13 +119,55 @@ public class ElectionServlet extends HttpServlet {
                 conn.disconnect();
             }
         }
+        
+        String elections = strBuf.toString(); 
 
-        String elections = strBuf.toString();  
+        JSONObject obj = new JSONObject(elections);
+        JSONArray electionData = obj.getJSONArray("elections");
+        int numElections = electionData.length();
+
+        for (int i = 0; i < numElections; ++i) {
+            JSONObject currentElection = electionData.getJSONObject(i);
+            Entity electionEntity = new Entity("Election");
+
+            /* The "id" of an Election Entity is stored as a property instead of
+               replacing the Datastore-generated ID because  Datastore may 
+               accidentally reassign IDs to other entities. To avoid this problem, I would have 
+               to obtain a block of IDs with allocateIds(), but this is also difficult because
+               election IDs are not always consecutive numbers and other entities we plan to store
+               in Datastore will not have IDs from the Civic Information API (ex. policies) */
+
+            electionEntity.setProperty("id", currentElection.getLong("id"));
+            electionEntity.setProperty("name", currentElection.getString("name"));
+            electionEntity.setProperty("scope", currentElection.getString("ocdDivisionId"));
+            electionEntity.setProperty("date", currentElection.getString("electionDay"));
+
+            datastore.put(electionEntity);
+        }
+    }
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Query query = new Query("Election");
+
+        DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+        PreparedQuery results = datastore.prepare(query);
+
+        List<Election> elections = new ArrayList<Election>();
+
+        for (Entity entity : results.asIterable()) {
+            long id = (long) entity.getProperty("id");
+            String name = (String) entity.getProperty("name");
+            String scope = (String) entity.getProperty("scope");
+            String date = (String) entity.getProperty("date");
+
+            Election newElection = new Election(id, name, scope, date);
+            elections.add(newElection);
+        }
+        
         Gson gson = new Gson();
         String json = gson.toJson(elections);
 
-        // TODO(anooshree): Store information in database instead of 
-        //                  printing to /elections page
         response.setContentType("application/json;");
         response.getWriter().println(json);
     }

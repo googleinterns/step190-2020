@@ -19,25 +19,27 @@ import java.util.HashSet;
 /** A state or national election that will appear on voter ballots */
 public final class Election {
 
+  private final long id;
   private final String name;
   private final String scope;
-  private final HashSet<long> positions;
+  private final HashSet<Long> positions;
   private final String date;
-  private final HashSet<long> propositions;
+  private final HashSet<Long> propositions;
 
-  public Election(String name, String scope, String date) {
+  public Election(long id, String name, String scope, String date) {
+    this.id = id;
     this.name = name;
     this.scope = scope;
     this.date = date;
-    this.positions = new HashSet<long> ();
-    this.propositions = new HashSet<long> ();
+    this.positions = new HashSet<Long> ();
+    this.propositions = new HashSet<Long> ();
   }
 
-  public void addPosition(int positionID) {
-      this.positions.add(positionID);
+  public void addPosition(Long positionId) {
+      this.positions.add(positionId);
   }
 
-  public void addProposition(int propID) {
-      this.propositions.add(propID);
+  public void addProposition(Long propositionId) {
+      this.propositions.add(propositionId);
   }
 }
