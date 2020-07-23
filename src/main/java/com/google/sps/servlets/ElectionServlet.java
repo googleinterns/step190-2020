@@ -130,6 +130,13 @@ public class ElectionServlet extends HttpServlet {
             JSONObject currentElection = electionData.getJSONObject(i);
             Entity electionEntity = new Entity("Election");
 
+            /* The "id" of an Election Entity is stored as a property instead of
+               replacing the Datastore-generated ID because  Datastore may 
+               accidentally reassign IDs to other entities. To avoid this problem, I would have 
+               to obtain a block of IDs with allocateIds(), but this is also difficult because
+               election IDs are not always consecutive numbers and other entities we plan to store
+               in Datastore will not have IDs from the Civic Information API (ex. policies) */
+
             electionEntity.setProperty("id", currentElection.getLong("id"));
             electionEntity.setProperty("name", currentElection.getString("name"));
             electionEntity.setProperty("scope", currentElection.getString("ocdDivisionId"));
