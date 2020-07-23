@@ -67,7 +67,7 @@ public class ElectionServlet extends HttpServlet {
             }
             
             // Using IO Stream with Buffer for increased efficiency 
-	    reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
+	      reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
             String output = null;  
 
             while ((output = reader.readLine()) != null) {
@@ -82,7 +82,7 @@ public class ElectionServlet extends HttpServlet {
             response.getWriter().println("Cannot retrieve information from provided URL");
             return;     
         } finally {
-           if (reader != null) {
+            if (reader != null) {
                 try {
                     reader.close();
                 } catch (IOException e) {
@@ -91,7 +91,7 @@ public class ElectionServlet extends HttpServlet {
                     return;
                 }
             } 
-           if (conn != null) {
+            if (conn != null) {
                 conn.disconnect();
             }
         }
