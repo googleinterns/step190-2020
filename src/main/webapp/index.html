@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Cool Project Name</title>
+    <title>gVote</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans&display=swap" rel="stylesheet">
 
@@ -17,61 +17,85 @@
 
   </head>
   <body>
-    <div id="header-bar">
-      <p id="header-text">gVote</p>
-    </div>
+    <div id="page-wrapper">
+      <a href="index.html">
+        <div id="header-bar">
+          <p id="header-text">gVote</p>
+        </div>
+      </a>
 
-    <div class="container" id="content">
-      <div class="row" id="site-description">
-        <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
-          Hello! We’re gVote, and we want to help you learn <b>when and how to vote in the United States</b>. 
-          <br>
-          <br>
-          Before you continue: <b>are you registered to vote</b>?
-        </p> 
+      <div class="container" id="content">
+        <div class="row page-title-text">
+          <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
+            Hello! We’re gVote, and we want to help you learn <b>when and how to vote in the 
+            United States</b>. 
+            <br>
+            <br>
+            Before you continue: <b>are you registered to vote</b>?
+          </p> 
+        </div>
+        <div class="row" id="register-buttons">
+          <a href="https://turbovote.org/" target="_blank">
+            <div class="col-lg-3 col-lg-offset-2 col-md-3 col-md-offset-2 col-sm-3 col-sm-offset-2" 
+                 id="turbo-vote-button">
+              No, take me to TurboVote
+            </div>
+          </a>
+          <a href="electionlist.html">
+            <div class="col-lg-3 col-lg-offset-2 col-md-3 col-md-offset-2 col-sm-3 col-sm-offset-2" 
+                 id="show-elections-button">
+              Yes, show me my upcoming elections
+            </div>
+          </a>
+        </div> 
       </div>
-      <div class="row" id="register-buttons">
-        <a href="https://turbovote.org/">
-          <div class="col-lg-3 col-lg-offset-2 col-md-3 col-md-offset-2 col-sm-3 col-sm-offset-2" id="turbo-vote-button">No, take me to TurboVote</div>
-        </a>
-        <div class="col-lg-3 col-lg-offset-2 col-md-3 col-md-offset-2 col-sm-3 col-sm-offset-2" id="show-elections-button">Yes, show me my upcoming elections</div>
-      </div> 
+      
+      <div id="about-bar">
+        <div class="container" id="about-content">
+          <div class="row">
+            <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="find-elections-container">
+              <div class="image-wrapper">
+                <img src="icons/registerIcon.svg" class="icon" id="register-icon"/>
+              </div>
+              <div class="about-description">
+                <p class="description-heading">
+                  <b>Find Elections</b>
+                <p>
+                <p class="description-body">
+                  Find upcoming elections affecting your area by simply providing your address.
+                </p>
+              </div>  
+            </div>
+            <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="stay-informed-container">
+              <div class="image-wrapper">
+                <img src="icons/informIcon.svg" class="icon" id="register-icon"/>
+              </div>
+              <div class="about-description">
+                <p class="description-heading">
+                  <b>Stay Informed</b>
+                <p>
+                <p class="description-body">
+                  See what’s on the ballot for each election and get information and relevant links 
+                  for all positions, candidates, and propositions.
+                </p>
+              </div>  
+            </div>
+            <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="go-vote-container">
+              <div class="image-wrapper">
+                <img src="icons/mapIcon.svg" class="icon" id="register-icon"/>
+              </div>
+              <div class="about-description">
+                <p class="description-heading">
+                  <b>Go Vote</b>
+                <p>
+                <p class="description-body">Find polling places near your address along with mail-in 
+                  and in person voting deadlines for your area.
+                </p>
+              </div>  
+            </div>
+          </div>   
+        </div> 
+      </div>
     </div>
-    <div class="container-fluid" id="content-padding">
-      &nbsp;
-    </div>
-    <div id="about-bar">
-      <div class="container" id="about-content">
-        <div class="row">
-          <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="find-elections-container">
-            <div class="image-wrapper">
-              <img src="icons/registerIcon.svg" class="icon" id="register-icon"/>
-            </div>
-            <div class="about-description">
-              <p class="description-heading"><b>Find Elections</b><p>
-              <p class="description-body">Find upcoming elections affecting your area by simply providing your address.</p>
-            </div>  
-          </div>
-          <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="stay-informed-container">
-            <div class="image-wrapper">
-              <img src="icons/informIcon.svg" class="icon" id="register-icon"/>
-            </div>
-            <div class="about-description">
-              <p class="description-heading"><b>Stay Informed</b><p>
-              <p class="description-body">See what’s on the ballot for each election and get information and relevant links for all positions, candidates, and propositions.</p>
-            </div>  
-          </div>
-          <div class = "col-lg-4 col-md-4 col-sm-4 about-info-container" id="go-vote-container">
-            <div class="image-wrapper">
-              <img src="icons/mapIcon.svg" class="icon" id="register-icon"/>
-            </div>
-            <div class="about-description">
-              <p class="description-heading"><b>Go Vote</b><p>
-              <p class="description-body">Find polling places near your address along with mail-in and in person voting deadlines for your area.</p>
-            </div>  
-          </div>
-        </div>   
-      </div> 
-    </div>   
   </body>
 </html>

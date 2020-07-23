@@ -10,6 +10,11 @@ body{
   font-family: Nunito Sans;
 }
 
+#page-wrapper{
+  position: relative;
+  min-height: 100%;
+}
+
 #header-bar{
   position: fixed;
   width: 100%;
@@ -37,18 +42,16 @@ body{
 
 #content{
   width: 100%;
+  padding-bottom: 11%; 
 }
 
-
-#site-description p{
+.page-title-text p {
   height: 35%;
   margin-top: 10%;
   font-style: normal;
   font-weight: normal;
-  font-size: 5vh;
-  line-height: 100%;
-
-  color: #000000;
+  font-size: 5vmin;
+  line-height: 120%;
 }
 
 #register-buttons{
@@ -56,11 +59,11 @@ body{
 }
 
 #register-buttons div{
-  min-height: 10vh;
+  min-height: 10vmin;
   height:auto;
   font-style: normal;
   font-weight: bold;
-  font-size: 3vh;
+  font-size: 3vmin;
   text-align: center;
   color: #FFFFFF;
   box-sizing: border-box;
@@ -97,27 +100,21 @@ body{
   color: #668EDB;
 }
 
-#content-padding{
-  width: 100%;
-  margin-bottom: 100%;
-}
 
 #about-bar{
-  position: fixed;
   width: 100%;
   min-height: 20%;
-  bottom: 0px;
+  bottom: 0;
   height: auto;
   background: #BED4FF;
-  
 }
 
 .icon{
   fill-opacity: 1;
   float: left;
   margin-right: 8%;
-  width:10vh;
-  height:10vh;
+  width:10vmin;
+  height:10vmin;
   padding-top: 2%;
   clear: both;
 }
@@ -142,16 +139,73 @@ body{
 .description-heading{
   font-style: normal;
   font-weight: bold;
-  font-size: 2vh;
+  font-size: 2vmin;
   overflow: hidden;
 }
 
 .description-body{
   font-style: normal;
   font-weight: normal;
-  font-size: 1.8vh;
+  font-size: 1.8vmin;
   overflow: hidden;
 }
 
+#dropdown-title {
+  color: #668EDB;
+  font-weight: bold;
+}
 
+#state-dropdown {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  margin: 2vmin 0;
+}
 
+#state-dropdown > select {
+  background-color: #FFFFFF;
+  border: 1px solid #C5C5C5;
+  border-radius: 20px;
+  font-size: 2vmin;
+  padding: 0.8vmin 1vmin;
+  cursor: pointer;
+  outline:none;
+}
+
+#election-list-content {
+  margin: 2% 30%;
+}
+
+#election-list-content > h3 {
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 40px;
+}
+
+#election-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.election-quick-details p {
+  font-size: 2.5vmin;
+}
+
+.learn-more-button {
+  background: #FFFFFF;
+  border: 1px solid #668EDB;
+  border-radius: 10px;
+  color: #668EDB;
+  font-weight: bold;
+  padding: 10px;
+  display: flex;
+  height: 50%;
+}
+
+.learn-more-button:hover {
+  background: #668EDB;
+  border: 1px solid #668EDB;
+  color: #FFFFFF;
+  cursor: pointer;
+}
