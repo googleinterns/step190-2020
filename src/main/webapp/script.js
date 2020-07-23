@@ -1,9 +1,20 @@
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                'August', 'September', 'October', 'November', 'December'];
+const OCD_STATE_TITLE = 'state:';
+const OCD_DISTRICT_TITLE = 'district:';
+const STATE_CODE_LENGTH = 2;
+
+/**
+ * Fetch the list of upcoming elections and display relevant ones according
+ * to the state selected by the user.
+ */
 function listElections() {
-  let stateSelected = document.getElementById('select-state').value;
+  let selectedStateId = document.getElementById('select-state').value;
+  let selectedStateName = document.getElementById('select-state').innerHTML;
   let nationalElections = [];
   let stateElections = [];
 
-  if (stateSelected === null) {
+  if (selectedStateId === null) {
     return;
   }
 
@@ -12,22 +23,122 @@ function listElections() {
     .then((textResponse) => {
       let electionList = JSON.parse(textResponse).elections;
       electionList.forEach((election) => {
-        if (election.ocdDivisionId == stateSelected) {
-          // TODO: update ocdDivisionId to cater to state vs. national elections
-          stateElections.append(election);
+        console.log(election.ocdDivisionId);
+        let ocdId = election.ocdDivisionId;
+        let stateId = ocdId.indexOf(OCD_STATE_TITLE);
+        let districtId = ocdId.indexOf(OCD_DISTRICT_TITLE);
+
+        if (stateId !== -1) {
+          if (ocdId.substring(stateId, OCD_STATE_TITLE.length + STATE_CODE_LENGTH) 
+              == selectedStateId) {
+            stateElections.append(election);
+          }
+        } else if (districtId !== -1) {
+          if (ocdId.substring(districtId, OCD_DISTRICT_TITLE.length + STATE_CODE_LENGTH) 
+              == selectedStateId) {
+            stateElections.append(election);
+          }
+        } else {
+          nationalElections.append(election);
         }
       });
       
-      buildElectionListElements(stateElections);
+      const electionListContainerElement = document.getElementById('election-list-content');
+      
+      const electionsInStateHeadingElement = document.createElement('h3');
+      electionsInStateHeadingElement.innerHTML = 'Elections coming up in ' + selectedStateName;
+      electionListContainerElement.appendChild(electionsInStateHeadingElement);
+
+      if (stateElections.length == 0) {
+        buildElectionListElements(electionListContainerElement, stateElections);
+      } else {
+        buildEmptyListText(electionListContainerElement);
+      }
+
+      const electionsInNationHeadingElement = document.createElement('h3');
+      electionsInNationHeadingElement.innerHTML = 'Elections coming up in the United States';
+      electionListContainerElement.appendChild(electionsInNationHeadingElement);
+
+      if (nationalElections.length == 0) {
+        buildElectionListElements(electionListContainerElement, nationalElections);
+      } else {
+        buildEmptyListText(electionListContainerElement);
+      }
   });
 }
 
-function buildElectionListElements(elections) {
-  const electionListContainerElement = document.getElementById('election-list-content');
+/**
+ * 
+ * @param {*} containerElement 
+ * @param {*} elections 
+ */
+function buildElectionListElements(containerElement, elections) {
+  const electionListElement = document.createElement('ul');
+  electionListElement.className = 'list-group list-group-flush';
+  electionListElement.id = 'election-list';
 
-  const electionsInStateHeadingElement = document.createElement('h3');
-  electionsInStateHeadingElement.innerHTML = 'Elections coming up in Washington';
-  electionListContainerElement.appendChild(electionsInStateHeadingElement);
+  elections.forEach((election) => {
+    const electionItemElement = document.createElement('li');
+    electionItemElement.className = 'list-group-item';
+    electionItemElement.id = 'election-item';
 
-  const electionsInStateList
+    const electionDetailsElement = document.createElement('div');
+    electionDetailsElement.className = 'election-quick-details';
+
+    const electionNameElement = document.createElement('p');
+    electionNameElement.innerHTML = election.name;
+    electionDetailsElement.appendChild(electionNameElement);
+
+    const electionDateElement = document.createElement('p');
+    const electionDateEmphasisElement = document.createElement('em');
+    electionDateEmphasisElement.innerHTML = formatDate(election.date);
+    electionDateElement.appendChild(electionDateEmphasisElement);
+    electionDetailsElement.appendChild(electionDateElement);
+
+    electionItemElement.appendChild(electionDetailsElement);
+
+    const learnMoreButtonElement = document.createElement('div');
+    learnMoreButtonElement.className = 'learn-more-button';
+    learnMoreButtonElement.innerHTML = 'Learn more';
+
+    electionItemElement.appendChild(learnMoreButtonElement);
+
+    electionListElement.appendChild(electionItemElement);
+  });
+
+  containerElement.appendChild(electionListElement);
+}
+
+/**
+ * Build the text that 
+ * @param {*} containerElement 
+ */
+function buildEmptyListText(containerElement) {
+  const emptyTextElement = document.createElement('p');
+  const textEmphasisElement = document.createElement('em');
+  textEmphasisElement.innerHTML = 'No elections coming up soon.';
+  emptyTextElement.appendChild(textEmphasisElement);
+  containerElement.appendChild(emptyTextElement);
+}
+
+/**
+ * 
+ * @param {String} apiDate the date returned by the Google Civic Information
+ *                         API in the form YYYY-MM-DD.
+ * @return {String} the formatted date in the form Month DD, YYYY
+ */
+function formatDate(apiDate) {
+  let dateParts = apiDate.split('-');
+
+  if (dateParts.length !== 3) {
+    return 'Invalid date';
+  }
+
+  let monthNum = parseInt(dateParts[1]);
+
+  if (monthNum > MONTHS.length) {
+    return 'Invalid month';
+  }
+
+  return MONTHS[monthNum - 1] + ' ' + parseInt(dateParts[2]) + ', ' + dateParts[0];
 }
