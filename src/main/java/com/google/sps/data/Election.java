@@ -35,11 +35,11 @@ public final class Election {
     this.propositions = new HashSet<Long> ();
   }
 
-  public void addPosition(Long positionID) {
-      this.positions.add(positionID);
+  public void addPosition(Long positionId) {
+      this.positions.add(positionId);
   }
 
-  public void addProposition(Long propID) {
-      this.propositions.add(propID);
+  public void addProposition(Long propositionId) {
+      this.propositions.add(propositionId);
   }
 }
