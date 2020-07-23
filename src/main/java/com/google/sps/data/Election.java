@@ -16,7 +16,7 @@ package com.google.sps.data;
 
 import java.util.HashSet;
 
-/** An item on a todo list. */
+/** A state or national election that will appear on voter ballots */
 public final class Election {
 
   private final String name;
