@@ -21,6 +21,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -54,7 +55,8 @@ public class ElectionServlet extends HttpServlet {
         BufferedReader reader = null;
 
         try {  
-            URL url = new URL(baseURL + "AIzaSyBlNN_uUrbqY2uRaBpKTD-5Jbw6nk8n0_k");
+            // Requires storing API key in environment variable.
+            URL url = new URL(baseURL + System.getenv("GOOGLE_API_KEY"));
             conn = (HttpURLConnection) url.openConnection();  
 
             conn.setRequestMethod("GET");
