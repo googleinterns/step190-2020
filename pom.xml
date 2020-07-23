@@ -33,6 +33,11 @@
       <artifactId>appengine-api-1.0-sdk</artifactId>
       <version>1.9.59</version>
     </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20180130</version>
+    </dependency>
   </dependencies>
 
   <build>
