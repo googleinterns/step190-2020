@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.*;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,6 +47,7 @@ import com.google.gson.JsonSyntaxException;
 public class ElectionServlet extends HttpServlet {
 
   private static final String baseURL = "https://www.googleapis.com/civicinfo/v2/elections?key=";
+  private static final Logger logger = Logger.getLogger(ElectionServlet.class.getName());
 
   // TODO(anooshree): Change GET to PUT and store retrieved information in the database
   @Override
@@ -88,9 +91,7 @@ public class ElectionServlet extends HttpServlet {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    response.setContentType("text/html");
-                    response.getWriter().println("Could not read contents found at URL");
-                    return;
+                    logger.log(Level.WARNING, e.getMessage());
                 }
             } 
             if (conn != null) {
