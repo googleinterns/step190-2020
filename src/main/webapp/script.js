@@ -4,6 +4,8 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
 /**
  * Fetch the list of upcoming elections and display relevant ones according
  * to the state selected by the user.
+ * 
+ * TODO: Write tests to check that the expected election information shows up
  */
 function listElections() {
   let dropdownSelection = document.getElementById('select-state');
