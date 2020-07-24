@@ -24,8 +24,7 @@ function listElections() {
       let electionList = JSON.parse(textResponse).elections;
       // ocdDivisionId is in the form "ocd-division/country:us/state:<state_code>"
       // For example, Lousiana's ID is "ocd-division/country:us/state:la"
-      let stateRegex = /ocd\-division\/country\:us\/state\:([a-z][a-z])/;
-      let districtRegex = /ocd\-division\/country\:us\/district\:([a-z][a-z])/;
+      let regex = /ocd\-division\/country\:us\/(state|district)\:([a-z][a-z])/;
 
       // For every election returned, store it if the state matches or if national election,
       // to later display the details to the user.
@@ -34,8 +33,8 @@ function listElections() {
 
         // Match the OCD Division ID with the regular expressions to check if this election
         // is a state election, district election, or national election.
-        let stateMatch = stateRegex.exec(ocdId);
-        let districtMatch = districtRegex.exec(ocdId);
+        let stateMatch = regex.exec(ocdId);
+        let districtMatch = regex.exec(ocdId);
 
         if (stateMatch != null) {
           if (stateMatch[1] == selectedStateId) {
