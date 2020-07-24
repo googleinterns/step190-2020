@@ -183,7 +183,7 @@ body{
   margin-top: 40px;
 }
 
-#election-item {
+.election-item {
   display: flex;
   justify-content: space-between;
   align-items: center;

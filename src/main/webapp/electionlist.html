@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
 
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
@@ -87,6 +88,37 @@
         </div>
 
         <div class="container-fluid" id="election-list-content"></div>
+        <script id="election-list-template" type="text/x-handlebars-template">
+          <h3>Elections coming up in {{state}}</h3>
+          <ul class="list-group list-group-flush election-list">
+            {{#each stateElections}}
+            <li class="list-group-item election-item">
+              <div class="election-quick-details">
+                <p>{{this.name}}</p>
+                <p><em>{{formatDate this.electionDay}}</em></p>
+              </div>
+              <div class="learn-more-button">Learn more</div>
+            </li>
+            {{else}}
+            <p><em>No elections coming up soon.</em></p>
+            {{/each}}
+          </ul>
+          
+          <h3>Elections coming up in the United States</h3>
+          <ul class="list-group list-group-flush election-list">
+            {{#each nationalElections}}
+            <li class="list-group-item election-item">
+              <div class="election-quick-details">
+                <p>{{this.name}}</p>
+                <p><em>{{formatDate this.electionDay}}</em></p>
+              </div>
+              <div class="learn-more-button">Learn more</div>
+            </li>
+            {{else}}
+            <p><em>No elections coming up soon.</em></p>
+            {{/each}}
+          </ul>
+        </script>
       </div>
 
       <div id="about-bar">
