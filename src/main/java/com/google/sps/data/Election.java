@@ -31,15 +31,15 @@ public final class Election {
     this.name = name;
     this.scope = scope;
     this.date = date;
-    this.positions = new HashSet<Long> ();
-    this.propositions = new HashSet<Long> ();
+    this.positions = new HashSet<Long>();
+    this.propositions = new HashSet<Long>();
   }
 
   public void addPosition(Long positionId) {
-      this.positions.add(positionId);
+    this.positions.add(positionId);
   }
 
   public void addProposition(Long propositionId) {
-      this.propositions.add(propositionId);
+    this.propositions.add(propositionId);
   }
 }
