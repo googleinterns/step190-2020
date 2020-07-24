@@ -1,8 +1,5 @@
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
                 'August', 'September', 'October', 'November', 'December'];
-const OCD_STATE_TITLE = 'state:';
-const OCD_DISTRICT_TITLE = 'district:';
-const STATE_CODE_LENGTH = 2;
 
 /**
  * Fetch the list of upcoming elections and display relevant ones according
@@ -15,7 +12,7 @@ function listElections() {
   let nationalElections = [];
   let stateElections = [];
 
-  if (selectedStateId === undefined) {
+  if (selectedStateId === undefined || selectedStateName === undefined) {
     return;
   }
 
@@ -23,24 +20,27 @@ function listElections() {
     .then(response => response.json())
     .then((textResponse) => {
       let electionList = JSON.parse(textResponse).elections;
+      // ocdDivisionId is in the form "ocd-division/country:us/state:<state_code>"
+      // For example, Lousiana's ID is "ocd-division/country:us/state:la"
+      let stateRegex = /ocd\-division\/country\:us\/state\:[a-z][a-z]/;
+      let districtRegex = /ocd\-division\/country\:us\/district\:[a-z][a-z]/;
 
       // For every election returned, store it if the state matches or if national election,
       // to later display the details to the user.
       electionList.forEach((election) => {
         let ocdId = election.ocdDivisionId;
-        let stateId = ocdId.indexOf(OCD_STATE_TITLE);
-        let districtId = ocdId.indexOf(OCD_DISTRICT_TITLE);
 
-        // ocdDivisionId is in the form "ocd-division/country:us/state:<state_code>"
-        // For example, Lousiana's ID is "ocd-division/country:us/state:la"
-        if (stateId !== -1) {
-          if (ocdId.substring(stateId, stateId + OCD_STATE_TITLE.length + STATE_CODE_LENGTH)
-              == selectedStateId) {
+        // Match the OCD Division ID with the regular expressions to check if this election
+        // is a state election, district election, or national election.
+        let stateMatch = stateRegex.exec(ocdId);
+        let districtMatch = districtRegex.exec(ocdId);
+
+        if (stateMatch != null) {
+          if (ocdId.substr(ocdId.length - 2) == selectedStateId) {
             stateElections.push(election);
           }
-        } else if (districtId !== -1) {
-          if (ocdId.substring(districtId, districtId + OCD_DISTRICT_TITLE.length + STATE_CODE_LENGTH) 
-              == selectedStateId) {
+        } else if (districtMatch != null) {
+          if (ocdId.substr(ocdId.length - 2) == selectedStateId) {
             stateElections.push(election);
           }
         } else {
