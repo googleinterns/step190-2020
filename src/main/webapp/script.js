@@ -23,7 +23,7 @@ function listElections() {
     .then((electionList) => {
       // ocdDivisionId is in the form "ocd-division/country:us/state:<state_code>"
       // For example, Lousiana's ID is "ocd-division/country:us/state:la"
-      let regex = /ocd\-division\/country\:us\/(state|district)\:([a-z][a-z])/;
+      let regex = /ocd\-division\/country\:us(\/(state|district)\:([a-z][a-z]))?/;
 
       // For every election returned, store it if the state matches or if national election,
       // to later display the details to the user.
@@ -34,11 +34,9 @@ function listElections() {
         // is a state election, district election, or national election.
         let regexMatch = regex.exec(ocdId);
 
-        if (regexMatch != null) {
-          if (regexMatch[2] == selectedStateId) {
-            stateElections.push(election);
-          }
-        } else {
+        if (regexMatch != null && regexMatch[3] == selectedStateId) {
+          stateElections.push(election);
+        } else if (regexMatch != null && regexMatch[1] == undefined) {
           nationalElections.push(election);
         }
       });
