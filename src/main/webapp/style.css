@@ -8,6 +8,7 @@ html {
 body{
   width:100%;
   font-family: Nunito Sans;
+  font-size: 18px;
 }
 
 #page-wrapper{
@@ -173,7 +174,7 @@ body{
 }
 
 #election-list-content {
-  margin: 2% 30%;
+  margin: 2% 27%;
 }
 
 #election-list-content > h3 {
@@ -182,7 +183,7 @@ body{
   margin-top: 40px;
 }
 
-#election-item {
+.election-item {
   display: flex;
   justify-content: space-between;
   align-items: center;

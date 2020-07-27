@@ -62,3 +62,4 @@ public class ElectionServlet extends HttpServlet {
     response.getWriter().println(json);
   }
 }
+
