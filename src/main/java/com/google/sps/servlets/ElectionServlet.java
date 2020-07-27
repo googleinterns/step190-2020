@@ -56,12 +56,12 @@ public class ElectionServlet extends HttpServlet {
 
   // This method is used to access the api key stored in gcloud secret manager.
   public String getApiKey(String projectId, String secretId, String versionId) throws IOException {
-      // TODO(anooshree): Figure out how to control this difference via flag
+    // TODO(anooshree): Figure out how to control this difference via flag
 
-      // Running on a local server requires storing API key in environment variable.
-      // In this case, uncomment the following line, and comment out the remaining lines
-      // in this function. Do the reverse when deploying.
-      // return System.getenv("GOOGLE_API_KEY");
+    // Running on a local server requires storing API key in environment variable.
+    // In this case, uncomment the following line, and comment out the remaining lines
+    // in this function. Do the reverse when deploying.
+    // return System.getenv("GOOGLE_API_KEY");
 
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
       SecretVersionName secretVersionName = SecretVersionName.of(projectId, secretId, versionId);
