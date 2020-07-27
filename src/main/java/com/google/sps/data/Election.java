@@ -26,13 +26,13 @@ public final class Election {
   private final String date;
   private final HashSet<Long> propositions;
 
-  public Election(long id, String name, String scope, String date) {
-    this.id = id;
-    this.name = name;
-    this.scope = scope;
-    this.date = date;
-    this.positions = new HashSet<Long>();
-    this.propositions = new HashSet<Long>();
+  public Election(ElectionBuilder builder) {
+    this.id = builder.getID();
+    this.name = builder.getName();
+    this.scope = builder.getScope();
+    this.date = builder.getDate();
+    this.positions = builder.getPositions();
+    this.propositions = builder.getPropositions();
   }
 
   public void addPosition(Long positionId) {

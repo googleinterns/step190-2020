@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
 import com.google.sps.data.Election;
+import com.google.sps.data.ElectionBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/election")
 
 /**
- * This servlet is used to retrieve the information on the ongoing elections that
- * an eligible voter can participate in on a given day.
+ * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
+ * can participate in on a given day.
  */
 public class ElectionServlet extends HttpServlet {
   @Override
@@ -51,7 +52,8 @@ public class ElectionServlet extends HttpServlet {
       String scope = (String) entity.getProperty("scope");
       String date = (String) entity.getProperty("date");
 
-      Election newElection = new Election(id, name, scope, date);
+      Election newElection =
+          new ElectionBuilder().setID(id).setName(name).setScope(scope).setDate(date).build();
       elections.add(newElection);
     }
 
