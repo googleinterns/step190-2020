@@ -51,11 +51,18 @@ import org.json.JSONObject;
  */
 public class ElectionServlet extends HttpServlet {
 
-  private static final String baseURL = "https://www.googleapis.com/civicinfo/v2/elections?key=";
+  private static final String BASE_URL = "https://www.googleapis.com/civicinfo/v2/elections?key=";
   private static final Logger logger = Logger.getLogger(ElectionServlet.class.getName());
 
   // This method is used to access the api key stored in gcloud secret manager.
   public String getApiKey(String projectId, String secretId, String versionId) throws IOException {
+      // TODO(anooshree): Figure out how to control this difference via flag
+
+      // Running on a local server requires storing API key in environment variable.
+      // In this case, uncomment the following line, and comment out the remaining lines
+      // in this function. Do the reverse when deploying.
+      // return System.getenv("GOOGLE_API_KEY");
+
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
       SecretVersionName secretVersionName = SecretVersionName.of(projectId, secretId, versionId);
       AccessSecretVersionResponse response = client.accessSecretVersion(secretVersionName);
@@ -82,14 +89,8 @@ public class ElectionServlet extends HttpServlet {
     BufferedReader reader = null;
 
     try {
-      // TODO(anooshree): Figure out how to control this difference via flag
-      // Running on a local server requires storing API key in environment variable.
-      // In this case, uncomment the following line, and comment out the call to
-      // accessSecretVersion. Do the reverse when deploying.
-      // String electionApiKey = System.getenv("GOOGLE_API_KEY");
-
       String electionApiKey = getApiKey("112408856470", "election-api-key", "1");
-      URL url = new URL(baseURL + electionApiKey);
+      URL url = new URL(BASE_URL + electionApiKey);
       conn = (HttpURLConnection) url.openConnection();
 
       conn.setRequestMethod("GET");
@@ -151,12 +152,6 @@ public class ElectionServlet extends HttpServlet {
 
       datastore.put(electionEntity);
     }
-
-    Gson gson = new Gson();
-    String json = gson.toJson(elections);
-
-    response.setContentType("application/json");
-    response.getWriter().println(json);
   }
 
   @Override
