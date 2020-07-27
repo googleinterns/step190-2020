@@ -52,15 +52,11 @@ public class GetElectionServlet extends HttpServlet {
   private static final Logger logger = Logger.getLogger(ElectionServlet.class.getName());
 
   // This method is used to access the api key stored in gcloud secret manager.
-  public String accessSecretVersion(String projectId, String secretId, String versionId)
-      throws IOException {
+  public String getApiKey(String projectId, String secretId, String versionId) throws IOException {
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
       SecretVersionName secretVersionName = SecretVersionName.of(projectId, secretId, versionId);
-
-      // Access the secret version.
       AccessSecretVersionResponse response = client.accessSecretVersion(secretVersionName);
 
-      // Get the secret payload
       return response.getPayload().getData().toStringUtf8();
     }
   }
@@ -83,12 +79,13 @@ public class GetElectionServlet extends HttpServlet {
     BufferedReader reader = null;
 
     try {
+      // TODO(anooshree): Figure out how to control this difference via flag
       // Running on a local server requires storing API key in environment variable.
       // In this case, uncomment the following line, and comment out the call to
       // accessSecretVersion. Do the reverse when deploying.
       // String electionApiKey = System.getenv("GOOGLE_API_KEY");
 
-      String electionApiKey = accessSecretVersion("112408856470", "election-api-key", "1");
+      String electionApiKey = getApiKey("112408856470", "election-api-key", "1");
       URL url = new URL(baseURL + electionApiKey);
       conn = (HttpURLConnection) url.openConnection();
 
@@ -159,8 +156,8 @@ public class GetElectionServlet extends HttpServlet {
     response.getWriter().println(json);
   }
 
-  // As of now, I kept the doGet nested within a doPut call because I was unsure about whether
-  // a) the doGet method could have a return type that could be passed to the doPut and
+  // TODO(anooshree): Figure out if doGet should remain nested within doPut or
+  // a) if the doGet method could have a return type that could be passed to the doPut and
   // b) if the cron job should be calling a doGet when putting something in the Datastore.
   @Override
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
