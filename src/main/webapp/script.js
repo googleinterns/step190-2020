@@ -34,9 +34,17 @@ function listElections() {
         // is a state election, district election, or national election.
         let regexMatch = regex.exec(ocdId);
 
+<<<<<<< HEAD
         if (regexMatch != null && regexMatch[3] == selectedStateId) {
           stateElections.push(election);
         } else if (regexMatch != null && regexMatch[1] == undefined) {
+=======
+        if (regexMatch != null) {
+          if (regexMatch[2] == selectedStateId) {
+            stateElections.push(election);
+          }
+        } else {
+>>>>>>> d851a287c074c12639fc8466267e9ddb9cea08eb
           nationalElections.push(election);
         }
       });
