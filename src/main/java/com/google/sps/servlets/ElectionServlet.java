@@ -32,7 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/election")
 
 /**
- * This servlet is used to update the gVote database with information on the ongoing elections that
+ * This servlet is used to retrieve the information on the ongoing elections that
  * an eligible voter can participate in on a given day.
  */
 public class ElectionServlet extends HttpServlet {
