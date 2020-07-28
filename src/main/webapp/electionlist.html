@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
-  <body>
+  <body onload="onElectionListLoad();">
     <div id="page-wrapper">
       <a href="index.html">
         <div id="header-bar">
@@ -95,7 +95,7 @@
             <li class="list-group-item election-item">
               <div class="election-quick-details">
                 <p>{{this.name}}</p>
-                <p><em>{{formatDate this.electionDay}}</em></p>
+                <p><em>{{formatDate this.date}}</em></p>
               </div>
               <div class="learn-more-button">Learn more</div>
             </li>
@@ -110,7 +110,7 @@
             <li class="list-group-item election-item">
               <div class="election-quick-details">
                 <p>{{this.name}}</p>
-                <p><em>{{formatDate this.electionDay}}</em></p>
+                <p><em>{{formatDate this.date}}</em></p>
               </div>
               <div class="learn-more-button">Learn more</div>
             </li>
