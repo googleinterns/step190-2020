@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.support.ui.Select;
 
 // Note: Integration tests must conform to the following naming pattern:
@@ -20,11 +20,8 @@ public class ExampleIT {
 
   @Before
   public void setUp() {
-    System.setProperty("webdriver.chrome.driver", "resources/chromedriver");
-    driver = new ChromeDriver();
+    driver = new HtmlUnitDriver(true);
     driver.get("http://localhost:9876");
-    System.out.println(driver.getTitle());
-    Select states = new Select(driver.findElement(By.name("states")));
   }
 
   @Test
