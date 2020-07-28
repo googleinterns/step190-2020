@@ -16,9 +16,9 @@
     <script src="script.js"></script>
 
   </head>
-  <body>
+  <body onload="onWelcomePageLoad();">
     <div id="page-wrapper">
-      <a href="index.html">
+      <a href="index.html" id="home-link">
         <div id="header-bar">
           <p id="header-text">gVote</p>
         </div>
@@ -41,7 +41,7 @@
               No, take me to TurboVote
             </div>
           </a>
-          <a href="electionlist.html">
+          <a href="electionlist.html" id="elections-list-link">
             <div class="col-lg-3 col-lg-offset-2 col-md-3 col-md-offset-2 col-sm-3 col-sm-offset-2" 
                  id="show-elections-button">
               Yes, show me my upcoming elections
