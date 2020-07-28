@@ -1,6 +1,16 @@
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
                 'August', 'September', 'October', 'November', 'December'];
 
+
+function onElectionListLoad(){
+  let searchParams = new URLSearchParams(window.location.search);
+  let selectedState = searchParams.get("state");
+  if(selectedState != null){
+    document.getElementById('select-state').value = selectedState;
+    listElections();
+  }
+}
+
 /**
  * Fetch the list of upcoming elections and display relevant ones according
  * to the state selected by the user.
@@ -13,6 +23,9 @@ function listElections() {
   let selectedStateName = dropdownSelection.options[dropdownSelection.selectedIndex].text;
   let nationalElections = [];
   let stateElections = [];
+ 
+  // Registering state selection as a query parameter
+  addQueryParameter("state", selectedStateId);
 
   if (selectedStateId === undefined || selectedStateName === undefined) {
     return;
@@ -50,6 +63,41 @@ function listElections() {
       let electionListContainerElement = document.getElementById('election-list-content');
       electionListContainerElement.innerHTML = template(context);
   });
+  updateLinksWithQueryParams(document.links);
+}
+
+/**
+ * Update the current URL with a query parameter defined by the 
+ * provided key/value pair.
+ *
+ */
+function addQueryParameter(key, value){
+  let currentURL = new URL(window.location.href);
+  let searchParameters = currentURL.searchParams;
+  searchParameters.set(key, value);
+  currentURL.search = searchParameters.toString();
+  let newURL = currentURL.toString();
+  window.history.pushState({path: newURL},'',newURL);
+}
+
+
+/**
+ * Updates provided list of links on the page to have query parameters in the current URL
+ * 
+ */
+function updateLinksWithQueryParams(anchorsList){
+  let currentURL = new URL(window.location.href);
+  let searchParams = currentURL.searchParams;
+  for(let i = 0; i < anchorsList.length; i++){
+    let linkURL = new URL(anchorsList[i].href);
+    let linkSearchParams = linkURL.searchParams;
+    searchParams.forEach(function(value, key){
+      linkSearchParams.set(key, value);
+    });
+    linkURL.search = linkSearchParams.toString();
+    anchorsList[i].href = linkURL.toString();
+    console.log(linkURL.toString());
+  }
 }
 
 /**
