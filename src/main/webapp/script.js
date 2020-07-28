@@ -11,6 +11,11 @@ function onElectionListLoad(){
   }
 }
 
+function onWelcomePageLoad(){
+  let links = [document.getElementById("home-link"), document.getElementById("elections-list-link")];
+  updateLinksWithQueryParams(links);
+}
+
 /**
  * Fetch the list of upcoming elections and display relevant ones according
  * to the state selected by the user.
@@ -69,7 +74,9 @@ function listElections() {
 /**
  * Update the current URL with a query parameter defined by the 
  * provided key/value pair.
- *
+ * 
+ * @param {String} key of the query parameter
+ * @param {String} value of the query parameter
  */
 function addQueryParameter(key, value){
   let currentURL = new URL(window.location.href);
@@ -82,8 +89,9 @@ function addQueryParameter(key, value){
 
 
 /**
- * Updates provided list of links on the page to have query parameters in the current URL
+ * Updates provided list of links on the page to have query parameters in the current URL.
  * 
+ * @param {List} anchorsList list of links to apply changes to  
  */
 function updateLinksWithQueryParams(anchorsList){
   let currentURL = new URL(window.location.href);
@@ -96,13 +104,13 @@ function updateLinksWithQueryParams(anchorsList){
     });
     linkURL.search = linkSearchParams.toString();
     anchorsList[i].href = linkURL.toString();
-    console.log(linkURL.toString());
   }
 }
 
 /**
  * Change the format of the date returned by the Google Civic Information
  * API to be the standard date format (ex. 2020-08-16 ==> August 16, 2020).
+ *
  * @param {String} apiDate date in the form YYYY-MM-DD
  * @return {String} the formatted date in the form Month DD, YYYY
  */
