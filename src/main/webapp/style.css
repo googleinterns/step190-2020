@@ -8,11 +8,13 @@ html {
 body{
   width:100%;
   font-family: Nunito Sans;
+  font-size: 18px;
 }
 
 #page-wrapper{
-  position: relative;
-  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 #header-bar{
@@ -42,7 +44,8 @@ body{
 
 #content{
   width: 100%;
-  padding-bottom: 11%; 
+  flex: 1; 
+  padding-bottom: 5%;
 }
 
 .page-title-text p {
@@ -110,7 +113,6 @@ body{
 }
 
 .icon{
-  fill-opacity: 1;
   float: left;
   margin-right: 8%;
   width:10vmin;
@@ -173,7 +175,7 @@ body{
 }
 
 #election-list-content {
-  margin: 2% 30%;
+  margin: 2% 27%;
 }
 
 #election-list-content > h3 {
@@ -182,7 +184,7 @@ body{
   margin-top: 40px;
 }
 
-#election-item {
+.election-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
