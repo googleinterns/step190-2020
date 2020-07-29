@@ -57,7 +57,7 @@ public class InfoCardServlet extends HttpServlet {
 
     // find the corresponding election and check fields
     // TODO (anooshree): iterate through Datastore and find the election
-    //									 with the matching electionId
+    //                   with the matching electionId
     // if this election is already populated, we don't need to make another
     // query
 
@@ -134,7 +134,7 @@ public class InfoCardServlet extends HttpServlet {
     JSONObject obj = new JSONObject(results);
 
     // TODO(anooshree, caseyprice): process JSON objects from API to store as
-    //															Datastore entities using decomposed functions
+    //                              Datastore entities using decomposed functions
 
     /*JSONArray pollingLocationData = obj.getJSONArray("pollingLocations");
     processLocations(pollingLocationData, "polling");
@@ -149,7 +149,7 @@ public class InfoCardServlet extends HttpServlet {
     processCandidatesAndPropositions(contestData, electionId);*/
 
     // TODO(caseyprice): populate the election entity by mapping to the
-    // 									 candidates and propositions on the ballot
+    //                   candidates and propositions on the ballot
 
   }
 }
