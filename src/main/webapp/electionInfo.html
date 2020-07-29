@@ -9,18 +9,19 @@
 
     <!--Bootstrap Libraries-->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlNN_uUrbqY2uRaBpKTD-5Jbw6nk8n0_k&libraries=places&callback=initAutocomplete" async defer></script>
-    <script src="auto-complete.js"></script>  
-
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    <script src="auto-complete.js"></script>
+    <script type="text/javascript" defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBlNN_uUrbqY2uRaBpKTD-5Jbw6nk8n0_k&libraries=places&callback=initAutocomplete">
+    </script>
 
     </head>
-    <body onload="initialize()">
+    <body>
         <div id="page-wrapper">
         <a href="index.html">
             <div id="header-bar">
@@ -42,7 +43,9 @@
       <div class="container">
   <div class="panel panel-primary">
     <div class="panel-body">
-      <input id="autocomplete" placeholder="Enter your address" onFocus="geolocate()" type="text" class="form-control">
+        <div id="locationField">
+            <input id="autocomplete" placeholder="Enter your address" onFocus="geolocate()" type="text"/>
+        </div>
       <div id="address">
         <div class="row">
           <div class="col-md-6">

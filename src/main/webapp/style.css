@@ -211,3 +211,14 @@ body{
   color: #FFFFFF;
   cursor: pointer;
 }
+
+.panel-body {
+  min-height: 30vmin;
+  height:auto;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 3vmin;
+  text-align: center;
+  justify-content: center;
+  align-content: center;
+}
