@@ -3,20 +3,26 @@ package com.google.sps.integration;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 
 public class WelcomePageIT {
   private WebDriver driver;
   private final int WAIT_TIME = 30;
   private final int MAX_NUM_TABS = 2;
 
+  @BeforeClass
+  public static void setUp() {
+    System.setProperty("webdriver.chrome.driver", "resources/chromedriver");
+  }
+
   @Before
-  public void setUp() {
-    driver = new HtmlUnitDriver();
+  public void testSetUp() {
+    driver = new ChromeDriver();
   }
 
   /**
@@ -31,7 +37,7 @@ public class WelcomePageIT {
     assert driver.getWindowHandles().size() == 1;
 
     String currentWindow = driver.getWindowHandle();
-    WebElement turboVotesButton = driver.findElement(By.id("turbo-vote-link"));
+    WebElement turboVotesButton = driver.findElement(By.id("turbo-vote-button"));
     turboVotesButton.click();
 
     // Ensure a new tab is created.
@@ -57,7 +63,7 @@ public class WelcomePageIT {
     assert driver.getWindowHandles().size() == 1;
 
     String currentWindow = driver.getWindowHandle();
-    WebElement electionListButton = driver.findElement(By.id("elections-list-link"));
+    WebElement electionListButton = driver.findElement(By.id("show-elections-button"));
     electionListButton.click();
 
     Assert.assertEquals("http://localhost:9876/electionlist.html", driver.getCurrentUrl());

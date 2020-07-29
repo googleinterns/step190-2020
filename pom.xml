@@ -71,10 +71,10 @@
       <version>3.141.59</version>
     </dependency>
     <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>htmlunit-driver</artifactId>
-      <version>2.40.0</version>
-    </dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>29.0-jre</version>
+    </dependency>  
   </dependencies>
 
   <dependencyManagement>
