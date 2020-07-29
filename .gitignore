@@ -1,5 +1,9 @@
 target/
 
+# API keys
+src/main/webapp/config.js
+
+
 # IntelliJ specific project files
 .idea/
 portfolio.iml

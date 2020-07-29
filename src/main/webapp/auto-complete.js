@@ -1,3 +1,15 @@
+// you need to set up a config.js file for this to work, put
+// it in your .gitignore file so the API key isn't uploaded online
+var mapKey = config.PLACES_API_KEY;
+
+var script = document.createElement('script');
+script.type = 'text/javascript';
+script.src = 'https://maps.googleapis.com/maps/api/js?key='
+             + mapKey + '&libraries=places&callback=initAutocomplete';
+script.defer = true;
+
+document.head.appendChild(script);
+
 var placeSearch, autocomplete;
 
 var componentForm = {

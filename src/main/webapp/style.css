@@ -213,11 +213,11 @@ body{
 }
 
 .panel-body {
-  min-height: 30vmin;
+  min-height: 50vmin;
   height:auto;
   font-style: normal;
   font-weight: bold;
-  font-size: 3vmin;
+  font-size: 2vmin;
   text-align: center;
   justify-content: center;
   align-content: center;
