@@ -12,8 +12,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 public class WelcomePageIT {
   private WebDriver driver;
-  private final int WAIT_TIME = 30;
-  private final int MAX_NUM_TABS = 2;
+  private static final int WAIT_TIME = 30;
+  private static final int MAX_NUM_TABS = 2;
 
   @BeforeClass
   public static void setUp() {
@@ -30,20 +30,17 @@ public class WelcomePageIT {
    * TurboVotes page.
    */
   @Test
-  public void testTurboVotesButton() {
+  public void turboVotesButton_onClick_redirectsToTurboVotes() {
     driver.get("http://localhost:9876");
 
-    // Ensure only one window is open.
-    assert driver.getWindowHandles().size() == 1;
+    Assert.assertEquals(1, driver.getWindowHandles().size());
 
-    String currentWindow = driver.getWindowHandle();
     WebElement turboVotesButton = driver.findElement(By.id("turbo-vote-button"));
     turboVotesButton.click();
 
-    // Ensure a new tab is created.
     Assert.assertEquals(MAX_NUM_TABS, driver.getWindowHandles().size());
 
-    // Find new tab/window and switch to it.
+    String currentWindow = driver.getWindowHandle();
     for (String windowHandle : driver.getWindowHandles()) {
       if (!currentWindow.contentEquals(windowHandle)) {
         driver.switchTo().window(windowHandle);
@@ -56,13 +53,11 @@ public class WelcomePageIT {
 
   /** Testing if clicking "Show me my elections" button navigates to the elections list */
   @Test
-  public void testElectionListButton() {
+  public void electionListButton_onClick_navigatesToElectionListPage() {
     driver.get("http://localhost:9876");
 
-    // Ensure only one window is open.
-    assert driver.getWindowHandles().size() == 1;
+    Assert.assertEquals(1, driver.getWindowHandles().size());
 
-    String currentWindow = driver.getWindowHandle();
     WebElement electionListButton = driver.findElement(By.id("show-elections-button"));
     electionListButton.click();
 

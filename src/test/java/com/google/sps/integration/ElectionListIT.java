@@ -30,19 +30,17 @@ public class ElectionListIT {
    * state.
    */
   @Test
-  public void loggingStateSelection() {
+  public void stateSelection_onSelection_createAndUpdateStateQueryParameter() {
     driver.get("http://localhost:9876/electionlist.html");
     WebElement stateSelectElement = driver.findElement(By.id("select-state"));
     Select stateSelect = new Select(stateSelectElement);
 
-    // Checking if parameter is created correctly after first selection.
     String targetStateValue = "ca";
     stateSelect.selectByValue(targetStateValue);
     Assert.assertEquals(
         "http://localhost:9876/electionlist.html?state=" + targetStateValue,
         driver.getCurrentUrl());
 
-    // Ensuring value of "state" updates accordingly when changing selection.
     targetStateValue = "fl";
     stateSelect.selectByValue(targetStateValue);
     Assert.assertEquals(
