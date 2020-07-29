@@ -169,7 +169,8 @@ public class ElectionServlet extends HttpServlet {
       String scope = (String) entity.getProperty("scope");
       String date = (String) entity.getProperty("date");
 
-      Election newElection = new Election(id, name, scope, date);
+      Election newElection =
+          Election.builder().setID(id).setName(name).setScope(scope).setDate(date).build();
       elections.add(newElection);
     }
 
