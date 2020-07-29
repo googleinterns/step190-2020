@@ -57,7 +57,11 @@ public class InfoCardServlet extends HttpServlet {
 
     // find the corresponding election and check fields
     // TODO (anooshree): iterate through Datastore and find the election
+<<<<<<< HEAD
     //									 with the matching electionId
+=======
+    //                   with the matching electionId
+>>>>>>> 53c9fad8c2e0565c4b5683458013db43778662d2
     // if this election is already populated, we don't need to make another
     // query
 
@@ -85,10 +89,8 @@ public class InfoCardServlet extends HttpServlet {
       }
 
       URL url =
-          new URL(
-              String.format(
-                  "BASE_URL?address=%s&electionId=%s&key=%s",
-                  address, electionId, getApiKey("112408856470", "election-api-key", "1")));
+          new URL(String.format(BASE_URL, address, electionId,
+                  getApiKey("112408856470", "election-api-key", "1")));
       conn = (HttpURLConnection) url.openConnection();
 
       conn.setRequestMethod("GET");
@@ -131,7 +133,7 @@ public class InfoCardServlet extends HttpServlet {
     JSONObject obj = new JSONObject(results);
 
     // TODO(anooshree, caseyprice): process JSON objects from API to store as
-    //															Datastore entities using decomposed functions
+    //                              Datastore entities using decomposed functions
 
     /*JSONArray pollingLocationData = obj.getJSONArray("pollingLocations");
     processLocations(pollingLocationData, "polling");
@@ -146,7 +148,7 @@ public class InfoCardServlet extends HttpServlet {
     processCandidatesAndPropositions(contestData, electionId);*/
 
     // TODO(caseyprice): populate the election entity by mapping to the
-    // 									 candidates and propositions on the ballot
+    //                   candidates and propositions on the ballot
 
   }
 }
