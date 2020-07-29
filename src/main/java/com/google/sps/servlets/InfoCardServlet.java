@@ -85,7 +85,11 @@ public class InfoCardServlet extends HttpServlet {
       }
 
       URL url =
-          new URL(String.format(BASE_URL, address, electionId,
+          new URL(
+              String.format(
+                  BASE_URL,
+                  address,
+                  electionId,
                   getApiKey("112408856470", "election-api-key", "1")));
       conn = (HttpURLConnection) url.openConnection();
 
