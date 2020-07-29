@@ -24,8 +24,8 @@ public class WelcomePageIT {
   @Before
   public void testSetUp() {
     ChromeOptions options = new ChromeOptions();
-    options.addArguments("–no-sandbox");
-    options.addArguments("–disable-dev-shm-usage");
+    options.addArguments("--no-sandbox");
+    options.addArguments("--disable-dev-shm-usage");
     options.setExperimentalOption("useAutomationExtension", false);
     driver = new ChromeDriver(options);
   }
