@@ -26,7 +26,7 @@ public class WelcomePageIT {
     ChromeOptions options = new ChromeOptions();
     options.addArguments("--no-sandbox");
     options.addArguments("--disable-dev-shm-usage");
-    options.addArguments('--headless');
+    options.addArguments("--headless");
     options.setExperimentalOption("useAutomationExtension", false);
     driver = new ChromeDriver(options);
   }
