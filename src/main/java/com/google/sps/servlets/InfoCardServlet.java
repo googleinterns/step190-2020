@@ -57,11 +57,7 @@ public class InfoCardServlet extends HttpServlet {
 
     // find the corresponding election and check fields
     // TODO (anooshree): iterate through Datastore and find the election
-<<<<<<< HEAD
-    //									 with the matching electionId
-=======
     //                   with the matching electionId
->>>>>>> 53c9fad8c2e0565c4b5683458013db43778662d2
     // if this election is already populated, we don't need to make another
     // query
 
