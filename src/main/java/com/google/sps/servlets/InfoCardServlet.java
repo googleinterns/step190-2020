@@ -14,33 +14,21 @@
 
 package com.google.sps.servlets;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
-import com.google.gson.Gson;
-import com.google.sps.data.Election;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 @WebServlet("/info-cards")
@@ -67,11 +55,11 @@ public class InfoCardServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-		// find the corresponding election and check fields
-		// TODO (anooshree): iterate through Datastore and find the election
-		//									 with the matching electionId
-		// if this election is already populated, we don't need to make another
-		// query
+    // find the corresponding election and check fields
+    // TODO (anooshree): iterate through Datastore and find the election
+    //									 with the matching electionId
+    // if this election is already populated, we don't need to make another
+    // query
 
     StringBuilder strBuf = new StringBuilder();
     HttpURLConnection conn = null;
@@ -79,21 +67,31 @@ public class InfoCardServlet extends HttpServlet {
 
     try {
       String address = request.getParameter("address");
-	    if (address == null) { 
-				response.setContentType("text/html");
-      	response.getWriter().println("No address in the query URL, please check why this is the case.");
-      	return;
-			}
+      if (address == null) {
+        response.setContentType("text/html");
+        response
+            .getWriter()
+            .println("No address in the query URL, please check why this is the case.");
+        return;
+      }
 
-			String electionId = request.getParameter("electionId");
-			if (electionId == null) { 
-				response.setContentType("text/html");
-      	response.getWriter().println("No election ID in the query URL, please check why this is the case.");
-      	return;
-			}
+      String electionId = request.getParameter("electionId");
+      if (electionId == null) {
+        response.setContentType("text/html");
+        response
+            .getWriter()
+            .println("No election ID in the query URL, please check why this is the case.");
+        return;
+      }
 
-      URL url = new URL(String.format("BASE_URL?address=%s&electionId=%s&key=%s", address, electionID,
-                                      getApiKey("112408856470", "election-api-key", "1"))
+      URL url =
+          new URL(
+              String.format(
+                  "%s?address=%s&electionId=%s&key=%s",
+                  BASE_URL,
+                  address,
+                  electionId,
+                  getApiKey("112408856470", "election-api-key", "1")));
       conn = (HttpURLConnection) url.openConnection();
 
       conn.setRequestMethod("GET");
@@ -135,23 +133,23 @@ public class InfoCardServlet extends HttpServlet {
     String results = strBuf.toString();
     JSONObject obj = new JSONObject(results);
 
-		// TODO(anooshree, caseyprice): process JSON objects from API to store as
-		//															Datastore entities using decomposed functions
+    // TODO(anooshree, caseyprice): process JSON objects from API to store as
+    //															Datastore entities using decomposed functions
 
     /*JSONArray pollingLocationData = obj.getJSONArray("pollingLocations");
-		processLocations(pollingLocationData, "polling");
-		
-		JSONArray dropOffLocationData = obj.getJSONArray("dropOffLocations");
-		processLocations(dropOffLocationData, "dropOff");
+    processLocations(pollingLocationData, "polling");
 
-		JSONArray earlyVoteSiteData = obj.getJSONArray("earlyVoteSites");
-		processLocations(earlyVoteSiteData, "earlyVote");
+    JSONArray dropOffLocationData = obj.getJSONArray("dropOffLocations");
+    processLocations(dropOffLocationData, "dropOff");
 
-		JSONArray contestData = obj.getJSONArray("contests");
-		processCandidatesAndPropositions(contestData, electionId);*/
+    JSONArray earlyVoteSiteData = obj.getJSONArray("earlyVoteSites");
+    processLocations(earlyVoteSiteData, "earlyVote");
 
-		// TODO(caseyprice): populate the election entity by mapping to the 
-		// 									 candidates and propositions on the ballot
+    JSONArray contestData = obj.getJSONArray("contests");
+    processCandidatesAndPropositions(contestData, electionId);*/
+
+    // TODO(caseyprice): populate the election entity by mapping to the
+    // 									 candidates and propositions on the ballot
 
   }
 }
