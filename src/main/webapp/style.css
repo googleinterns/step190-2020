@@ -212,13 +212,19 @@ body{
   cursor: pointer;
 }
 
-.panel-body {
-  min-height: 50vmin;
-  height:auto;
+#address {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-style: normal;
-  font-weight: bold;
+  font-weight: normal;
   font-size: 2vmin;
+  height:auto;
   text-align: center;
-  justify-content: center;
   align-content: center;
+  flex-direction: column;
+}
+
+.election-name {
+  color: black;
 }

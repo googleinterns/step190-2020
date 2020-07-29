@@ -55,7 +55,7 @@ public class ElectionServlet extends HttpServlet {
   private static final Logger logger = Logger.getLogger(ElectionServlet.class.getName());
 
   // This method is used to access the api key stored in gcloud secret manager.
-  public String getApiKey(String projectId, String secretId, String versionId) throws IOException 
+  public String getApiKey(String projectId, String secretId, String versionId) throws IOException {
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
       SecretVersionName secretVersionName = SecretVersionName.of(projectId, secretId, versionId);
       AccessSecretVersionResponse response = client.accessSecretVersion(secretVersionName);
