@@ -1,4 +1,6 @@
 target/
+config.js
+.DS_Store
 
 # IntelliJ specific project files
 .idea/

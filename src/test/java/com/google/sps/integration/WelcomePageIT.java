@@ -1,10 +1,6 @@
 package com.google.sps.integration;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -15,10 +11,7 @@ public class WelcomePageIT {
   private static final int WAIT_TIME = 30;
   private static final int MAX_NUM_TABS = 2;
 
-  @BeforeClass
-  public static void setUp() {
-    System.setProperty("webdriver.chrome.driver", "resources/chromedriver");
-  }
+  @ClassRule public static ChromeDriverPropertySetup chromeDriverPropertySetup = new ChromeDriverPropertySetup();
 
   @Before
   public void testSetUp() {
