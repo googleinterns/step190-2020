@@ -8,7 +8,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class WelcomePageIT {
   private WebDriver driver;
@@ -27,12 +26,13 @@ public class WelcomePageIT {
   @Test
   public void testTurboVotesButton() {
     driver.get("http://localhost:9876");
+
+    // Ensure only one window is open.
     assert driver.getWindowHandles().size() == 1;
 
     String currentWindow = driver.getWindowHandle();
     WebElement turboVotesButton = driver.findElement(By.id("turbo-vote-link"));
     turboVotesButton.click();
-    new WebDriverWait(driver, WAIT_TIME);
 
     // Ensure a new tab is created.
     Assert.assertEquals(MAX_NUM_TABS, driver.getWindowHandles().size());
@@ -46,6 +46,21 @@ public class WelcomePageIT {
     }
 
     Assert.assertEquals("TurboVote", driver.getTitle());
+  }
+
+  /** Testing if clicking "Show me my elections" button navigates to the elections list */
+  @Test
+  public void testElectionListButton() {
+    driver.get("http://localhost:9876");
+
+    // Ensure only one window is open.
+    assert driver.getWindowHandles().size() == 1;
+
+    String currentWindow = driver.getWindowHandle();
+    WebElement electionListButton = driver.findElement(By.id("elections-list-link"));
+    electionListButton.click();
+
+    Assert.assertEquals("http://localhost:9876/electionlist.html", driver.getCurrentUrl());
   }
 
   @After
