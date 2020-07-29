@@ -13,7 +13,8 @@ public class ExampleIT {
 
   @Test
   public void testEndToEnd() throws Exception {
-    // We should probably pass in the port number into the test, but IMO it's more trouble than it's worth right now.
+    // We should probably pass in the port number into the test, but IMO it's more trouble than it's
+    // worth right now.
     URL url = new URL("http://localhost:9876");
     StringBuilder response = new StringBuilder();
     try (BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()))) {

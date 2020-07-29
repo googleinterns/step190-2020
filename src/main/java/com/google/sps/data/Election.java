@@ -14,32 +14,42 @@
 
 package com.google.sps.data;
 
+import com.google.auto.value.AutoValue;
 import java.util.HashSet;
 
 /** A state or national election that will appear on voter ballots */
-public final class Election {
+@AutoValue
+public abstract class Election {
+  public abstract long getID();
 
-  private final long id;
-  private final String name;
-  private final String scope;
-  private final HashSet<Long> positions;
-  private final String date;
-  private final HashSet<Long> propositions;
+  public abstract String getName();
 
-  public Election(ElectionBuilder builder) {
-    this.id = builder.getID();
-    this.name = builder.getName();
-    this.scope = builder.getScope();
-    this.date = builder.getDate();
-    this.positions = builder.getPositions();
-    this.propositions = builder.getPropositions();
+  public abstract String getScope();
+
+  public abstract HashSet<Long> getPositions();
+
+  public abstract String getDate();
+
+  public abstract HashSet<Long> getPropositions();
+
+  public static Builder builder() {
+    return new AutoValue_Election.Builder();
   }
 
-  public void addPosition(Long positionId) {
-    this.positions.add(positionId);
-  }
+  @AutoValue.Builder
+  public abstract static class Builder {
+    public abstract Builder setID(long id);
 
-  public void addProposition(Long propositionId) {
-    this.propositions.add(propositionId);
+    public abstract Builder setName(String name);
+
+    public abstract Builder setScope(String scope);
+
+    public abstract Builder setPositions(HashSet<Long> positions);
+
+    public abstract Builder setDate(String date);
+
+    public abstract Builder setPropositions(HashSet<Long> propositions);
+
+    public abstract Election build();
   }
 }

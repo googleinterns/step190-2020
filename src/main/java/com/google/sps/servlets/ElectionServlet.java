@@ -26,7 +26,6 @@ import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
 import com.google.gson.Gson;
 import com.google.sps.data.Election;
-import com.google.sps.data.ElectionBuilder;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -171,7 +170,7 @@ public class ElectionServlet extends HttpServlet {
       String date = (String) entity.getProperty("date");
 
       Election newElection =
-          new ElectionBuilder().setID(id).setName(name).setScope(scope).setDate(date).build();
+          Election.builder().setID(id).setName(name).setScope(scope).setDate(date).build();
       elections.add(newElection);
     }
 
