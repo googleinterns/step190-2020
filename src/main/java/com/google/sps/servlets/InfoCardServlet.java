@@ -52,17 +52,10 @@ import org.json.JSONObject;
 public class InfoCardServlet extends HttpServlet {
 
   private static final String BASE_URL = "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?";
-  private static final Logger logger = Logger.getLogger(ElectionServlet.class.getName());
+  private static final Logger logger = Logger.getLogger(InfoCardServlet.class.getName());
 
   // This method is used to access the api key stored in gcloud secret manager.
   public String getApiKey(String projectId, String secretId, String versionId) throws IOException {
-    // TODO(anooshree): Figure out how to control this difference via flag
-
-    // Running on a local server requires storing API key in environment variable.
-    // In this case, uncomment the following line, and comment out the remaining lines
-    // in this function. Do the reverse when deploying.
-    // return System.getenv("GOOGLE_API_KEY");
-
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
       SecretVersionName secretVersionName = SecretVersionName.of(projectId, secretId, versionId);
       AccessSecretVersionResponse response = client.accessSecretVersion(secretVersionName);
@@ -80,15 +73,13 @@ public class InfoCardServlet extends HttpServlet {
 		// if this election is already populated, we don't need to make another
 		// query
 
-		// fetchElection(electionId)
-
     StringBuilder strBuf = new StringBuilder();
     HttpURLConnection conn = null;
     BufferedReader reader = null;
 
     try {
       String address = request.getParameter("address");
-			if (address == null) { 
+	    if (address == null) { 
 				response.setContentType("text/html");
       	response.getWriter().println("No address in the query URL, please check why this is the case.");
       	return;
@@ -101,9 +92,8 @@ public class InfoCardServlet extends HttpServlet {
       	return;
 			}
 
-      URL url = new URL(BASE_URL + "address=" + address + "&electionId=" + electionId + "&key=" + 
-												getApiKey("112408856470", "election-api-key", "1"));
-
+      URL url = new URL(String.format("BASE_URL?address=%s&electionId=%s&key=%s", address, electionID,
+                                      getApiKey("112408856470", "election-api-key", "1"))
       conn = (HttpURLConnection) url.openConnection();
 
       conn.setRequestMethod("GET");
@@ -144,6 +134,9 @@ public class InfoCardServlet extends HttpServlet {
 
     String results = strBuf.toString();
     JSONObject obj = new JSONObject(results);
+
+		// TODO(anooshree, caseyprice): process JSON objects from API to store as
+		//															Datastore entities using decomposed functions
 
     /*JSONArray pollingLocationData = obj.getJSONArray("pollingLocations");
 		processLocations(pollingLocationData, "polling");
