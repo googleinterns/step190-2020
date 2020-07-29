@@ -10,7 +10,9 @@ import org.openqa.selenium.support.ui.Select;
 public class ElectionListIT {
   private WebDriver driver;
 
-  @ClassRule public static ChromeDriverPropertySetup chromeDriverPropertySetup = new ChromeDriverPropertySetup();
+  @ClassRule
+  public static ChromeDriverPropertySetup chromeDriverPropertySetup =
+      new ChromeDriverPropertySetup();
 
   @Before
   public void testSetUp() {

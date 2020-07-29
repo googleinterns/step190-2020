@@ -11,7 +11,9 @@ public class WelcomePageIT {
   private static final int WAIT_TIME = 30;
   private static final int MAX_NUM_TABS = 2;
 
-  @ClassRule public static ChromeDriverPropertySetup chromeDriverPropertySetup = new ChromeDriverPropertySetup();
+  @ClassRule
+  public static ChromeDriverPropertySetup chromeDriverPropertySetup =
+      new ChromeDriverPropertySetup();
 
   @Before
   public void testSetUp() {

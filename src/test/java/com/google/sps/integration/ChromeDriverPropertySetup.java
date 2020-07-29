@@ -4,7 +4,10 @@ import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
-/** Sets the "webdriver.chrome.driver" property to use the correct chromedriver binary depending on the os. */
+/**
+ * Sets the "webdriver.chrome.driver" property to use the correct chromedriver binary depending on
+ * the os.
+ */
 public class ChromeDriverPropertySetup implements TestRule {
   @Override
   public Statement apply(Statement statement, Description description) {
