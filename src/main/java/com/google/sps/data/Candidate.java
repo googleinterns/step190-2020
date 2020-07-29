@@ -15,25 +15,22 @@
 package com.google.sps.data;
 
 import com.google.auto.value.AutoValue;
-import java.util.HashSet;
 
-/** A state or national election that will appear on voter ballots */
+/** A candidate for a public office position that will appear on voter ballots */
 @AutoValue
-public abstract class Election {
+public abstract class Candidate {
   public abstract long getID();
 
   public abstract String getName();
 
-  public abstract String getScope();
+  public abstract String getPartyAffiliation();
 
-  public abstract HashSet<Long> getPositions();
+  public abstract String getCampaignSite();
 
-  public abstract String getDate();
-
-  public abstract HashSet<Long> getPropositions();
+  public abstract String getPlatformDescription();
 
   public static Builder builder() {
-    return new AutoValue_Election.Builder();
+    return new AutoValue_Candidate.Builder();
   }
 
   @AutoValue.Builder
@@ -42,14 +39,12 @@ public abstract class Election {
 
     public abstract Builder setName(String name);
 
-    public abstract Builder setScope(String scope);
+    public abstract Builder setPartyAffiliation(String partyAffiliation);
 
-    public abstract Builder setPositions(HashSet<Long> positions);
+    public abstract Builder setCampaignSite(String campaignSite);
 
-    public abstract Builder setDate(String date);
+    public abstract Builder setPlatformDescription(String platformDescription);
 
-    public abstract Builder setPropositions(HashSet<Long> propositions);
-
-    public abstract Election build();
+    public abstract Candidate build();
   }
 }

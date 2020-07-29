@@ -15,25 +15,21 @@
 package com.google.sps.data;
 
 import com.google.auto.value.AutoValue;
-import java.util.HashSet;
+import java.util.HashMap;
 
-/** A state or national election that will appear on voter ballots */
+/** A polling station open for voters to vote or drop ballots off at */
 @AutoValue
-public abstract class Election {
+public abstract class PollingStation {
   public abstract long getID();
 
   public abstract String getName();
 
-  public abstract String getScope();
+  public abstract String getAddress();
 
-  public abstract HashSet<Long> getPositions();
-
-  public abstract String getDate();
-
-  public abstract HashSet<Long> getPropositions();
+  public abstract HashMap<Long, Election> getElections();
 
   public static Builder builder() {
-    return new AutoValue_Election.Builder();
+    return new AutoValue_PollingStation.Builder();
   }
 
   @AutoValue.Builder
@@ -42,14 +38,10 @@ public abstract class Election {
 
     public abstract Builder setName(String name);
 
-    public abstract Builder setScope(String scope);
+    public abstract Builder setAddress(String scope);
 
-    public abstract Builder setPositions(HashSet<Long> positions);
+    public abstract Builder setElections(HashMap<Long, Election> elections);
 
-    public abstract Builder setDate(String date);
-
-    public abstract Builder setPropositions(HashSet<Long> propositions);
-
-    public abstract Election build();
+    public abstract PollingStation build();
   }
 }
