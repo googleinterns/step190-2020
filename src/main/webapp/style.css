@@ -211,3 +211,20 @@ body{
   color: #FFFFFF;
   cursor: pointer;
 }
+
+#address {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 2vmin;
+  height:auto;
+  text-align: center;
+  align-content: center;
+  flex-direction: column;
+}
+
+.election-name {
+  color: black;
+}

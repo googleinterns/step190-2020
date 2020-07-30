@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>gVote</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!--Bootstrap Libraries-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+
+	  <script type='text/javascript' src='config.js'></script>
+	  <link rel="stylesheet" href="style.css">
+    <script src="auto-complete.js"></script>
+
+    </head>
+
+    <body>
+      <div id="page-wrapper">
+        <a href="index.html">
+            <div id="header-bar">
+              <p id="header-text">gVote</p>
+            </div>
+        </a>
+
+        <div class="container" id="content">
+          <div class="row page-title-text" id="dropdown-title">
+            <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
+              <b>To show you polling locations, candidates, and ballot items from
+                  <span class="election-name"> [CHOSEN ELECTION NAME HERE]</span>, 
+                  we'll need your registered voter address: 
+              </b>
+            </p> 
+          </div>
+        </div>
+
+				<div class="container">
+					<div class="panel panel-primary">
+						<div class="panel-body">
+
+							<div id="locationField">
+									<input id="autocomplete" placeholder="Enter your address" onFocus="geolocate()" type="text"/>
+							</div>
+
+							<div id="address">
+								<div class="row">
+									<div class="col-md-6">
+										<label class="control-label">Street Number</label>
+										<input class="form-control" id="street_number" disabled="true">
+									</div>
+									<div class="col-md-6">
+										<label class="control-label">Street Name</label>
+										<input class="form-control" id="route" disabled="true">
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-6">
+										<label class="control-label">City</label>
+										<input class="form-control field" id="locality" disabled="true">
+									</div>
+									<div class="col-md-6"> 
+										<label class="control-label">State</label>
+										<input class="form-control" id="administrative_area_level_1" disabled="true">
+									</div>
+								</div>
+
+								<div class="row">
+									<div class="col-md-6">
+										<label class="control-label">Zip code</label>
+										<input class="form-control" id="postal_code" disabled="true">
+									</div>
+									<div class="col-md-6">
+										<label class="control-label">Country</label>
+										<input class="form-control" id="country" disabled="true">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</body>
+</html>

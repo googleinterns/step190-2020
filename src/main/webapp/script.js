@@ -87,7 +87,6 @@ function addQueryParameter(key, value){
   window.history.pushState({path: newURL},'',newURL);
 }
 
-
 /**
  * Updates provided list of links on the page to have query parameters in the current URL.
  * 
@@ -133,3 +132,5 @@ Handlebars.registerHelper("formatDate", function(apiDate) {
 
   return MONTHS[monthNum - 1] + ' ' + parseInt(dateParts[2]) + ', ' + dateParts[0];
 });
+
+
