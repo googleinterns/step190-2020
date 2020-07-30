@@ -14,6 +14,7 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
@@ -25,7 +26,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 public class ServletHelper {
@@ -43,8 +43,7 @@ public class ServletHelper {
     }
   }
 
-  public static JSONObject readFromApiUrl(URL url, HttpServletResponse response)
-      throws IOException {
+  public static JSONObject readFromApiUrl(URL url) throws IOException {
     StringBuilder strBuf = new StringBuilder();
     HttpURLConnection conn = null;
     BufferedReader reader = null;
@@ -89,5 +88,24 @@ public class ServletHelper {
     JSONObject obj = new JSONObject(results);
 
     return obj;
+  }
+
+  /**
+   * Find an Election Entity in the Datastore based off its electionId property.
+   * @param datastore the Datastore containing all election data
+   * @param electionId the ID of the election being queried
+   * @return the Election Entity if found, null otherwise
+   */
+  public static Entity findElectionInDatastore(DatastoreService datastore, String electionId) {
+    Query query = new Query("Election");
+    PreparedQuery results = datastore.prepare(query);
+
+    for (Entity entity : results.asIterable()) {
+      if (entity.getProperty("id") == electionId) {
+        return entity;
+      }
+    }
+
+    return null;
   }
 }

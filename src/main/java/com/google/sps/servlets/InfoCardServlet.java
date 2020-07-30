@@ -17,8 +17,6 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -39,14 +37,28 @@ public class InfoCardServlet extends HttpServlet {
 
   private static final String BASE_URL = "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo";
 
+  /**
+   * Makes an API call to voterInfoQuery in the Google Civic Information API and puts Position and
+   * Candidate Entities in Datastore from the response. Finds the chosen Election Entity in the
+   * Datastore and fills is properties with the corresponding API response data.
+   *
+   * TODO: Get Proposition data and add it as a field to the Election Entity.
+   *
+   * @param request the HTTP request containing user address and electionId as parameters
+   * @param response the HTTP response, contains error message if an error occurs
+   */
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     // find the corresponding election and check fields
     // TODO (anooshree): iterate through Datastore and find the election
     //                   with the matching electionId
     // if this election is already populated, we don't need to make another query
 
+    // Read in the user-chosen address and election ID, to be used as parameters to the
+    // voterInfoQuery.
+    // If these parameters aren't found, API call can't be performed so return early with error
+    // message.
     String address = request.getParameter("address");
     if (address == null) {
       response.setContentType("text/html");
@@ -76,27 +88,33 @@ public class InfoCardServlet extends HttpServlet {
                 electionId,
                 ServletHelper.getApiKey("112408856470", "election-api-key", "1")));
 
-    // TODO(anooshree, caseyprice): process JSON objects from API to store as
-    //                              Datastore entities using decomposed functions
-    // TODO(caseyprice): populate the election entity by mapping to the
-    //                   candidates and propositions on the ballot
+    JSONObject electionListFromApi = ServletHelper.readFromApiUrl(url);
+
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query = new Query("Election");
-    PreparedQuery results = datastore.prepare(query);
+    Entity chosenElection =
+        ServletHelper.findElectionInDatastore(datastore, electionListFromApi, electionId);
 
-    JSONObject obj = ServletHelper.readFromApiUrl(url, response);
-
-    for (Entity entity : results.asIterable()) {
-      if (entity.getProperty("id") == electionId) {
-        entity.setProperty("positions", fillPositions(datastore, obj.getJSONArray("contests")));
-        break;
-      }
+    if (chosenElection == null) {
+      response.setContentType("text/html");
+      response
+          .getWriter()
+          .println(String.format("Could not find election with ID %s in Datastore.", electionId));
+      response.setStatus(400);
+      return;
     }
+
+    JSONArray positionListFromApi = electionListFromApi.getJSONArray("contests");
+    chosenElection.setProperty("positions", fillPositions(datastore, positionListFromApi));
   }
 
-  /** */
+  /**
+   * Puts candidate Position Entities in the Datastore.
+   * @param datastore the Datastore containing all election data
+   * @param positionData API-returned list of positions on the election ballot
+   * @return list of Key names of all Position Entities added
+   */
   private List<String> fillPositions(DatastoreService datastore, JSONArray positionData) {
-    List<String> positionIdList = new ArrayList<String>();
+    List<String> positionKeyList = new ArrayList<String>();
     for (Object positionObject : positionData) {
       JSONObject position = (JSONObject) positionObject;
 
@@ -106,16 +124,20 @@ public class InfoCardServlet extends HttpServlet {
           "candidates", fillCandidates(datastore, position.getJSONArray("candidates")));
       datastore.put(positionEntity);
 
-      positionIdList.add(positionEntity.getKey().getName());
+      positionKeyList.add(positionEntity.getKey().getName());
     }
 
-    return positionIdList;
+    return positionKeyList;
   }
 
+  /**
+   * Puts Candidate Entities in the Datastore.
+   * @param datastore the Datastore containing all election data
+   * @param candidateData API-returned list of candidates for a position on the election ballot
+   * @return list of Key names of all Candidate Entities added
+   */
   private List<String> fillCandidates(DatastoreService datastore, JSONArray candidateData) {
-    // Candidates for this Position are also Entities in Datastore; save their
-    // ID's in a list for this Position to reference.
-    List<String> candidateIdList = new ArrayList<String>();
+    List<String> candidateKeyList = new ArrayList<String>();
     for (Object candidateObject : candidateData) {
       JSONObject candidate = (JSONObject) candidateObject;
 
@@ -124,9 +146,9 @@ public class InfoCardServlet extends HttpServlet {
       candidateEntity.setProperty("partyAffiliation", candidate.getString("party"));
       datastore.put(candidateEntity);
 
-      candidateIdList.add(candidateEntity.getKey().getName());
+      candidateKeyList.add(candidateEntity.getKey().getName());
     }
 
-    return candidateIdList;
+    return candidateKeyList;
   }
 }
