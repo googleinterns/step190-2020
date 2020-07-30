@@ -26,6 +26,7 @@ import com.google.sps.data.Election;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -98,7 +99,14 @@ public class ElectionServlet extends HttpServlet {
       String date = (String) entity.getProperty("date");
 
       Election newElection =
-          Election.builder().setID(id).setName(name).setScope(scope).setDate(date).build();
+          Election.builder()
+              .setID(id)
+              .setName(name)
+              .setScope(scope)
+              .setDate(date)
+              .setPositions(new HashSet<Long>())
+              .setPropositions(new HashSet<Long>())
+              .build();
       elections.add(newElection);
     }
 
