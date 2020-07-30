@@ -213,8 +213,9 @@ body{
 }
 
 #address {
+  margin: auto;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   font-style: normal;
   font-weight: normal;
@@ -225,6 +226,59 @@ body{
   flex-direction: column;
 }
 
+.row {
+  margin-bottom: 4.5%;
+}
+
+.input-wrapper {
+  margin-bottom: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 2vmin;
+  height:auto;
+  align-content: center;
+  flex-direction: column;
+}
+
+#locationField {
+  margin-bottom: 4.5%;
+}
+
 .election-name {
   color: black;
+}
+
+#submit-address-button{
+  background: #668EDB;
+  border: 1px solid #668EDB;
+  align-content: center;
+}
+
+#submit-address-button:hover{
+  background: #FFFFFF;
+  color: #668EDB;
+}
+
+#address-button-container{
+  margin-top: 4.5%;
+}
+
+#address-button-container div{
+  min-height: 5vmin;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 2vmin;
+  text-align: center;
+  color: #FFFFFF;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: row;
+}
+
+#address-button-container div a{
+  text-decoration: none;
 }
