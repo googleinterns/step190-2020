@@ -45,6 +45,7 @@ public class InfoCardServlet extends HttpServlet {
       response
           .getWriter()
           .println("No address in the query URL, please check why this is the case.");
+      response.setStatus(400);
       return;
     }
 
@@ -54,6 +55,7 @@ public class InfoCardServlet extends HttpServlet {
       response
           .getWriter()
           .println("No election ID in the query URL, please check why this is the case.");
+      response.setStatus(400);
       return;
     }
 
