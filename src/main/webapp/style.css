@@ -225,11 +225,8 @@ body{
   flex-direction: column;
 }
 
-.row {
-  margin-bottom: 4.5%;
-}
-
 .input-wrapper {
+  margin-top: 4.5%;
   margin-bottom: 20%;
   display: flex;
   justify-content: center;
@@ -242,11 +239,16 @@ body{
 }
 
 #locationField {
-  margin-bottom: 4.5%;
+  margin-bottom: 2.5%;
+  margin-top: 2.5%;
 }
 
 .election-name {
   color: black;
+}
+
+.address-row-wrapper{
+  margin-bottom: 4.5%;
 }
 
 #submit-address-button{
