@@ -72,10 +72,10 @@ public class ElectionServlet extends HttpServlet {
        * election IDs are not always consecutive numbers and other entities we plan to store
        * in Datastore will not have IDs from the Civic Information API (ex. policies) */
       Entity electionEntity = new Entity("Election");
-      electionEntity.setProperty("electionId", election.getLong("id"))
-      electionEntity.setProperty("name", election.getString("name"))
-      electionEntity.setProperty("scope", election.getString("ocdDivisionId"))
-      electionEntity.setProperty("date", election.getString("electionDay"))
+      electionEntity.setProperty("electionId", election.getLong("id"));
+      electionEntity.setProperty("name", election.getString("name"));
+      electionEntity.setProperty("scope", election.getString("ocdDivisionId"));
+      electionEntity.setProperty("date", election.getString("electionDay"));
 
       datastore.put(electionEntity);
     }
@@ -97,7 +97,7 @@ public class ElectionServlet extends HttpServlet {
       String date = (String) entity.getProperty("date");
 
       Election newElection =
-          Election.builder().setID(id).setName(name).setScope(scope).setDate(date).build();
+          Election.builder().setId(id).setName(name).setScope(scope).setDate(date).build();
       elections.add(newElection);
     }
 
