@@ -1,27 +1,28 @@
 package com.google.sps.integration;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.Select;
 
 public class ElectionListIT {
   private WebDriver driver;
 
-  @BeforeClass
-  public static void setUp() {
-    System.setProperty("webdriver.chrome.driver", "resources/chromedriver");
-  }
+  @ClassRule
+  public static ChromeDriverPropertySetup chromeDriverPropertySetup =
+      new ChromeDriverPropertySetup();
 
   @Before
   public void testSetUp() {
-    driver = new ChromeDriver();
+    ChromeOptions options = new ChromeOptions();
+    options.addArguments("--no-sandbox");
+    options.addArguments("--disable-dev-shm-usage");
+    options.addArguments("--headless");
+    options.setExperimentalOption("useAutomationExtension", false);
+    driver = new ChromeDriver(options);
   }
 
   /**
