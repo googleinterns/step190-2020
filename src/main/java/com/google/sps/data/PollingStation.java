@@ -14,14 +14,16 @@
 
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import java.util.ArrayList;
 import java.util.HashMap;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /** A polling station open for voters to vote or drop ballots off at */
 @AutoValue
 public abstract class PollingStation {
-  public abstract long getID();
-
   public abstract String getName();
 
   public abstract String getAddress();
@@ -32,10 +34,27 @@ public abstract class PollingStation {
     return new AutoValue_PollingStation.Builder();
   }
 
+  // creates a new PollingStation object by extracting the properties from "obj"
+  public static PollingStation fromJSONObject(JSONObject obj) throws JSONException {
+    return PollingStation.builder()
+        .setName(obj.getJSONObject("address").getString("locationName"))
+        // TODO(caseyprice): get values for elections and address
+        .setAddress("")
+        .setElections(new HashMap<Long, Election>())
+        .build();
+  }
+
+  // creates a new Entity and sets the proper properties.
+  public Entity toEntity() {
+    Entity entity = new Entity("PollingStation");
+    entity.setProperty("name", this.getName());
+    entity.setProperty("address", this.getAddress());
+    entity.setProperty("elections", new ArrayList<String>());
+    return entity;
+  }
+
   @AutoValue.Builder
   public abstract static class Builder {
-    public abstract Builder setID(long id);
-
     public abstract Builder setName(String name);
 
     public abstract Builder setAddress(String scope);

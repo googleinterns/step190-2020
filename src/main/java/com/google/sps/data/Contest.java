@@ -14,14 +14,16 @@
 
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import java.util.ArrayList;
 import java.util.HashMap;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /** A state or national public office position. */
 @AutoValue
-public abstract class Position {
-  public abstract long getID();
-
+public abstract class Contest {
   public abstract String getName();
 
   public abstract HashMap<Long, Candidate> getCandidates();
@@ -29,19 +31,36 @@ public abstract class Position {
   public abstract String getDescription();
 
   public static Builder builder() {
-    return new AutoValue_Position.Builder();
+    return new AutoValue_Contest.Builder();
+  }
+
+  // creates a new Contest object by extracting the properties from "obj"
+  public static Contest fromJSONObject(JSONObject obj) throws JSONException {
+    return Contest.builder()
+        .setName(obj.getString("office"))
+        // TODO(caseyprice): get values for candidates and description
+        .setCandidates(new HashMap<Long, Candidate>())
+        .setDescription("")
+        .build();
+  }
+
+  // creates a new Entity and sets the proper properties.
+  public Entity toEntity() {
+    Entity entity = new Entity("Contest");
+    entity.setProperty("name", this.getName());
+    entity.setProperty("candidates", new ArrayList<String>());
+    entity.setProperty("description", this.getDescription());
+    return entity;
   }
 
   @AutoValue.Builder
   public abstract static class Builder {
-    public abstract Builder setID(long id);
-
     public abstract Builder setName(String name);
 
     public abstract Builder setCandidates(HashMap<Long, Candidate> candidates);
 
     public abstract Builder setDescription(String description);
 
-    public abstract Position build();
+    public abstract Contest build();
   }
 }

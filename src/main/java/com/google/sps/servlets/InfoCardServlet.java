@@ -17,15 +17,19 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.sps.data.Candidate;
+import com.google.sps.data.Contest;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -93,56 +97,70 @@ public class InfoCardServlet extends HttpServlet {
                 BASE_URL,
                 address,
                 electionId,
-                ServletHelper.getApiKey("112408856470", "election-api-key", "1")));
-    JSONObject electionListFromApi = ServletHelper.readFromApiUrl(url);
-    JSONArray positionListFromApi = electionListFromApi.getJSONArray("contests");
-    chosenElection.setProperty("positions", fillPositions(datastore, positionListFromApi));
+                ServletUtils.getApiKey("112408856470", "election-api-key", "1")));
+    ArrayList<String> contestKeyList = new ArrayList<String>();
+    try {
+      JSONArray contestListFromApi = ServletUtils.readFromApiUrl(url).getJSONArray("contests");
+      populateDatastoreWithContestEntities(datastore, contestListFromApi);
+      contestKeyList = getEntityKeyNameList(datastore, "Contest");
+    } catch (JSONException e) {
+    }
+
+    chosenElection.setProperty("contests", contestKeyList);
   }
 
   /**
-   * Puts candidate Position Entities in the Datastore.
+   * Puts candidate Contest Entities in the Datastore.
    *
    * @param datastore the Datastore containing all election data
-   * @param positionData API-returned list of positions on the election ballot
-   * @return list of Key names of all Position Entities added
+   * @param contestData API-returned list of contests on the election ballot
    */
-  private List<String> fillPositions(DatastoreService datastore, JSONArray positionData) {
-    List<String> positionKeyList = new ArrayList<String>();
-    for (Object positionObject : positionData) {
-      JSONObject position = (JSONObject) positionObject;
+  private void populateDatastoreWithContestEntities(
+      DatastoreService datastore, JSONArray contestData) {
+    for (Object contestObject : contestData) {
+      JSONObject contest = (JSONObject) contestObject;
 
-      Entity positionEntity = new Entity("Position");
-      positionEntity.setProperty("name", position.getString("office"));
-      positionEntity.setProperty(
-          "candidates", fillCandidates(datastore, position.getJSONArray("candidates")));
-      datastore.put(positionEntity);
+      populateDatastoreWithCandidateEntities(datastore, contest.getJSONArray("candidates"));
 
-      positionKeyList.add(positionEntity.getKey().getName());
+      Entity contestEntity = Contest.fromJSONObject(contest).toEntity();
+      contestEntity.setProperty("candidates", getEntityKeyNameList(datastore, "Candidate"));
+
+      datastore.put(contestEntity);
     }
-
-    return positionKeyList;
   }
 
   /**
    * Puts Candidate Entities in the Datastore.
    *
    * @param datastore the Datastore containing all election data
-   * @param candidateData API-returned list of candidates for a position on the election ballot
+   * @param candidateData API-returned list of candidates for a contest on the election ballot
    * @return list of Key names of all Candidate Entities added
    */
-  private List<String> fillCandidates(DatastoreService datastore, JSONArray candidateData) {
-    List<String> candidateKeyList = new ArrayList<String>();
+  private void populateDatastoreWithCandidateEntities(
+      DatastoreService datastore, JSONArray candidateData) {
     for (Object candidateObject : candidateData) {
       JSONObject candidate = (JSONObject) candidateObject;
-
-      Entity candidateEntity = new Entity("Candidate");
-      candidateEntity.setProperty("name", candidate.getString("name"));
-      candidateEntity.setProperty("partyAffiliation", candidate.getString("party"));
+      Entity candidateEntity = Candidate.fromJSONObject(candidate).toEntity();
       datastore.put(candidateEntity);
+    }
+  }
 
-      candidateKeyList.add(candidateEntity.getKey().getName());
+  /**
+   * Gets the names of all Keys of a type of Entity in the Datastore.
+   *
+   * @param datastore the Datastore containing all election data
+   * @param entityType the kind of Entity to query
+   * @return list of Keys' names of all Contest Entities added
+   */
+  public ArrayList<String> getEntityKeyNameList(DatastoreService datastore, String entityType) {
+    ArrayList<String> keyNameList = new ArrayList<String>();
+    Query query = new Query(entityType);
+    PreparedQuery results = datastore.prepare(query);
+
+    for (Entity entity : results.asIterable()) {
+      keyNameList.add(entity.getKey().getName());
     }
 
-    return candidateKeyList;
+    return keyNameList;
   }
 }
