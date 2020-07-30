@@ -14,25 +14,10 @@
 
 package com.google.sps.servlets;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.cloud.datastore.*;
-import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
-import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
-import com.google.cloud.secretmanager.v1.SecretVersionName;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,25 +25,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-@WebServlet("/info-cards")
 /**
  * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
  * can participate in on a given day.
  */
+@WebServlet("/info-cards")
 public class InfoCardServlet extends HttpServlet {
 
-  private static final String BASE_URL = "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo";
-  private static final Logger logger = Logger.getLogger(InfoCardServlet.class.getName());
-
-  // This method is used to access the api key stored in gcloud secret manager.
-  public String getApiKey(String projectId, String secretId, String versionId) throws IOException {
-    try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
-      SecretVersionName secretVersionName = SecretVersionName.of(projectId, secretId, versionId);
-      AccessSecretVersionResponse response = client.accessSecretVersion(secretVersionName);
-
-      return response.getPayload().getData().toStringUtf8();
-    }
-  }
+  private static final String BASE_URL = "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?";
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -66,80 +40,36 @@ public class InfoCardServlet extends HttpServlet {
     // find the corresponding election and check fields
     // TODO (anooshree): iterate through Datastore and find the election
     //                   with the matching electionId
-    // if this election is already populated, we don't need to make another
-    // query
+    // if this election is already populated, we don't need to make another query
 
-    StringBuilder strBuf = new StringBuilder();
-    HttpURLConnection conn = null;
-    BufferedReader reader = null;
-
-    try {
-      String address = request.getParameter("address");
-      if (address == null) {
-        response.setContentType("text/html");
-        response
-            .getWriter()
-            .println("No address in the query URL, please check why this is the case.");
-        return;
-      }
-
-      String electionId = request.getParameter("electionId");
-      if (electionId == null) {
-        response.setContentType("text/html");
-        response
-            .getWriter()
-            .println("No election ID in the query URL, please check why this is the case.");
-        return;
-      }
-
-      URL url =
-          new URL(
-              String.format(
-                  "%s?address=%s&electionId=%s&key=%s",
-                  BASE_URL,
-                  address,
-                  electionId,
-                  getApiKey("112408856470", "election-api-key", "1")));
-      conn = (HttpURLConnection) url.openConnection();
-
-      conn.setRequestMethod("GET");
-      conn.setRequestProperty("Accept", "application/json");
-
-      if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-        throw new RuntimeException(
-            "HTTP GET Request Failed with Error code : " + conn.getResponseCode());
-      }
-
-      // Using IO Stream with Buffer for increased efficiency
-      reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
-      String output = null;
-
-      while ((output = reader.readLine()) != null) {
-        strBuf.append(output);
-      }
-    } catch (MalformedURLException e) {
+    String address = request.getParameter("address");
+    if (address == null) {
       response.setContentType("text/html");
-      response.getWriter().println("URL is incorrectly formatted");
+      response
+          .getWriter()
+          .println("No address in the query URL, please check why this is the case.");
+      response.setStatus(400);
       return;
-    } catch (IOException e) {
-      response.setContentType("text/html");
-      response.getWriter().println("Cannot retrieve information from provided URL");
-      return;
-    } finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        } catch (IOException e) {
-          logger.log(Level.WARNING, e.getMessage());
-        }
-      }
-      if (conn != null) {
-        conn.disconnect();
-      }
     }
 
-    String results = strBuf.toString();
-    JSONObject obj = new JSONObject(results);
+    String electionId = request.getParameter("electionId");
+    if (electionId == null) {
+      response.setContentType("text/html");
+      response
+          .getWriter()
+          .println("No election ID in the query URL, please check why this is the case.");
+      response.setStatus(400);
+      return;
+    }
+
+    URL url =
+        new URL(
+            String.format(
+                BASE_URL,
+                address,
+                electionId,
+                ServletHelper.getApiKey("112408856470", "election-api-key", "1")));
+    JSONObject obj = ServletHelper.readFromApiUrl(url, response);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 

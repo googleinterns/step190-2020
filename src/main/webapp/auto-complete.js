@@ -1,6 +1,6 @@
-// you need to set up a config.js file for this to work, put
-// it in your .gitignore file so the API key isn't uploaded online
-var mapKey = config.PLACES_API_KEY;
+// The config file contains the unrestricted key for use on localhost
+var mapKey = (typeof config === 'undefined' || config === null) 
+                ? 'AIzaSyCBrkGl891qgFHNFz3VGi3N-CEXGLp-DIU' : config.PLACES_API_KEY;
 
 var script = document.createElement('script');
 script.type = 'text/javascript';
@@ -31,13 +31,10 @@ function initAutocomplete() {
   // place fields that are returned to just the address components.
   autocomplete.setFields(['address_component']);
 
-  // When the user selects an address from the drop-down, populate the
-  // address fields in the form.
   autocomplete.addListener('place_changed', fillInAddress);
 }
 
 function fillInAddress() {
-  // Get the place details from the autocomplete object.
   var place = autocomplete.getPlace();
 
   for (var component in componentForm) {
@@ -49,6 +46,7 @@ function fillInAddress() {
   // and then fill-in the corresponding field on the form.
   for (var i = 0; i < place.address_components.length; i++) {
     var addressType = place.address_components[i].types[0];
+    
     if (componentForm[addressType]) {
       var val = place.address_components[i][componentForm[addressType]];
       document.getElementById(addressType).value = val;
@@ -56,18 +54,23 @@ function fillInAddress() {
   }
 }
 
+function positionCallback(position) {
+  var geolocation = {
+    lat: position.coords.latitude,
+    lng: position.coords.longitude
+  };
+
+  var circle = new google.maps.Circle({
+    center: geolocation, 
+    radius: position.coords.accuracy});
+  
+  autocomplete.setBounds(circle.getBounds());
+}
+
 // Bias the autocomplete object to the user's geographical location,
 // as supplied by the browser's 'navigator.geolocation' object.
 function geolocate() {
   if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      var geolocation = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
-      var circle = new google.maps.Circle(
-          {center: geolocation, radius: position.coords.accuracy});
-      autocomplete.setBounds(circle.getBounds());
-    });
+    navigator.geolocation.getCurrentPosition(positionCallback);
   }
 }
