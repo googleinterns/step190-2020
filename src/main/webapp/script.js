@@ -88,15 +88,15 @@ function addQueryParameter(key, value){
 }
 
 function logAddressInput(){
-  let streetNumber = document.getElementById('street-number');
-  let route = document.getElementById('route');
-  let city = document.getElementById('locality');
-  let state = document.getElementById('administrative_area_level_1');
-  let zipCode = document.getElementById('postal_code');
-  let country = document.getElementById('country');
+  let streetNumber = document.getElementById('street_number').value;
+  let route = document.getElementById('route').value;
+  let city = document.getElementById('locality').value;
+  let state = document.getElementById('administrative_area_level_1').value;
+  let zipCode = document.getElementById('postal_code').value;
+  let country = document.getElementById('country').value;
 
-  addQueryParameter("address", streetNumber + "%20" + route + "%20" + city + "%20"
-                               + state + "%20" + zipCode + "%20" + country);
+  addQueryParameter("address", streetNumber + " " + route + " " + city + " "
+                               + state + " " + zipCode + " " + country);
 }
 
 /**

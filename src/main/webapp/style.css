@@ -240,7 +240,6 @@ body{
 
 #locationField {
   margin-bottom: 2.5%;
-  margin-top: 2.5%;
 }
 
 .election-name {
@@ -268,7 +267,7 @@ body{
 }
 
 #address-button-container{
-  margin-top: 4.5%;
+  margin-top: 2.5%;
 }
 
 #address-button-container div{
