@@ -59,7 +59,7 @@ public class ElectionServlet extends HttpServlet {
     String electionApiKey = ServletHelper.getApiKey("112408856470", "election-api-key", "1");
     URL url = new URL(BASE_URL + electionApiKey);
 
-    JSONObject obj = ServletHelper.readFromApiUrl(url, response);
+    JSONObject obj = ServletHelper.readFromApiUrl(url);
     JSONArray electionData = obj.getJSONArray("elections");
 
     for (Object o : electionData) {
