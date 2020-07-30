@@ -42,7 +42,7 @@ public class InfoCardServlet extends HttpServlet {
    * Candidate Entities in Datastore from the response. Finds the chosen Election Entity in the
    * Datastore and fills is properties with the corresponding API response data.
    *
-   * <p>TODO: Get Proposition data and add it as a field to the Election Entity.
+   * TODO: Get Proposition data and add it as a field to the Election Entity.
    *
    * @param request the HTTP request containing user address and electionId as parameters
    * @param response the HTTP response, contains error message if an error occurs
@@ -50,9 +50,8 @@ public class InfoCardServlet extends HttpServlet {
   @Override
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
     // Read in the user-chosen address and election ID, to be used as parameters to the
-    // voterInfoQuery. If these parameters aren't found, API call can't be performed so return early
-    // with error
-    // message.
+    // voterInfoQuery. If these parameters aren't found, API call can't be performed so return 
+    // early with error message.
     String address = request.getParameter("address");
     if (address == null) {
       response.setContentType("text/html");
