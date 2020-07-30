@@ -33,6 +33,7 @@
         <div class="container" id="content">
           <div class="row page-title-text" id="dropdown-title">
             <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
+              <!-- TODO: Replace [CHOSEN ELECTION NAME HERE] with Handlebars.js templating -->
               <b>To show you polling locations, candidates, and ballot items from
                   <span class="election-name"> [CHOSEN ELECTION NAME HERE]</span>, 
                   we'll need your registered voter address: 
@@ -48,41 +49,38 @@
                   </div>
                 </div>
                 <div class="row address-row-wrapper">
-                  <div class="col-md-6">
-                    <label class="control-label">Street Number</label>
+                  <div class="col-md-2 col-md-offset-1">
                     <input class="form-control" id="street_number" disabled="true">
+                    <label class="control-label required">Street Number</label>
                   </div>
-                  <div class="col-md-6">
-                    <label class="control-label">Street Name</label>
+                  <div class="col-md-5">
                     <input class="form-control" id="route" disabled="true">
+                    <label class="control-label required">Street Name</label>
                   </div>
-                </div>
-
-                <div class="row address-row-wrapper">
-                  <div class="col-md-6">
-                    <label class="control-label">City</label>
+                  <div class="col-md-3">
                     <input class="form-control field" id="locality" disabled="true">
-                  </div>
-                  <div class="col-md-6"> 
-                    <label class="control-label">State</label>
-                    <input class="form-control" id="administrative_area_level_1" disabled="true">
+                    <label class="control-label required">City</label>
                   </div>
                 </div>
 
                 <div class="row address-row-wrapper">
-                  <div class="col-md-6">
-                    <label class="control-label">Zip Code</label>
-                    <input class="form-control" id="postal_code" disabled="true">
+                  <div class="col-md-2 col-md-offset-2"> 
+                    <input class="form-control" id="administrative_area_level_1" disabled="true">
+                    <label class="control-label required">State</label>
                   </div>
-                  <div class="col-md-6">
-                    <label class="control-label">Country</label>
+                  <div class="col-md-4">
                     <input class="form-control" id="country" disabled="true">
+                    <label class="control-label required">Country</label>
+                  </div>
+                  <div class="col-md-2">
+                    <input class="form-control" id="postal_code" disabled="true">
+                    <label class="control-label required">Zip Code</label>
                   </div>
                 </div>
 
                 <div class="row address-row-wrapper" id="address-button-container">
                   <a href="javascript:void(0)" onclick="logAddressInput();" id="address-input-js">
-                    <div class="col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4" 
+                    <div class="col-lg-2 col-lg-offset-5 col-md-2 col-md-offset-5 col-sm-2 col-sm-offset-5" 
                           id="submit-address-button">
                       Submit
                     </div>

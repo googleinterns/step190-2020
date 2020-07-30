@@ -288,3 +288,13 @@ body{
 #address-button-container div a{
   text-decoration: none;
 }
+
+.form-control {
+  background-color: #FFFFFF !important;
+  border-radius: 20px;
+}
+
+.required:after {
+  content:" *";
+  color: red;
+}
