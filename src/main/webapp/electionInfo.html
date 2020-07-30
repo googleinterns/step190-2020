@@ -18,6 +18,7 @@
 	  <script type='text/javascript' src='config.js'></script>
 	  <link rel="stylesheet" href="style.css">
     <script src="auto-complete.js"></script>
+    <script src="script.js"></script>
 
     </head>
 
@@ -73,7 +74,7 @@
 
 								<div class="row">
 									<div class="col-md-6">
-										<label class="control-label">Zip code</label>
+										<label class="control-label">Zip Code</label>
 										<input class="form-control" id="postal_code" disabled="true">
 									</div>
 									<div class="col-md-6">
@@ -84,10 +85,12 @@
 							</div>
 
               <div id="address-button-container">
-                <div class="col-lg-3 col-lg-offset-2 col-md-3 col-md-offset-2 col-sm-3 col-sm-offset-2" 
-                      id="show-elections-button">
-                  Submit
-                </div>
+                <a href="javascript:void(0)" onclick="logAddressInput();" id="address-input-js">
+                  <div class="col-lg-3 col-lg-offset-2 col-md-3 col-md-offset-2 col-sm-3 col-sm-offset-2" 
+                        id="show-elections-button">
+                    Submit
+                  </div>
+                </a>
               </div>
 
 						</div>

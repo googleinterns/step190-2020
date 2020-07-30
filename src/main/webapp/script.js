@@ -87,6 +87,18 @@ function addQueryParameter(key, value){
   window.history.pushState({path: newURL},'',newURL);
 }
 
+function logAddressInput(){
+  let streetNumber = document.getElementById('street-number');
+  let route = document.getElementById('route');
+  let city = document.getElementById('locality');
+  let state = document.getElementById('administrative_area_level_1');
+  let zipCode = document.getElementById('postal_code');
+  let country = document.getElementById('country');
+
+  addQueryParameter("address", streetNumber + "%20" + route + "%20" + city + "%20"
+                               + state + "%20" + zipCode + "%20" + country);
+}
+
 /**
  * Updates provided list of links on the page to have query parameters in the current URL.
  * 
