@@ -14,6 +14,12 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
+import com.google.cloud.datastore.*;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
@@ -23,23 +29,25 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 @WebServlet("/info-cards")
-
 /**
  * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
  * can participate in on a given day.
  */
 public class InfoCardServlet extends HttpServlet {
 
-  private static final String BASE_URL = "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?";
+  private static final String BASE_URL = "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo";
   private static final Logger logger = Logger.getLogger(InfoCardServlet.class.getName());
 
   // This method is used to access the api key stored in gcloud secret manager.
@@ -133,23 +141,48 @@ public class InfoCardServlet extends HttpServlet {
     String results = strBuf.toString();
     JSONObject obj = new JSONObject(results);
 
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
     // TODO(anooshree, caseyprice): process JSON objects from API to store as
     //                              Datastore entities using decomposed functions
-
-    /*JSONArray pollingLocationData = obj.getJSONArray("pollingLocations");
-    processLocations(pollingLocationData, "polling");
-
-    JSONArray dropOffLocationData = obj.getJSONArray("dropOffLocations");
-    processLocations(dropOffLocationData, "dropOff");
-
-    JSONArray earlyVoteSiteData = obj.getJSONArray("earlyVoteSites");
-    processLocations(earlyVoteSiteData, "earlyVote");
-
-    JSONArray contestData = obj.getJSONArray("contests");
-    processCandidatesAndPropositions(contestData, electionId);*/
-
     // TODO(caseyprice): populate the election entity by mapping to the
     //                   candidates and propositions on the ballot
+    JSONArray positionData = obj.getJSONArray("contests");
+    List<String> positionIdList = new ArrayList<String>();
 
+    for (Object positionObject : positionData) {
+      JSONObject position = (JSONObject) positionObject;
+
+      // Candidates for this Position are also Entities in Datastore; save their
+      // ID's in a list for this Position to reference.
+      List<String> candidateIdList = new ArrayList<String>();
+      for (Object candidateObject : position.getJSONArray("candidates")) {
+        JSONObject candidate = (JSONObject) candidateObject;
+
+        Entity candidateEntity = new Entity("Candidate");
+        candidateEntity.setProperty("name", candidate.getString("name"))
+        candidateEntity.setProperty("partyAffiliation", candidate.getString("party"));
+        datastore.put(candidateEntity);
+
+        candidateIdList.add(candidateEntity.getKey());
+      }
+
+      Entity positionEntity = new Entity("Position");
+      positionEntity.setProperty("name", position.getString("office"));
+      positionEntity.setProperty("candidates", candidateIdList);
+      datastore.put(positionEntity);
+
+      positionIdList.add(positionEntity.getKey());
+    }
+
+    Query query = new Query("Election");
+    PreparedQuery results = datastore.prepare(query);
+
+    for (Entity entity : results.asIterable()) {
+      if (entity.getProperty("id") == electionId) {
+        entity.setProperty("positions", positionIdList);
+        break;
+      }
+    }
   }
 }

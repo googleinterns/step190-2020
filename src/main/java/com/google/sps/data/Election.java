@@ -20,7 +20,7 @@ import java.util.HashSet;
 /** A state or national election that will appear on voter ballots */
 @AutoValue
 public abstract class Election {
-  public abstract long getID();
+  public abstract long getId();
 
   public abstract String getName();
 
@@ -38,7 +38,7 @@ public abstract class Election {
 
   @AutoValue.Builder
   public abstract static class Builder {
-    public abstract Builder setID(long id);
+    public abstract Builder setId(long id);
 
     public abstract Builder setName(String name);
 
