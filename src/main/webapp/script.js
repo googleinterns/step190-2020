@@ -95,8 +95,8 @@ function logAddressInput(){
   let zipCode = document.getElementById('postal_code').value;
   let country = document.getElementById('country').value;
 
-  addQueryParameter("address", streetNumber + " " + route + " " + city + " "
-                               + state + " " + zipCode + " " + country);
+  addQueryParameter("address", 
+                    `${streetNumber} ${route} ${city} ${state} ${zipcode} ${country}`);
 }
 
 /**
