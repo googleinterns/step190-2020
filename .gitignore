@@ -1,4 +1,6 @@
 target/
+config.js
+.DS_Store
 
 # API keys
 config.js
