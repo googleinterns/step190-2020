@@ -60,7 +60,8 @@ public class ExampleIT {
     // worth right now.
     String response = getUrlResponse("http://localhost:9876/election");
     System.out.println(response);
-    Thread.sleep(1000 * 100);
+    Assert.assertTrue(response.contains("Wisconsin State Primary Election"));
+    //    Thread.sleep(1000 * 100);
   }
 
   private String getUrlResponse(String urlAddress) throws Exception {
