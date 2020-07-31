@@ -61,7 +61,6 @@ public class ExampleIT {
     String response = getUrlResponse("http://localhost:9876/election");
     System.out.println(response);
     Assert.assertTrue(response.contains("Wisconsin State Primary Election"));
-    //    Thread.sleep(1000 * 100);
   }
 
   private String getUrlResponse(String urlAddress) throws Exception {
