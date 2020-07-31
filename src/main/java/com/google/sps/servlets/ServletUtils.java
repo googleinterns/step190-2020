@@ -27,13 +27,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONObject;
 
-public class ServletHelper {
+public class ServletUtils {
 
-  private static final Logger logger = Logger.getLogger(ServletHelper.class.getName());
+  private static final Logger logger = Logger.getLogger(ServletUtils.class.getName());
 
   /** Access the api key stored in gcloud secret manager. */
   public static String getApiKey(String projectId, String secretId, String versionId)
@@ -100,16 +101,18 @@ public class ServletHelper {
    * @param electionId the ID of the election being queried
    * @return the Election Entity if found, null otherwise
    */
-  public static Entity findElectionInDatastore(DatastoreService datastore, String electionId) {
+  public static Optional<Entity> findElectionInDatastore(
+      DatastoreService datastore, String electionId) {
     Query query = new Query("Election");
     PreparedQuery results = datastore.prepare(query);
+    Entity targetElection = null;
 
     for (Entity entity : results.asIterable()) {
       if (entity.getProperty("id") == electionId) {
-        return entity;
+        targetElection = entity;
       }
     }
 
-    return null;
+    return Optional.ofNullable(targetElection);
   }
 }

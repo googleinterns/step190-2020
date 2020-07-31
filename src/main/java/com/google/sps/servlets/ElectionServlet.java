@@ -57,10 +57,10 @@ public class ElectionServlet extends HttpServlet {
       datastore.delete(electionEntityKey);
     }
 
-    String electionApiKey = ServletHelper.getApiKey("112408856470", "election-api-key", "1");
+    String electionApiKey = ServletUtils.getApiKey("112408856470", "election-api-key", "1");
     URL url = new URL(BASE_URL + electionApiKey);
 
-    JSONObject obj = ServletHelper.readFromApiUrl(url);
+    JSONObject obj = ServletUtils.readFromApiUrl(url);
     JSONArray electionData = obj.getJSONArray("elections");
 
     for (Object o : electionData) {
