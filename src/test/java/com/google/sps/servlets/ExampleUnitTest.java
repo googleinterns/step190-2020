@@ -39,6 +39,7 @@ public class ExampleUnitTest {
     helper.tearDown();
   }
 
+  // Example for how to use DatastoreService for servlet-only tests.
   @Test
   public void testElectionGet() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();

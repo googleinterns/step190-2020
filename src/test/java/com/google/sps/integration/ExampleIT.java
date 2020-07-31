@@ -1,18 +1,9 @@
 package com.google.sps.integration;
 
-import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
-import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.URL;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.junit.*;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -22,16 +13,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 //   "**/*IT.java"
 //   "**/*ITCase.java"
 public class ExampleIT {
-  private final LocalServiceTestHelper helper =
-      new LocalServiceTestHelper(
-          new LocalDatastoreServiceTestConfig(), new LocalURLFetchServiceTestConfig());
-
   private WebDriver driver;
-  @Mock HttpServletRequest httpServletRequest;
-  @Mock HttpServletResponse httpServletResponse;
-  @Mock PrintWriter printWriter;
-
-  @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @ClassRule
   public static ChromeDriverPropertySetup chromeDriverPropertySetup =
@@ -45,12 +27,10 @@ public class ExampleIT {
     options.addArguments("--headless");
     options.setExperimentalOption("useAutomationExtension", false);
     driver = new ChromeDriver(options);
-    helper.setUp();
   }
 
   @After
   public void tearDown() {
-    helper.tearDown();
     driver.quit();
   }
 
