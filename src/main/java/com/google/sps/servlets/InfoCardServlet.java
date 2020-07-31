@@ -36,6 +36,8 @@ import org.json.JSONObject;
 /**
  * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
  * can participate in on a given day.
+ * 
+ * TODO(caseyprice): Write unit tests using Mockito framework
  */
 @WebServlet("/info-cards")
 public class InfoCardServlet extends HttpServlet {
