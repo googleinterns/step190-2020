@@ -24,6 +24,7 @@ import com.google.sps.data.Contest;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Optional;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -42,20 +43,16 @@ public class InfoCardServlet extends HttpServlet {
   private static final String BASE_URL = "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo";
 
   /**
-   * Makes an API call to voterInfoQuery in the Google Civic Information API and puts Position and
-   * Candidate Entities in Datastore from the response. Finds the chosen Election Entity in the
-   * Datastore and fills is properties with the corresponding API response data.
-   *
-   * TODO: Get Proposition data and add it as a field to the Election Entity.
+   * Makes an API call to voterInfoQuery in the Google Civic Information API using the user-chosen
+   * address and election ID as parameters. Puts Position and Candidate Entities in Datastore from
+   * the response. Finds the chosen Election Entity in the Datastore and fills in properties with
+   * the corresponding API response data.
    *
    * @param request the HTTP request containing user address and electionId as parameters
    * @param response the HTTP response, contains error message if an error occurs
    */
   @Override
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // Read in the user-chosen address and election ID, to be used as parameters to the
-    // voterInfoQuery. If these parameters aren't found, API call can't be performed so return 
-    // early with error message.
     String address = request.getParameter("address");
     if (address == null) {
       response.setContentType("text/html");
@@ -77,9 +74,10 @@ public class InfoCardServlet extends HttpServlet {
     }
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity chosenElection = ServletHelper.findElectionInDatastore(datastore, electionId);
+    Entity chosenElection;
 
-    if (chosenElection == null) {
+    Optional<Entity> foundElection = ServletUtils.findElectionInDatastore(datastore, electionId);
+    if (!foundElection.isPresent()) {
       response.setContentType("text/html");
       response
           .getWriter()
@@ -88,7 +86,10 @@ public class InfoCardServlet extends HttpServlet {
       return;
     }
 
-    // TODO: if this election is already populated, we don't need to make another query
+    chosenElection = foundElection.get();
+
+    // TODO(anooshree): if this election is already populated, we don't need to make another query
+    // TODO(caseyprice): Get Proposition data and add it as a field to the Election Entity.
 
     URL url =
         new URL(
@@ -98,15 +99,15 @@ public class InfoCardServlet extends HttpServlet {
                 address,
                 electionId,
                 ServletUtils.getApiKey("112408856470", "election-api-key", "1")));
-    ArrayList<String> contestKeyList = new ArrayList<String>();
+
     try {
       JSONArray contestListFromApi = ServletUtils.readFromApiUrl(url).getJSONArray("contests");
       populateDatastoreWithContestEntities(datastore, contestListFromApi);
-      contestKeyList = getEntityKeyNameList(datastore, "Contest");
+      ArrayList<String> contestKeyList = getEntityKeyNameList(datastore, "Contest");
+      chosenElection.setProperty("contests", contestKeyList);
     } catch (JSONException e) {
+      chosenElection.setProperty("contests", new ArrayList<String>());
     }
-
-    chosenElection.setProperty("contests", contestKeyList);
   }
 
   /**
