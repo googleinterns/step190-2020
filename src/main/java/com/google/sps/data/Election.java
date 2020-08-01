@@ -28,8 +28,6 @@ import org.json.JSONObject;
 public abstract class Election {
   public abstract String getId();
 
-  public abstract String getElectionId();
-
   public abstract String getName();
 
   public abstract String getDate();
@@ -47,8 +45,6 @@ public abstract class Election {
   @AutoValue.Builder
   public abstract static class Builder {
     public abstract Builder setId(String id);
-
-    public abstract Builder setElectionId(String electionId);
 
     public abstract Builder setName(String name);
 
@@ -72,7 +68,7 @@ public abstract class Election {
    */
   public static Election fromElectionQuery(JSONObject electionQueryData) throws JSONException {
     return Election.builder()
-        .setElectionId(electionQueryData.getString("id"))
+        .setId(electionQueryData.getString("id"))
         .setName(electionQueryData.getString("name"))
         .setDate(electionQueryData.getString("electionDay"))
         .setScope(electionQueryData.getString("ocdDivisionId"))
@@ -112,7 +108,7 @@ public abstract class Election {
     // TODO(caseyprice): get values for propositions
 
     return Election.builder()
-        .setElectionId(election.getElectionId())
+        .setId(election.getId())
         .setName(election.getName())
         .setDate(election.getDate())
         .setScope(election.getScope())
@@ -139,7 +135,7 @@ public abstract class Election {
    */
   public static Election fromEntity(Entity entity) {
     return Election.builder()
-        .setId((String) entity.getProperty("electionId"))
+        .setId((String) entity.getProperty("id"))
         .setName((String) entity.getProperty("name"))
         .setDate((String) entity.getProperty("date"))
         .setScope((String) entity.getProperty("scope"))
@@ -162,7 +158,7 @@ public abstract class Election {
      * allocateIds(), but this is also difficult because election IDs are not always
      * consecutive numbers and other entities we plan to store in Datastore will not
      * have IDs from the Civic Information API (ex. policies) */
-    entity.setProperty("electionId", this.getElectionId());
+    entity.setProperty("id", this.getId());
     entity.setProperty("name", this.getName());
     entity.setProperty("scope", this.getScope());
     entity.setProperty("date", this.getDate());
