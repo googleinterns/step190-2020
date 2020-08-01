@@ -24,9 +24,7 @@ import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
 import com.google.sps.data.Election;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -42,7 +40,7 @@ import org.json.JSONObject;
 @WebServlet("/election")
 public class ElectionServlet extends HttpServlet {
 
-  private static final String BASE_URL = "https://www.googleapis.com/civicinfo/v2/elections?key=";
+  private static final String BASE_URL = "https://www.googleapis.com/civicinfo/v2/elections?key=%s";
 
   @Override
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -58,15 +56,13 @@ public class ElectionServlet extends HttpServlet {
     }
 
     String electionApiKey = ServletUtils.getApiKey("112408856470", "election-api-key", "1");
-    URL url = new URL(BASE_URL + electionApiKey);
 
-    JSONObject obj = ServletUtils.readFromApiUrl(url);
-    JSONArray electionData = obj.getJSONArray("elections");
+    JSONObject obj = ServletUtils.readFromApiUrl(String.format(BASE_URL, electionApiKey));
+    JSONArray electionQueryArray = obj.getJSONArray("elections");
 
-    for (Object o : electionData) {
+    for (Object o : electionQueryArray) {
       JSONObject election = (JSONObject) o;
-      Entity electionEntity = Election.fromJSONObject(election).toEntity();
-      datastore.put(electionEntity);
+      Election.fromElectionQuery(election).putInDatastore(datastore);
     }
   }
 
@@ -80,21 +76,7 @@ public class ElectionServlet extends HttpServlet {
     List<Election> elections = new ArrayList<Election>();
 
     for (Entity entity : results.asIterable()) {
-      long id = (long) entity.getProperty("id");
-      String name = (String) entity.getProperty("name");
-      String scope = (String) entity.getProperty("scope");
-      String date = (String) entity.getProperty("date");
-
-      Election newElection =
-          Election.builder()
-              .setId(id)
-              .setName(name)
-              .setScope(scope)
-              .setDate(date)
-              .setContests(new HashSet<Long>())
-              .setPropositions(new HashSet<Long>())
-              .build();
-      elections.add(newElection);
+      elections.add(Election.fromEntity(entity));
     }
 
     Gson gson = new Gson();

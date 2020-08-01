@@ -21,20 +21,46 @@ import com.google.appengine.api.datastore.Query;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
+import com.google.sps.data.Election;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 public class ServletUtils {
 
   private static final Logger logger = Logger.getLogger(ServletUtils.class.getName());
+
+  /**
+   * Get the value of a query parameter to an HTTP request.
+   *
+   * @param request the HTTP request to be serialized
+   * @param response the HTTP response to publish any error messages
+   * @param inputName the query parameter key
+   * @return Optional container that contains either the parameter or null
+   */
+  public static Optional<String> getRequestParam(
+      HttpServletRequest request, HttpServletResponse response, String inputName)
+      throws IOException {
+    String input = request.getParameter(inputName);
+
+    if (input == null) {
+      response.setContentType("text/html");
+      response.getWriter().println(String.format("No %s in the query URL.", inputName));
+      response.setStatus(400);
+    }
+
+    return Optional.ofNullable(input);
+  }
 
   /** Access the api key stored in gcloud secret manager. */
   public static String getApiKey(String projectId, String secretId, String versionId)
@@ -47,10 +73,11 @@ public class ServletUtils {
     }
   }
 
-  public static JSONObject readFromApiUrl(URL url) throws IOException {
+  public static JSONObject readFromApiUrl(String urlString) throws IOException {
     StringBuilder strBuf = new StringBuilder();
     HttpURLConnection conn = null;
     BufferedReader reader = null;
+    URL url = new URL(urlString);
 
     try {
       conn = (HttpURLConnection) url.openConnection();
@@ -99,20 +126,41 @@ public class ServletUtils {
    *
    * @param datastore the Datastore containing all election data
    * @param electionId the ID of the election being queried
-   * @return the Election Entity if found, null otherwise
+   * @return Optional container that contains either the Election Entity or null
    */
-  public static Optional<Entity> findElectionInDatastore(
+  public static Optional<Election> findElectionInDatastore(
       DatastoreService datastore, String electionId) {
     Query query = new Query("Election");
     PreparedQuery results = datastore.prepare(query);
-    Entity targetElection = null;
+    Election targetElection = null;
 
     for (Entity entity : results.asIterable()) {
-      if (entity.getProperty("id") == electionId) {
-        targetElection = entity;
+      if (entity.getProperty("id").equals(electionId)) {
+        targetElection = Election.fromEntity(entity);
+        break;
       }
     }
 
     return Optional.ofNullable(targetElection);
+  }
+
+  /**
+   * Gets the names of all Keys of a type of Entity in the Datastore.
+   *
+   * @param datastore the Datastore containing all election data
+   * @param entityType the kind of Entity to query
+   * @return set of Keys' names of all Contest Entities added
+   */
+  public static HashSet<String> getEntityKeyNameList(
+      DatastoreService datastore, String entityType) {
+    HashSet<String> keyNameList = new HashSet<String>();
+    Query query = new Query(entityType);
+    PreparedQuery results = datastore.prepare(query);
+
+    for (Entity entity : results.asIterable()) {
+      keyNameList.add(entity.getKey().getName());
+    }
+
+    return keyNameList;
   }
 }
