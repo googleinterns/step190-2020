@@ -15,6 +15,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <failOnMissingWebXml>false</failOnMissingWebXml>
     <integrationTest.devServerPort>9876</integrationTest.devServerPort>
+    <integrationTest.datastoreFileDir>${project.basedir}/src/test/java/com/google/sps/integration</integrationTest.datastoreFileDir>
+    <integrationTest.datastoreFileDirTmp>${integrationTest.datastoreFileDir}/tmp</integrationTest.datastoreFileDirTmp>
+    <integrationTest.datastoreFile>integration_db.bin</integrationTest.datastoreFile>
   </properties>
 
   <dependencies>
@@ -48,6 +51,16 @@
       <artifactId>appengine-testing</artifactId>
       <version>1.9.81</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.appengine</groupId>
+      <artifactId>appengine-api-stubs</artifactId>
+      <version>1.9.81</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>1.10.19</version>
     </dependency>
     <dependency>
       <groupId>com.google.appengine</groupId>
@@ -103,6 +116,50 @@
 
   <build>
     <plugins>
+      <!-- Copy the integration test db file into a tmp folder.-->
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-tmp-integration-test-datastore</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${integrationTest.datastoreFileDir}/tmp</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${integrationTest.datastoreFileDir}</directory>
+                  <includes>
+                    <include>${integrationTest.datastoreFile}</include>
+                  </includes>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- Delete the integration test db tmp folder after integration test is done. -->
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>delete-tmp-integration-test-datastore</id>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+            <phase>post-integration-test</phase>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>${integrationTest.datastoreFileDirTmp}</directory>
+                </fileset>
+              </filesets>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Provides `mvn package appengine:run` for local testing
            and `mvn package appengine:deploy` for deploying. -->
       <plugin>
@@ -113,6 +170,7 @@
           <deploy.projectId>contrib-geo-step-2020</deploy.projectId>
           <deploy.version>1</deploy.version>
         </configuration>
+        <!-- Start up the dev server for integration tests -->
         <executions>
           <execution>
             <id>start-for-integration</id>
@@ -121,6 +179,11 @@
               <goal>start</goal>
             </goals>
             <configuration>
+              <jvmFlags>
+                <jvmFlag>
+                  -Ddatastore.backing_store=${integrationTest.datastoreFileDirTmp}/${integrationTest.datastoreFile}
+                </jvmFlag>
+              </jvmFlags>
               <port>${integrationTest.devServerPort}</port>
             </configuration>
           </execution>
