@@ -41,7 +41,7 @@ public class ElectionServletTest {
     helper.tearDown();
   }
 
-  // Test putting API JSON response in the Datastore and reading from it.
+  // Test putting API JSON response for one election in the Datastore and reading from it.
   @Test
   public void testElectionPutAndGet() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
@@ -61,5 +61,29 @@ public class ElectionServletTest {
     verify(printWriter)
         .println(
             "[{\"id\":\"9999\",\"name\":\"myElection\",\"date\":\"myDate\",\"scope\":\"myScope\",\"contests\":[],\"propositions\":[]}]");
+  }
+
+  // Test putting API JSON response for multiple elections in the Datastore and reading from it.
+  @Test
+  public void testMultipleElectionsPutAndGet() throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    JSONObject json =
+        new JSONObject(
+            "{\"elections\": [{\"id\": \"0001\",\"name\": \"election1\",\"electionDay\": \"date1\",\"ocdDivisionId\": \"scope1\"},"
+                + "{\"id\": \"0002\",\"name\": \"election2\",\"electionDay\": \"date2\",\"ocdDivisionId\": \"scope2\"}]}");
+    JSONArray electionQueryArray = json.getJSONArray("elections");
+
+    for (Object o : electionQueryArray) {
+      JSONObject election = (JSONObject) o;
+      Election.fromElectionQuery(election).putInDatastore(ds);
+    }
+
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+    ElectionServlet electionServlet = new ElectionServlet();
+    electionServlet.doGet(httpServletRequest, httpServletResponse);
+    verify(printWriter)
+        .println(
+            "[{\"id\":\"0001\",\"name\":\"election1\",\"date\":\"date1\",\"scope\":\"scope1\",\"contests\":[],\"propositions\":[]},"
+                + "{\"id\":\"0002\",\"name\":\"election2\",\"date\":\"date2\",\"scope\":\"scope2\",\"contests\":[],\"propositions\":[]}]");
   }
 }
