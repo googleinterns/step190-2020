@@ -134,13 +134,23 @@ public abstract class Election {
    * @return the new Election object
    */
   public static Election fromEntity(Entity entity) {
+    HashSet<String> contests = new HashSet<String>();
+    HashSet<String> propositions = new HashSet<String>();
+    if (entity.getProperty("contests") != null) {
+      contests = (HashSet<String>) entity.getProperty("contests");
+    }
+
+    if (entity.getProperty("propositions") != null) {
+      propositions = (HashSet<String>) entity.getProperty("propositions");
+    }
+
     return Election.builder()
         .setId((String) entity.getProperty("id"))
         .setName((String) entity.getProperty("name"))
         .setDate((String) entity.getProperty("date"))
         .setScope((String) entity.getProperty("scope"))
-        .setContests((HashSet<String>) entity.getProperty("contests"))
-        .setPropositions((HashSet<String>) entity.getProperty("propositions"))
+        .setContests(contests)
+        .setPropositions(propositions)
         .build();
   }
 

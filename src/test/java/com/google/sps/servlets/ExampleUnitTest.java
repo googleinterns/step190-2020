@@ -10,6 +10,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.*;
@@ -44,17 +45,19 @@ public class ExampleUnitTest {
   public void testElectionGet() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Entity electionEntity = new Entity("Election");
-    electionEntity.setProperty("id", 9999);
+    electionEntity.setProperty("id", "9999");
     electionEntity.setProperty("name", "myElection");
     electionEntity.setProperty("scope", "myScope");
     electionEntity.setProperty("date", "myDate");
+    electionEntity.setProperty("contests", new HashSet<String>());
+    electionEntity.setProperty("propositions", new HashSet<String>());
     ds.put(electionEntity);
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
     ElectionServlet electionServlet = new ElectionServlet();
     electionServlet.doGet(httpServletRequest, httpServletResponse);
     verify(printWriter)
         .println(
-            "[{\"ID\":9999,\"name\":\"myElection\",\"scope\":\"myScope\",\"positions\":[],\"date\":\"myDate\",\"propositions\":[]}]");
+            "[{\"id\":\"9999\",\"name\":\"myElection\",\"date\":\"myDate\",\"scope\":\"myScope\",\"contests\":[],\"propositions\":[]}]");
   }
 
   @Test
