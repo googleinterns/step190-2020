@@ -59,7 +59,8 @@ public abstract class Candidate {
         .build();
   }
 
-  // creates a new Entity and sets the proper properties.
+  // Converts the Candidate into a Datastore Entity and puts the Entity into the given Datastore
+  // instance.
   public String putInDatastore(DatastoreService datastore) {
     Entity entity = new Entity("Candidate");
     entity.setProperty("name", this.getName());

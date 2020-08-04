@@ -28,7 +28,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -142,25 +141,5 @@ public class ServletUtils {
     }
 
     return Optional.ofNullable(targetElection);
-  }
-
-  /**
-   * Gets the names of all Keys of a type of Entity in the Datastore.
-   *
-   * @param datastore the Datastore containing all election data
-   * @param entityType the kind of Entity to query
-   * @return set of Keys' names of all Contest Entities added
-   */
-  public static HashSet<String> getEntityKeyNameList(
-      DatastoreService datastore, String entityType) {
-    HashSet<String> keyNameList = new HashSet<String>();
-    Query query = new Query(entityType);
-    PreparedQuery results = datastore.prepare(query);
-
-    for (Entity entity : results.asIterable()) {
-      keyNameList.add(entity.getKey().getName());
-    }
-
-    return keyNameList;
   }
 }

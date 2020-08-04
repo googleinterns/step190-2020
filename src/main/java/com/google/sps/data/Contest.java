@@ -28,7 +28,7 @@ public abstract class Contest {
 
   // This Contest references a collection of Candidate entities in Datastore. This HashSet
   // represents their Key names.
-  public abstract HashSet<String> getCandidateKeyNames();
+  public abstract HashSet<String> getCandidates();
 
   public abstract String getDescription();
 
@@ -40,17 +40,19 @@ public abstract class Contest {
   public abstract static class Builder {
     public abstract Builder setName(String name);
 
-    public abstract Builder setCandidateKeyNames(HashSet<String> candidateKeyNames);
+    public abstract Builder setCandidates(HashSet<String> candidates);
 
     public abstract Builder setDescription(String description);
 
     public abstract Contest build();
   }
 
-  // creates a new Contest object by extracting the properties from "contestData"
+  // Creates a new Contest object by extracting the properties from "contestData". For each of its
+  // "candidate" properties, creates a new Candidate object and inserts it into the given Datastore
+  // instance.
   public static Contest fromVoterInfoQuery(DatastoreService datastore, JSONObject contestData)
       throws JSONException {
-    HashSet<String> candidateKeyNames = new HashSet<String>();
+    HashSet<String> candidateKeyNames = new HashSet<>();
 
     if (contestData.has("candidates")) {
       for (Object candidateObject : contestData.getJSONArray("candidates")) {
@@ -63,17 +65,18 @@ public abstract class Contest {
 
     return Contest.builder()
         .setName(contestData.getString("office"))
-        .setCandidateKeyNames(candidateKeyNames)
+        .setCandidates(candidateKeyNames)
         // TODO(gianelgado): get value for description
         .setDescription("")
         .build();
   }
 
-  // creates a new Entity and sets the proper properties.
+  // Converts the Contest into a Datastore Entity and puts the Entity into the given Datastore
+  // instance.
   public String putInDatastore(DatastoreService datastore) {
     Entity entity = new Entity("Contest");
     entity.setProperty("name", this.getName());
-    entity.setProperty("candidates", this.getCandidateKeyNames());
+    entity.setProperty("candidates", this.getCandidates());
     entity.setProperty("description", this.getDescription());
     datastore.put(entity);
     return entity.getKey().getName();

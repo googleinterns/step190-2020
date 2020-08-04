@@ -5,11 +5,13 @@ import static org.mockito.Mockito.when;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import com.google.sps.data.Election;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
@@ -19,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-/** An example unit test. */
 public class ElectionServletTest {
   private final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(
@@ -41,9 +42,29 @@ public class ElectionServletTest {
     helper.tearDown();
   }
 
+  // Test getting election data from Datastore
+  @Test
+  public void testElectionGet() throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Entity electionEntity = new Entity("Election");
+    electionEntity.setProperty("id", "9999");
+    electionEntity.setProperty("name", "myElection");
+    electionEntity.setProperty("scope", "myScope");
+    electionEntity.setProperty("date", "myDate");
+    electionEntity.setProperty("contests", new HashSet<String>());
+    electionEntity.setProperty("propositions", new HashSet<String>());
+    ds.put(electionEntity);
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+    ElectionServlet electionServlet = new ElectionServlet();
+    electionServlet.doGet(httpServletRequest, httpServletResponse);
+    verify(printWriter)
+        .println(
+            "[{\"id\":\"9999\",\"name\":\"myElection\",\"date\":\"myDate\",\"scope\":\"myScope\",\"contests\":[],\"propositions\":[]}]");
+  }
+
   // Test putting API JSON response for one election in the Datastore and reading from it.
   @Test
-  public void testElectionPutAndGet() throws Exception {
+  public void testElectionPut() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     JSONObject json =
         new JSONObject(

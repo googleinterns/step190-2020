@@ -104,7 +104,7 @@ public abstract class Election {
   public Election fromVoterInfoQuery(DatastoreService datastore, JSONObject voterInfoQueryData)
       throws JSONException {
     HashSet<String> contestKeyList = this.getContests();
-    HashSet<String> propositionKeyList = new HashSet<String>();
+    HashSet<String> propositionKeyList = new HashSet<>();
 
     if (voterInfoQueryData.has("contests")) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray("contests");
@@ -139,8 +139,8 @@ public abstract class Election {
    * @return the new Election object
    */
   public static Election fromEntity(Entity entity) {
-    HashSet<String> contests = new HashSet<String>();
-    HashSet<String> propositions = new HashSet<String>();
+    HashSet<String> contests = new HashSet<>();
+    HashSet<String> propositions = new HashSet<>();
     if (entity.getProperty("contests") != null) {
       contests = (HashSet<String>) entity.getProperty("contests");
     }
