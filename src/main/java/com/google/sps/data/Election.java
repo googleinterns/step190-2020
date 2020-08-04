@@ -110,7 +110,7 @@ public abstract class Election {
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
 
-        Long contestEntityKeyId =
+        long contestEntityKeyId =
             Contest.fromVoterInfoQuery(datastore, contest).addToDatastore(datastore);
         contestKeyList.add(contestEntityKeyId);
       }

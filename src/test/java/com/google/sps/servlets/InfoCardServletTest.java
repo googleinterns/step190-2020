@@ -11,7 +11,6 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import com.google.sps.data.Election;
 import java.io.PrintWriter;
-import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
@@ -73,9 +72,7 @@ public class InfoCardServletTest {
     Election election = Election.fromEntity(entity);
     election.fromVoterInfoQuery(ds, voterInfoQueryJson).putInDatastore(ds, entity);
 
-    HashSet<Long> keys = new HashSet<>();
-    keys.add(new Long(entityKeyId));
-    Assert.assertEquals(election.getContests(), keys);
+    Assert.assertEquals(election.getContests().size(), 1);
   }
 
   // TODO(caseyprice,gianelgado): Finish populating other Entity objects and write further tests.
