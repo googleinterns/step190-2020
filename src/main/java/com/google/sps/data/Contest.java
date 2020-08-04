@@ -17,6 +17,7 @@ package com.google.sps.data;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import java.util.Set;
 import org.json.JSONException;
@@ -29,7 +30,7 @@ public abstract class Contest {
 
   // This Contest references a collection of Candidate entities in Datastore. This HashSet
   // represents their Key names.
-  public abstract Set<Long> getCandidates();
+  public abstract ImmutableSet<Long> getCandidates();
 
   public abstract String getDescription();
 
