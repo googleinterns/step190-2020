@@ -301,12 +301,12 @@ body{
   min-height: 10vmin;
   font-style: normal;
   font-weight: bold;
-  text-align: left;
+  text-align: center;
   color: #668EDB;
-  display: flex;
+  display: inline-block;
   justify-content: center;
   align-content: center;
-  flex-direction: row;
+  flex-direction: column;
   font-size: 1.75em;
 }
 
