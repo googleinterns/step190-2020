@@ -115,7 +115,7 @@ function logAddressInput(){
 
 /**
  * Redirect to a given URL while maintaining the query string
- * and tracking the name of the chosen state election
+ * and tracking the name, ID of the chosen state election
  */
 function redirectToStateElectionPage(electionId){
   let electionName = document.getElementById('state-election-name').innerText;
@@ -124,7 +124,7 @@ function redirectToStateElectionPage(electionId){
 
 /**
  * Redirect to a given URL while maintaining the query string
- * and tracking the name of the chosen national election
+ * and tracking the name, ID of the chosen national election
  */
 function redirectToNationalElectionPage(electionId){
   let electionName = document.getElementById('national-election-name').innerText;
@@ -132,7 +132,7 @@ function redirectToNationalElectionPage(electionId){
 }
 
 /**
- * Redirect to a new site and keep the entirety of the query string.
+ * Redirect to third page and update the query string with election info.
  */
 function goToElectionPage(electionName, electionId){
   addQueryParameter("electionName", electionName);
