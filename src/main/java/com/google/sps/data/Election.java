@@ -35,11 +35,11 @@ public abstract class Election {
 
   // This Election references a collection of Contest entities in Datastore. This HashSet represents
   // their Key names.
-  public abstract HashSet<String> getContests();
+  public abstract HashSet<Long> getContests();
 
   // This Election references a collection of Proposition entities in Datastore. This HashSet
   // represents their Key names.
-  public abstract HashSet<String> getPropositions();
+  public abstract HashSet<Long> getPropositions();
 
   public static Builder builder() {
     return new AutoValue_Election.Builder();
@@ -47,11 +47,11 @@ public abstract class Election {
 
   public abstract Builder toBuilder();
 
-  public Election withContests(HashSet<String> contests) {
+  public Election withContests(HashSet<Long> contests) {
     return toBuilder().setContests(contests).build();
   }
 
-  public Election withPropositions(HashSet<String> propositions) {
+  public Election withPropositions(HashSet<Long> propositions) {
     return toBuilder().setPropositions(propositions).build();
   }
 
@@ -65,9 +65,9 @@ public abstract class Election {
 
     public abstract Builder setDate(String date);
 
-    public abstract Builder setContests(HashSet<String> contests);
+    public abstract Builder setContests(HashSet<Long> contests);
 
-    public abstract Builder setPropositions(HashSet<String> propositions);
+    public abstract Builder setPropositions(HashSet<Long> propositions);
 
     public abstract Election build();
   }
@@ -85,8 +85,8 @@ public abstract class Election {
         .setName(electionQueryData.getString("name"))
         .setDate(electionQueryData.getString("electionDay"))
         .setScope(electionQueryData.getString("ocdDivisionId"))
-        .setContests(new HashSet<String>())
-        .setPropositions(new HashSet<String>())
+        .setContests(new HashSet<Long>())
+        .setPropositions(new HashSet<Long>())
         .build();
   }
 
@@ -103,17 +103,17 @@ public abstract class Election {
    */
   public Election fromVoterInfoQuery(DatastoreService datastore, JSONObject voterInfoQueryData)
       throws JSONException {
-    HashSet<String> contestKeyList = this.getContests();
-    HashSet<String> propositionKeyList = new HashSet<>();
+    HashSet<Long> contestKeyList = this.getContests();
+    HashSet<Long> propositionKeyList = new HashSet<>();
 
     if (voterInfoQueryData.has("contests")) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray("contests");
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
 
-        String contestEntityKeyName =
+        long contestEntityKeyId =
             Contest.fromVoterInfoQuery(datastore, contest).addToDatastore(datastore);
-        contestKeyList.add(contestEntityKeyName);
+        contestKeyList.add(contestEntityKeyId);
       }
     }
 
@@ -139,14 +139,14 @@ public abstract class Election {
    * @return the new Election object
    */
   public static Election fromEntity(Entity entity) {
-    HashSet<String> contests = new HashSet<>();
-    HashSet<String> propositions = new HashSet<>();
+    HashSet<Long> contests = new HashSet<>();
+    HashSet<Long> propositions = new HashSet<>();
     if (entity.getProperty("contests") != null) {
-      contests = (HashSet<String>) entity.getProperty("contests");
+      contests = (HashSet<Long>) entity.getProperty("contests");
     }
 
     if (entity.getProperty("propositions") != null) {
-      propositions = (HashSet<String>) entity.getProperty("propositions");
+      propositions = (HashSet<Long>) entity.getProperty("propositions");
     }
 
     return Election.builder()
@@ -165,7 +165,7 @@ public abstract class Election {
    *
    * @param datastore the DatastoreService to store the new Entity
    */
-  public String addToDatastore(DatastoreService datastore) {
+  public long addToDatastore(DatastoreService datastore) {
     return putInDatastore(datastore, new Entity("Election"));
   }
 
@@ -175,7 +175,7 @@ public abstract class Election {
    *
    * @param datastore the DatastoreService to store the new Entity
    */
-  public String putInDatastore(DatastoreService datastore, Entity entity) {
+  public long putInDatastore(DatastoreService datastore, Entity entity) {
     /* The "id" of an Election Entity is stored as a property instead of replacing the
      * Datastore-generated ID because Datastore may accidentally reassign IDs to other
      * entities. To avoid this problem, I would have to obtain a block of IDs with
@@ -189,6 +189,6 @@ public abstract class Election {
     entity.setProperty("contests", this.getContests());
     entity.setProperty("propositions", this.getPropositions());
     datastore.put(entity);
-    return entity.getKey().getName();
+    return entity.getKey().getId();
   }
 }
