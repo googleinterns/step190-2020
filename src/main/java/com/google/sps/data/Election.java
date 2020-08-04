@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import java.util.HashSet;
+import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,11 +36,11 @@ public abstract class Election {
 
   // This Election references a collection of Contest entities in Datastore. This HashSet represents
   // their Key names.
-  public abstract HashSet<Long> getContests();
+  public abstract Set<Long> getContests();
 
   // This Election references a collection of Proposition entities in Datastore. This HashSet
   // represents their Key names.
-  public abstract HashSet<Long> getPropositions();
+  public abstract Set<Long> getPropositions();
 
   public static Builder builder() {
     return new AutoValue_Election.Builder();
@@ -47,11 +48,11 @@ public abstract class Election {
 
   public abstract Builder toBuilder();
 
-  public Election withContests(HashSet<Long> contests) {
+  public Election withContests(Set<Long> contests) {
     return toBuilder().setContests(contests).build();
   }
 
-  public Election withPropositions(HashSet<Long> propositions) {
+  public Election withPropositions(Set<Long> propositions) {
     return toBuilder().setPropositions(propositions).build();
   }
 
@@ -65,9 +66,9 @@ public abstract class Election {
 
     public abstract Builder setDate(String date);
 
-    public abstract Builder setContests(HashSet<Long> contests);
+    public abstract Builder setContests(Set<Long> contests);
 
-    public abstract Builder setPropositions(HashSet<Long> propositions);
+    public abstract Builder setPropositions(Set<Long> propositions);
 
     public abstract Election build();
   }
@@ -103,8 +104,8 @@ public abstract class Election {
    */
   public Election fromVoterInfoQuery(DatastoreService datastore, JSONObject voterInfoQueryData)
       throws JSONException {
-    HashSet<Long> contestKeyList = this.getContests();
-    HashSet<Long> propositionKeyList = new HashSet<>();
+    Set<Long> contestKeyList = this.getContests();
+    Set<Long> propositionKeyList = new HashSet<>();
     if (voterInfoQueryData.has("contests")) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray("contests");
       for (Object contestObject : contestListData) {
@@ -138,8 +139,8 @@ public abstract class Election {
    * @return the new Election object
    */
   public static Election fromEntity(Entity entity) {
-    HashSet<Long> contests = new HashSet<>();
-    HashSet<Long> propositions = new HashSet<>();
+    Set<Long> contests = new HashSet<>();
+    Set<Long> propositions = new HashSet<>();
     if (entity.getProperty("contests") != null) {
       contests = (HashSet<Long>) entity.getProperty("contests");
     }

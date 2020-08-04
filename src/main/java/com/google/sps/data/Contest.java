@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import java.util.HashSet;
+import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,7 +29,7 @@ public abstract class Contest {
 
   // This Contest references a collection of Candidate entities in Datastore. This HashSet
   // represents their Key names.
-  public abstract HashSet<Long> getCandidates();
+  public abstract Set<Long> getCandidates();
 
   public abstract String getDescription();
 
@@ -40,7 +41,7 @@ public abstract class Contest {
   public abstract static class Builder {
     public abstract Builder setName(String name);
 
-    public abstract Builder setCandidates(HashSet<Long> candidates);
+    public abstract Builder setCandidates(Set<Long> candidates);
 
     public abstract Builder setDescription(String description);
 
@@ -52,7 +53,7 @@ public abstract class Contest {
   // instance.
   public static Contest fromVoterInfoQuery(DatastoreService datastore, JSONObject contestData)
       throws JSONException {
-    HashSet<Long> candidateKeyIds = new HashSet<>();
+    Set<Long> candidateKeyIds = new HashSet<>();
 
     if (contestData.has("candidates")) {
       for (Object candidateObject : contestData.getJSONArray("candidates")) {
