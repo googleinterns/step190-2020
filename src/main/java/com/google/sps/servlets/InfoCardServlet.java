@@ -74,6 +74,6 @@ public class InfoCardServlet extends HttpServlet {
             ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID));
     JSONObject voterInfoData = ServletUtils.readFromApiUrl(url);
     Election election = optionalElection.get();
-    Election.fromVoterInfoQuery(election, datastore, voterInfoData).putInDatastore(datastore);
+    election.fromVoterInfoQuery(datastore, voterInfoData).putInDatastore(datastore);
   }
 }

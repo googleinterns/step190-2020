@@ -17,7 +17,6 @@ package com.google.sps.data;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
-import com.google.sps.servlets.ServletUtils;
 import java.util.HashSet;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,12 +33,26 @@ public abstract class Election {
 
   public abstract String getScope();
 
+  // This Election references a collection of Contest entities in Datastore. This HashSet represents
+  // their Key names.
   public abstract HashSet<String> getContests();
 
+  // This Election references a collection of Proposition entities in Datastore. This HashSet
+  // represents their Key names.
   public abstract HashSet<String> getPropositions();
 
   public static Builder builder() {
     return new AutoValue_Election.Builder();
+  }
+
+  public abstract Builder toBuilder();
+
+  public Election withContests(HashSet<String> contests) {
+    return toBuilder().setContests(contests).build();
+  }
+
+  public Election withPropositions(HashSet<String> propositions) {
+    return toBuilder().setPropositions(propositions).build();
   }
 
   @AutoValue.Builder
@@ -88,10 +101,9 @@ public abstract class Election {
    *     API
    * @return the new Election object
    */
-  public static Election fromVoterInfoQuery(
-      Election election, DatastoreService datastore, JSONObject voterInfoQueryData)
+  public Election fromVoterInfoQuery(DatastoreService datastore, JSONObject voterInfoQueryData)
       throws JSONException {
-    HashSet<String> contestKeyList = new HashSet<String>();
+    HashSet<String> contestKeyList = this.getContests();
     HashSet<String> propositionKeyList = new HashSet<String>();
 
     if (voterInfoQueryData.has("contests")) {
@@ -99,22 +111,15 @@ public abstract class Election {
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
 
-        Contest.fromVoterInfoQuery(datastore, contest).putInDatastore(datastore);
+        String contestEntityKeyName =
+            Contest.fromVoterInfoQuery(datastore, contest).putInDatastore(datastore);
+        contestKeyList.add(contestEntityKeyName);
       }
-
-      contestKeyList = ServletUtils.getEntityKeyNameList(datastore, "Contest");
     }
 
     // TODO(caseyprice): get values for propositions
 
-    return Election.builder()
-        .setId(election.getId())
-        .setName(election.getName())
-        .setDate(election.getDate())
-        .setScope(election.getScope())
-        .setContests(contestKeyList)
-        .setPropositions(propositionKeyList)
-        .build();
+    return this.withContests(contestKeyList).withPropositions(propositionKeyList);
   }
 
   /**

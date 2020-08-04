@@ -17,7 +17,6 @@ package com.google.sps.data;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
-import com.google.sps.servlets.ServletUtils;
 import java.util.HashSet;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +26,9 @@ import org.json.JSONObject;
 public abstract class Contest {
   public abstract String getName();
 
-  public abstract HashSet<String> getCandidates();
+  // This Contest references a collection of Candidate entities in Datastore. This HashSet
+  // represents their Key names.
+  public abstract HashSet<String> getCandidateKeyNames();
 
   public abstract String getDescription();
 
@@ -39,7 +40,7 @@ public abstract class Contest {
   public abstract static class Builder {
     public abstract Builder setName(String name);
 
-    public abstract Builder setCandidates(HashSet<String> candidates);
+    public abstract Builder setCandidateKeyNames(HashSet<String> candidateKeyNames);
 
     public abstract Builder setDescription(String description);
 
@@ -49,31 +50,32 @@ public abstract class Contest {
   // creates a new Contest object by extracting the properties from "contestData"
   public static Contest fromVoterInfoQuery(DatastoreService datastore, JSONObject contestData)
       throws JSONException {
-    HashSet<String> candidateKeyList = new HashSet<String>();
+    HashSet<String> candidateKeyNames = new HashSet<String>();
 
     if (contestData.has("candidates")) {
       for (Object candidateObject : contestData.getJSONArray("candidates")) {
         JSONObject candidate = (JSONObject) candidateObject;
-        Candidate.fromVoterInfoQuery(candidate).putInDatastore(datastore);
+        String candidateEntityKeyName =
+            Candidate.fromVoterInfoQuery(candidate).putInDatastore(datastore);
+        candidateKeyNames.add(candidateEntityKeyName);
       }
-
-      candidateKeyList = ServletUtils.getEntityKeyNameList(datastore, "Candidate");
     }
 
     return Contest.builder()
         .setName(contestData.getString("office"))
-        .setCandidates(candidateKeyList)
-        // TODO(caseyprice): get value for description
+        .setCandidateKeyNames(candidateKeyNames)
+        // TODO(gianelgado): get value for description
         .setDescription("")
         .build();
   }
 
   // creates a new Entity and sets the proper properties.
-  public void putInDatastore(DatastoreService datastore) {
+  public String putInDatastore(DatastoreService datastore) {
     Entity entity = new Entity("Contest");
     entity.setProperty("name", this.getName());
-    entity.setProperty("candidates", this.getCandidates());
+    entity.setProperty("candidates", this.getCandidateKeyNames());
     entity.setProperty("description", this.getDescription());
     datastore.put(entity);
+    return entity.getKey().getName();
   }
 }
