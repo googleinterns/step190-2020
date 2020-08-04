@@ -36,12 +36,21 @@ import org.json.JSONObject;
 /**
  * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
  * can participate in on a given day.
+ *
+ * TODO(anooshree): Write unit tests using the Power Mockito framework
  */
 @WebServlet("/election")
 public class ElectionServlet extends HttpServlet {
 
   private static final String BASE_URL = "https://www.googleapis.com/civicinfo/v2/elections?key=%s";
 
+  /**
+   * Makes an API call to electionQuery in the Google Civic Information API. Puts 
+   * Election Entities in Datastore from the response.
+   *
+   * @param request the HTTP request containing user address and electionId as parameters
+   * @param response the HTTP response, contains error message if an error occurs
+   */
   @Override
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
@@ -66,6 +75,13 @@ public class ElectionServlet extends HttpServlet {
     }
   }
 
+  /**
+   * Retrieves the list of elections still open for voting on a given day in the form of 
+   * a JSON object
+   *
+   * @param request the HTTP request containing user address and electionId as parameters
+   * @param response the HTTP response, contains error message if an error occurs
+   */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Query query = new Query("Election");
