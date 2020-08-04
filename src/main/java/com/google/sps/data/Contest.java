@@ -58,7 +58,7 @@ public abstract class Contest {
       for (Object candidateObject : contestData.getJSONArray("candidates")) {
         JSONObject candidate = (JSONObject) candidateObject;
         String candidateEntityKeyName =
-            Candidate.fromVoterInfoQuery(candidate).putInDatastore(datastore);
+            Candidate.fromVoterInfoQuery(candidate).addToDatastore(datastore);
         candidateKeyNames.add(candidateEntityKeyName);
       }
     }
@@ -73,7 +73,7 @@ public abstract class Contest {
 
   // Converts the Contest into a Datastore Entity and puts the Entity into the given Datastore
   // instance.
-  public String putInDatastore(DatastoreService datastore) {
+  public String addToDatastore(DatastoreService datastore) {
     Entity entity = new Entity("Contest");
     entity.setProperty("name", this.getName());
     entity.setProperty("candidates", this.getCandidates());

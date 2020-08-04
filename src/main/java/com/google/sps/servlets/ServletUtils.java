@@ -21,7 +21,6 @@ import com.google.appengine.api.datastore.Query;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
-import com.google.sps.data.Election;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -125,21 +124,21 @@ public class ServletUtils {
    *
    * @param datastore the Datastore containing all election data
    * @param electionId the ID of the election being queried
-   * @return Optional container that contains either the Election Entity or null
+   * @return Optional container that contains either the Election entity's Key or null
    */
-  public static Optional<Election> findElectionInDatastore(
+  public static Optional<Entity> findElectionInDatastore(
       DatastoreService datastore, String electionId) {
     Query query = new Query("Election");
     PreparedQuery results = datastore.prepare(query);
-    Election targetElection = null;
+    Entity targetEntity = null;
 
     for (Entity entity : results.asIterable()) {
       if (entity.getProperty("id").equals(electionId)) {
-        targetElection = Election.fromEntity(entity);
+        targetEntity = entity;
         break;
       }
     }
 
-    return Optional.ofNullable(targetElection);
+    return Optional.ofNullable(targetEntity);
   }
 }

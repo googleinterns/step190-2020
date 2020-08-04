@@ -112,7 +112,7 @@ public abstract class Election {
         JSONObject contest = (JSONObject) contestObject;
 
         String contestEntityKeyName =
-            Contest.fromVoterInfoQuery(datastore, contest).putInDatastore(datastore);
+            Contest.fromVoterInfoQuery(datastore, contest).addToDatastore(datastore);
         contestKeyList.add(contestEntityKeyName);
       }
     }
@@ -165,8 +165,17 @@ public abstract class Election {
    *
    * @param datastore the DatastoreService to store the new Entity
    */
-  public void putInDatastore(DatastoreService datastore) {
-    Entity entity = new Entity("Election");
+  public String addToDatastore(DatastoreService datastore) {
+    return putInDatastore(datastore, new Entity("Election"));
+  }
+
+  /**
+   * Assigns the given Entity the properties of this Election object and puts it into the given
+   * Datastore instance.
+   *
+   * @param datastore the DatastoreService to store the new Entity
+   */
+  public String putInDatastore(DatastoreService datastore, Entity entity) {
     /* The "id" of an Election Entity is stored as a property instead of replacing the
      * Datastore-generated ID because Datastore may accidentally reassign IDs to other
      * entities. To avoid this problem, I would have to obtain a block of IDs with
@@ -180,5 +189,6 @@ public abstract class Election {
     entity.setProperty("contests", this.getContests());
     entity.setProperty("propositions", this.getPropositions());
     datastore.put(entity);
+    return entity.getKey().getName();
   }
 }

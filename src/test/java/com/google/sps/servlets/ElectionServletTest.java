@@ -73,7 +73,7 @@ public class ElectionServletTest {
 
     for (Object o : electionQueryArray) {
       JSONObject election = (JSONObject) o;
-      Election.fromElectionQuery(election).putInDatastore(ds);
+      Election.fromElectionQuery(election).addToDatastore(ds);
     }
 
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
@@ -96,7 +96,7 @@ public class ElectionServletTest {
 
     for (Object o : electionQueryArray) {
       JSONObject election = (JSONObject) o;
-      Election.fromElectionQuery(election).putInDatastore(ds);
+      Election.fromElectionQuery(election).addToDatastore(ds);
     }
 
     when(httpServletResponse.getWriter()).thenReturn(printWriter);

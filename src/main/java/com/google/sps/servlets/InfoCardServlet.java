@@ -16,6 +16,7 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import com.google.sps.data.Election;
 import java.io.IOException;
 import java.util.Optional;
@@ -59,10 +60,17 @@ public class InfoCardServlet extends HttpServlet {
     }
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Optional<Election> optionalElection =
+    Optional<Entity> optionalEntity =
         ServletUtils.findElectionInDatastore(datastore, optionalElectionId.get());
 
-    if (!optionalElection.isPresent() || (optionalElection.get().isPopulatedByVoterInfoQuery())) {
+    if (!optionalEntity.isPresent()) {
+      return;
+    }
+
+    Entity electionEntity = optionalEntity.get();
+    Election election = Election.fromEntity(electionEntity);
+    // Don't need to make the API call if this Election object has already been populated.
+    if (election.isPopulatedByVoterInfoQuery()) {
       return;
     }
 
@@ -73,7 +81,6 @@ public class InfoCardServlet extends HttpServlet {
             optionalElectionId.get(),
             ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID));
     JSONObject voterInfoData = ServletUtils.readFromApiUrl(url);
-    Election election = optionalElection.get();
-    election.fromVoterInfoQuery(datastore, voterInfoData).putInDatastore(datastore);
+    election.fromVoterInfoQuery(datastore, voterInfoData).putInDatastore(datastore, electionEntity);
   }
 }

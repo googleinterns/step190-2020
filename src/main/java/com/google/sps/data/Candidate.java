@@ -61,7 +61,7 @@ public abstract class Candidate {
 
   // Converts the Candidate into a Datastore Entity and puts the Entity into the given Datastore
   // instance.
-  public String putInDatastore(DatastoreService datastore) {
+  public String addToDatastore(DatastoreService datastore) {
     Entity entity = new Entity("Candidate");
     entity.setProperty("name", this.getName());
     entity.setProperty("partyAffiliation", this.getPartyAffiliation());
