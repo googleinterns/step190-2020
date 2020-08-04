@@ -56,7 +56,11 @@ public class InfoCardServlet extends HttpServlet {
         ServletUtils.getRequestParam(request, response, "electionId");
 
     if (!optionalAddress.isPresent() || !optionalElectionId.isPresent()) {
-      return;
+      response.setContentType("text/html");
+      response
+          .getWriter()
+          .println("Insufficient parameters to /info-cards. Needs address and electionId.");
+      response.setStatus(400);
     }
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
@@ -64,7 +68,12 @@ public class InfoCardServlet extends HttpServlet {
         ServletUtils.findElectionInDatastore(datastore, optionalElectionId.get());
 
     if (!optionalEntity.isPresent()) {
-      return;
+      response.setContentType("text/html");
+      response
+          .getWriter()
+          .println(
+              "Could not find election with ID " + optionalElectionId.get() + " in Datastore.");
+      response.setStatus(400);
     }
 
     Entity electionEntity = optionalEntity.get();
