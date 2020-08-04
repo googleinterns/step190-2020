@@ -1,14 +1,11 @@
 package com.google.sps.integration;
 
 import org.junit.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.Select;
 
-public class ElectionListIT {
+public class ElectionInfoIT {
   private WebDriver driver;
 
   @ClassRule
@@ -26,10 +23,9 @@ public class ElectionListIT {
   }
 
   /**
-   * TODO(anooshree): Resolve issue of being unable to test address input box locally due to 
-   *                  API restrictions
+   * TODO(anooshree): Resolve issue of being unable to test address input box locally due to API
+   * restrictions
    */
-
   @After
   public void tearDown() {
     driver.quit();
