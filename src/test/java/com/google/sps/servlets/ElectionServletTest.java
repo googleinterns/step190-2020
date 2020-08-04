@@ -51,8 +51,8 @@ public class ElectionServletTest {
     electionEntity.setProperty("name", "myElection");
     electionEntity.setProperty("scope", "myScope");
     electionEntity.setProperty("date", "myDate");
-    electionEntity.setProperty("contests", new HashSet<String>());
-    electionEntity.setProperty("propositions", new HashSet<String>());
+    electionEntity.setProperty("contests", new HashSet<Long>());
+    electionEntity.setProperty("propositions", new HashSet<Long>());
     ds.put(electionEntity);
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
     ElectionServlet electionServlet = new ElectionServlet();
@@ -73,7 +73,7 @@ public class ElectionServletTest {
 
     for (Object o : electionQueryArray) {
       JSONObject election = (JSONObject) o;
-      Election.fromElectionQuery(election).addToDatastore(ds);
+      long l = Election.fromElectionQuery(election).addToDatastore(ds);
     }
 
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
@@ -96,7 +96,7 @@ public class ElectionServletTest {
 
     for (Object o : electionQueryArray) {
       JSONObject election = (JSONObject) o;
-      Election.fromElectionQuery(election).addToDatastore(ds);
+      long l = Election.fromElectionQuery(election).addToDatastore(ds);
     }
 
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
