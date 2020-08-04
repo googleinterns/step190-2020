@@ -242,9 +242,7 @@ body{
   margin-bottom: 2.5%;
 }
 
-.election-name {
-  color: black;
-}
+
 
 .address-row-wrapper{
   margin-bottom: 4.5%;
@@ -296,4 +294,22 @@ body{
 .required:after {
   content:" *";
   color: red;
+}
+
+#election-info-page-title {
+  margin-top: 100px;
+  min-height: 10vmin;
+  font-style: normal;
+  font-weight: bold;
+  text-align: left;
+  color: #668EDB;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  flex-direction: row;
+  font-size: 1.75em;
+}
+
+#chosen-election {
+    color: #000000;
 }

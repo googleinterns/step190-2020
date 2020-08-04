@@ -94,10 +94,16 @@
             {{#each stateElections}}
             <li class="list-group-item election-item">
               <div class="election-quick-details">
-                <p>{{this.name}}</p>
+                <div id="state-election-name">
+                  <p>{{this.name}}</p>
+                </div>
                 <p><em>{{formatDate this.date}}</em></p>
               </div>
-              <div class="learn-more-button">Learn more</div>
+              <a href="#" 
+                 onclick="redirectToStateElectionPage({{{this.ID}}});return false;" 
+                 id="election-choice-js">
+                <div class="learn-more-button">Learn more</div>
+              </a>
             </li>
             {{else}}
             <p><em>No elections coming up soon.</em></p>
@@ -109,10 +115,16 @@
             {{#each nationalElections}}
             <li class="list-group-item election-item">
               <div class="election-quick-details">
-                <p>{{this.name}}</p>
+                <div id="national-election-name">
+                  <p>{{this.name}}</p>
+                </div>
                 <p><em>{{formatDate this.date}}</em></p>
               </div>
-              <div class="learn-more-button">Learn more</div>
+              <a href="#" 
+                 onclick="redirectToNationalElectionPage({{{this.ID}}});return false;" 
+                 id="election-choice-js">
+                <div class="learn-more-button">Learn more</div>
+              </a>
             </li>
             {{else}}
             <p><em>No elections coming up soon.</em></p>

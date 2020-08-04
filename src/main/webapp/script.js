@@ -11,6 +11,16 @@ function onElectionListLoad(){
   }
 }
 
+function onElectionInfoLoad(){
+  let searchParams = new URLSearchParams(window.location.search);
+  let selectedElection = searchParams.get("electionName"); 
+
+  if(selectedElection != null){
+    const chosenElection = document.getElementById('chosen-election');
+    chosenElection.innerText = selectedElection;
+  }
+}
+
 function onWelcomePageLoad(){
   let links = [document.getElementById("home-link"), document.getElementById("elections-list-link")];
   updateLinksWithQueryParams(links);
@@ -87,6 +97,10 @@ function addQueryParameter(key, value){
   window.history.pushState({path: newURL},'',newURL);
 }
 
+/**
+ * Add the user's address (autocompleted by the Places API) to the 
+ * query URL
+ */
 function logAddressInput(){
   let streetNumber = document.getElementById('street_number').value;
   let route = document.getElementById('route').value;
@@ -97,6 +111,35 @@ function logAddressInput(){
 
   addQueryParameter("address", 
                     `${streetNumber} ${route} ${city} ${state} ${zipcode} ${country}`);
+}
+
+/**
+ * Redirect to a given URL while maintaining the query string
+ * and tracking the name of the chosen state election
+ */
+function redirectToStateElectionPage(electionId){
+  let electionName = document.getElementById('state-election-name').innerText;
+  goToElectionPage(electionName, electionId);
+}
+
+/**
+ * Redirect to a given URL while maintaining the query string
+ * and tracking the name of the chosen national election
+ */
+function redirectToNationalElectionPage(electionId){
+  let electionName = document.getElementById('national-election-name').innerText;
+  goToElectionPage(electionName, electionId);
+}
+
+/**
+ * Redirect to a new site and keep the entirety of the query string.
+ */
+function goToElectionPage(electionName, electionId){
+  addQueryParameter("electionName", electionName);
+  addQueryParameter("electionId", electionId);
+
+  var query = window.location.search;
+  window.location.href = "electionInfo.html" + query;
 }
 
 /**
@@ -144,5 +187,3 @@ Handlebars.registerHelper("formatDate", function(apiDate) {
 
   return MONTHS[monthNum - 1] + ' ' + parseInt(dateParts[2]) + ', ' + dateParts[0];
 });
-
-

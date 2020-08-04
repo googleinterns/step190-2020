@@ -22,8 +22,9 @@
 
     </head>
 
-    <body>
+    <body onload="onElectionInfoLoad();">
       <div id="page-wrapper">
+
         <a href="index.html">
           <div id="header-bar">
             <p id="header-text">gVote</p>
@@ -31,15 +32,16 @@
         </a>
 
         <div class="container" id="content">
-          <div class="row page-title-text" id="dropdown-title">
-            <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
-              <!-- TODO: Replace [CHOSEN ELECTION NAME HERE] with Handlebars.js templating -->
-              <b>To show you polling locations, candidates, and ballot items from
-                  <span class="election-name"> [CHOSEN ELECTION NAME HERE]</span>, 
-                  we'll need your registered voter address: 
-              </b>
-            </p> 
+          <div id="election-info-page-title">
+            <p style="display:inline">
+              <b>To show you polling locations, candidates, and ballot items from the&nbsp;</b> 
+            </p>
+            <div id="chosen-election"> </div>
+            <p style="display:inline">
+              <b>, we'll need your registered voter address: </b>
+            </p>
           </div>
+
           <div class="input-wrapper">
             <div class="panel panel-primary">
               <div class="container panel-body">
