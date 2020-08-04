@@ -72,6 +72,21 @@ public abstract class Contest {
         .build();
   }
 
+  // Creates a new Contest object by using the propperties of the provided
+  // contenst entity
+  public static Contest fromEntity(Entity entity) {
+    HashSet<Long> candidates = new HashSet<>();
+    if (entity.getProperty("candidates") != null) {
+      candidates = (HashSet<Long>) entity.getProperty("candidates");
+    }
+
+    return Contest.builder()
+        .setName((String) entity.getProperty("name"))
+        .setDescription((String) entity.getProperty("description"))
+        .setCandidates(candidates)
+        .build();
+  }
+
   // Converts the Contest into a Datastore Entity and puts the Entity into the given Datastore
   // instance.
   public long addToDatastore(DatastoreService datastore) {
