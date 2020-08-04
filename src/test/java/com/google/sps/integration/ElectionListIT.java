@@ -49,6 +49,29 @@ public class ElectionListIT {
         driver.getCurrentUrl());
   }
 
+  /**
+   * Tests if selecting an election from the list available post-state selection changes the URL to
+   * redirect to the election information page and add the query parameters 'electionName' with the
+   * value being the name of the selected election and 'electionID' with the value being its ID.
+   */
+  @Test
+  public void electionSelection_onClick_redirectAndUpdateElectionQueryParameters() {
+    driver.get("http://localhost:9876/electionlist.html?state=ga");
+
+    WebElement learnMoreButton = driver.findElement(By.id("state-learn-more-button"));
+    learnMoreButton.click();
+
+    String targetElectionName = "Georgia+General+Primary+Runoff+Election";
+    String targetElectionID = "4979";
+
+    Assert.assertEquals(
+        "http://localhost:9876/electionInfo.html?state=ga&electionName="
+            + targetElectionName
+            + "&electionId="
+            + targetElectionID,
+        driver.getCurrentUrl());
+  }
+
   @After
   public void tearDown() {
     driver.quit();
