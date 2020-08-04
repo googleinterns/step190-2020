@@ -53,19 +53,21 @@ public abstract class Candidate {
     return Candidate.builder()
         .setName(candidateData.getString("name"))
         .setPartyAffiliation(candidateData.getString("party"))
-        // TODO(caseyprice): get values for campaignSite and platformDescription
+        // TODO(gianelgado): get values for campaignSite and platformDescription
         .setCampaignSite("")
         .setPlatformDescription("")
         .build();
   }
 
-  // creates a new Entity and sets the proper properties.
-  public void putInDatastore(DatastoreService datastore) {
+  // Converts the Candidate into a Datastore Entity and puts the Entity into the given Datastore
+  // instance.
+  public long addToDatastore(DatastoreService datastore) {
     Entity entity = new Entity("Candidate");
     entity.setProperty("name", this.getName());
     entity.setProperty("partyAffiliation", this.getPartyAffiliation());
     entity.setProperty("campaignSite", this.getCampaignSite());
     entity.setProperty("platformDescription", this.getPlatformDescription());
     datastore.put(entity);
+    return entity.getKey().getId();
   }
 }

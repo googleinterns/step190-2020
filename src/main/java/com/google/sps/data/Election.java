@@ -17,8 +17,8 @@ package com.google.sps.data;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
-import com.google.sps.servlets.ServletUtils;
 import java.util.HashSet;
+import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,12 +34,26 @@ public abstract class Election {
 
   public abstract String getScope();
 
-  public abstract HashSet<String> getContests();
+  // This Election references a collection of Contest entities in Datastore. This HashSet represents
+  // their Key names.
+  public abstract Set<Long> getContests();
 
-  public abstract HashSet<String> getPropositions();
+  // This Election references a collection of Proposition entities in Datastore. This HashSet
+  // represents their Key names.
+  public abstract Set<Long> getPropositions();
 
   public static Builder builder() {
     return new AutoValue_Election.Builder();
+  }
+
+  public abstract Builder toBuilder();
+
+  public Election withContests(Set<Long> contests) {
+    return toBuilder().setContests(contests).build();
+  }
+
+  public Election withPropositions(Set<Long> propositions) {
+    return toBuilder().setPropositions(propositions).build();
   }
 
   @AutoValue.Builder
@@ -52,9 +66,9 @@ public abstract class Election {
 
     public abstract Builder setDate(String date);
 
-    public abstract Builder setContests(HashSet<String> contests);
+    public abstract Builder setContests(Set<Long> contests);
 
-    public abstract Builder setPropositions(HashSet<String> propositions);
+    public abstract Builder setPropositions(Set<Long> propositions);
 
     public abstract Election build();
   }
@@ -72,8 +86,8 @@ public abstract class Election {
         .setName(electionQueryData.getString("name"))
         .setDate(electionQueryData.getString("electionDay"))
         .setScope(electionQueryData.getString("ocdDivisionId"))
-        .setContests(new HashSet<String>())
-        .setPropositions(new HashSet<String>())
+        .setContests(new HashSet<Long>())
+        .setPropositions(new HashSet<Long>())
         .build();
   }
 
@@ -88,33 +102,24 @@ public abstract class Election {
    *     API
    * @return the new Election object
    */
-  public static Election fromVoterInfoQuery(
-      Election election, DatastoreService datastore, JSONObject voterInfoQueryData)
+  public Election fromVoterInfoQuery(DatastoreService datastore, JSONObject voterInfoQueryData)
       throws JSONException {
-    HashSet<String> contestKeyList = new HashSet<String>();
-    HashSet<String> propositionKeyList = new HashSet<String>();
-
+    Set<Long> contestKeyList = this.getContests();
+    Set<Long> propositionKeyList = new HashSet<>();
     if (voterInfoQueryData.has("contests")) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray("contests");
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
 
-        Contest.fromVoterInfoQuery(datastore, contest).putInDatastore(datastore);
+        long contestEntityKeyId =
+            Contest.fromVoterInfoQuery(datastore, contest).addToDatastore(datastore);
+        contestKeyList.add(contestEntityKeyId);
       }
-
-      contestKeyList = ServletUtils.getEntityKeyNameList(datastore, "Contest");
     }
 
     // TODO(caseyprice): get values for propositions
 
-    return Election.builder()
-        .setId(election.getId())
-        .setName(election.getName())
-        .setDate(election.getDate())
-        .setScope(election.getScope())
-        .setContests(contestKeyList)
-        .setPropositions(propositionKeyList)
-        .build();
+    return this.withContests(contestKeyList);
   }
 
   /**
@@ -134,14 +139,14 @@ public abstract class Election {
    * @return the new Election object
    */
   public static Election fromEntity(Entity entity) {
-    HashSet<String> contests = new HashSet<String>();
-    HashSet<String> propositions = new HashSet<String>();
+    Set<Long> contests = new HashSet<>();
+    Set<Long> propositions = new HashSet<>();
     if (entity.getProperty("contests") != null) {
-      contests = (HashSet<String>) entity.getProperty("contests");
+      contests = (HashSet<Long>) entity.getProperty("contests");
     }
 
     if (entity.getProperty("propositions") != null) {
-      propositions = (HashSet<String>) entity.getProperty("propositions");
+      propositions = (HashSet<Long>) entity.getProperty("propositions");
     }
 
     return Election.builder()
@@ -160,8 +165,17 @@ public abstract class Election {
    *
    * @param datastore the DatastoreService to store the new Entity
    */
-  public void putInDatastore(DatastoreService datastore) {
-    Entity entity = new Entity("Election");
+  public long addToDatastore(DatastoreService datastore) {
+    return putInDatastore(datastore, new Entity("Election"));
+  }
+
+  /**
+   * Assigns the given Entity the properties of this Election object and puts it into the given
+   * Datastore instance.
+   *
+   * @param datastore the DatastoreService to store the new Entity
+   */
+  public long putInDatastore(DatastoreService datastore, Entity entity) {
     /* The "id" of an Election Entity is stored as a property instead of replacing the
      * Datastore-generated ID because Datastore may accidentally reassign IDs to other
      * entities. To avoid this problem, I would have to obtain a block of IDs with
@@ -175,5 +189,6 @@ public abstract class Election {
     entity.setProperty("contests", this.getContests());
     entity.setProperty("propositions", this.getPropositions());
     datastore.put(entity);
+    return entity.getKey().getId();
   }
 }

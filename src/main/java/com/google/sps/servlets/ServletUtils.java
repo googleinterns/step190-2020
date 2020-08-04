@@ -21,14 +21,12 @@ import com.google.appengine.api.datastore.Query;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
-import com.google.sps.data.Election;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -131,41 +129,21 @@ public class ServletUtils {
    *
    * @param datastore the Datastore containing all election data
    * @param electionId the ID of the election being queried
-   * @return Optional container that contains either the Election Entity or null
+   * @return Optional container that contains either the Election entity's Key or null
    */
-  public static Optional<Election> findElectionInDatastore(
+  public static Optional<Entity> findElectionInDatastore(
       DatastoreService datastore, String electionId) {
     Query query = new Query("Election");
     PreparedQuery results = datastore.prepare(query);
-    Election targetElection = null;
+    Entity targetEntity = null;
 
     for (Entity entity : results.asIterable()) {
       if (entity.getProperty("id").equals(electionId)) {
-        targetElection = Election.fromEntity(entity);
+        targetEntity = entity;
         break;
       }
     }
 
-    return Optional.ofNullable(targetElection);
-  }
-
-  /**
-   * Gets the names of all Keys of a type of Entity in the Datastore.
-   *
-   * @param datastore the Datastore containing all election data
-   * @param entityType the kind of Entity to query
-   * @return set of Keys' names of all Contest Entities added
-   */
-  public static HashSet<String> getEntityKeyNameList(
-      DatastoreService datastore, String entityType) {
-    HashSet<String> keyNameList = new HashSet<String>();
-    Query query = new Query(entityType);
-    PreparedQuery results = datastore.prepare(query);
-
-    for (Entity entity : results.asIterable()) {
-      keyNameList.add(entity.getKey().getName());
-    }
-
-    return keyNameList;
+    return Optional.ofNullable(targetEntity);
   }
 }

@@ -71,7 +71,8 @@ public class ElectionServlet extends HttpServlet {
 
     for (Object o : electionQueryArray) {
       JSONObject election = (JSONObject) o;
-      Election.fromElectionQuery(election).putInDatastore(datastore);
+      // TODO(anooshree): store Key name returned by addToDatastore(), to be used in PollingStation.
+      Election.fromElectionQuery(election).addToDatastore(datastore);
     }
   }
 

@@ -16,6 +16,7 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import com.google.sps.data.Election;
 import java.io.IOException;
 import java.util.Optional;
@@ -55,14 +56,30 @@ public class InfoCardServlet extends HttpServlet {
         ServletUtils.getRequestParam(request, response, "electionId");
 
     if (!optionalAddress.isPresent() || !optionalElectionId.isPresent()) {
-      return;
+      response.setContentType("text/html");
+      response
+          .getWriter()
+          .println("Insufficient parameters to /info-cards. Needs address and electionId.");
+      response.setStatus(400);
     }
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Optional<Election> optionalElection =
+    Optional<Entity> optionalEntity =
         ServletUtils.findElectionInDatastore(datastore, optionalElectionId.get());
 
-    if (!optionalElection.isPresent() || (optionalElection.get().isPopulatedByVoterInfoQuery())) {
+    if (!optionalEntity.isPresent()) {
+      response.setContentType("text/html");
+      response
+          .getWriter()
+          .println(
+              "Could not find election with ID " + optionalElectionId.get() + " in Datastore.");
+      response.setStatus(400);
+    }
+
+    Entity electionEntity = optionalEntity.get();
+    Election election = Election.fromEntity(electionEntity);
+    // Don't need to make the API call if this Election object has already been populated.
+    if (election.isPopulatedByVoterInfoQuery()) {
       return;
     }
 
@@ -73,7 +90,6 @@ public class InfoCardServlet extends HttpServlet {
             optionalElectionId.get(),
             ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID));
     JSONObject voterInfoData = ServletUtils.readFromApiUrl(url);
-    Election election = optionalElection.get();
-    Election.fromVoterInfoQuery(election, datastore, voterInfoData).putInDatastore(datastore);
+    election.fromVoterInfoQuery(datastore, voterInfoData).putInDatastore(datastore, electionEntity);
   }
 }

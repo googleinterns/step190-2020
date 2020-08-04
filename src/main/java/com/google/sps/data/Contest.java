@@ -17,8 +17,9 @@ package com.google.sps.data;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
-import com.google.sps.servlets.ServletUtils;
+import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
+import java.util.Set;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,7 +28,9 @@ import org.json.JSONObject;
 public abstract class Contest {
   public abstract String getName();
 
-  public abstract HashSet<String> getCandidates();
+  // This Contest references a collection of Candidate entities in Datastore. This HashSet
+  // represents their Key names.
+  public abstract ImmutableSet<Long> getCandidates();
 
   public abstract String getDescription();
 
@@ -39,41 +42,60 @@ public abstract class Contest {
   public abstract static class Builder {
     public abstract Builder setName(String name);
 
-    public abstract Builder setCandidates(HashSet<String> candidates);
+    public abstract Builder setCandidates(Set<Long> candidates);
 
     public abstract Builder setDescription(String description);
 
     public abstract Contest build();
   }
 
-  // creates a new Contest object by extracting the properties from "contestData"
+  // Creates a new Contest object by extracting the properties from "contestData". For each of its
+  // "candidate" properties, creates a new Candidate object and inserts it into the given Datastore
+  // instance.
   public static Contest fromVoterInfoQuery(DatastoreService datastore, JSONObject contestData)
       throws JSONException {
-    HashSet<String> candidateKeyList = new HashSet<String>();
+    Set<Long> candidateKeyIds = new HashSet<>();
 
     if (contestData.has("candidates")) {
       for (Object candidateObject : contestData.getJSONArray("candidates")) {
         JSONObject candidate = (JSONObject) candidateObject;
-        Candidate.fromVoterInfoQuery(candidate).putInDatastore(datastore);
+        long candidateEntityKeyId =
+            Candidate.fromVoterInfoQuery(candidate).addToDatastore(datastore);
+        candidateKeyIds.add(candidateEntityKeyId);
       }
-
-      candidateKeyList = ServletUtils.getEntityKeyNameList(datastore, "Candidate");
     }
 
     return Contest.builder()
         .setName(contestData.getString("office"))
-        .setCandidates(candidateKeyList)
-        // TODO(caseyprice): get value for description
+        .setCandidates(candidateKeyIds)
+        // TODO(gianelgado): get value for description
         .setDescription("")
         .build();
   }
 
-  // creates a new Entity and sets the proper properties.
-  public void putInDatastore(DatastoreService datastore) {
+  // Creates a new Contest object by using the propperties of the provided
+  // contenst entity
+  public static Contest fromEntity(Entity entity) {
+    HashSet<Long> candidates = new HashSet<>();
+    if (entity.getProperty("candidates") != null) {
+      candidates = (HashSet<Long>) entity.getProperty("candidates");
+    }
+
+    return Contest.builder()
+        .setName((String) entity.getProperty("name"))
+        .setDescription((String) entity.getProperty("description"))
+        .setCandidates(candidates)
+        .build();
+  }
+
+  // Converts the Contest into a Datastore Entity and puts the Entity into the given Datastore
+  // instance.
+  public long addToDatastore(DatastoreService datastore) {
     Entity entity = new Entity("Contest");
     entity.setProperty("name", this.getName());
     entity.setProperty("candidates", this.getCandidates());
     entity.setProperty("description", this.getDescription());
     datastore.put(entity);
+    return entity.getKey().getId();
   }
 }
