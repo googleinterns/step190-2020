@@ -28,9 +28,10 @@ public class ContestServletTest {
   @Mock HttpServletResponse httpServletResponse;
   @Mock PrintWriter printWriter;
 
-  private static Set<Long> CANDIDATE_ID_SET;
+  private static Set<Long> candidateIdSet;
   private static Entity electionEntityOne;
   private static Entity contestEntityOne;
+  private static Entity contestEntityTwo;
 
   @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -38,10 +39,10 @@ public class ContestServletTest {
   public static void classSetUp() {
     helper.setUp();
 
-    CANDIDATE_ID_SET = new HashSet<Long>();
-    CANDIDATE_ID_SET.add(Long.valueOf(1));
-    CANDIDATE_ID_SET.add(Long.valueOf(2));
-    CANDIDATE_ID_SET.add(Long.valueOf(3));
+    candidateIdSet = new HashSet<Long>();
+    candidateIdSet.add(Long.valueOf(1));
+    candidateIdSet.add(Long.valueOf(2));
+    candidateIdSet.add(Long.valueOf(3));
 
     electionEntityOne = new Entity("Election");
     electionEntityOne.setProperty("id", "9999");
@@ -51,10 +52,15 @@ public class ContestServletTest {
     electionEntityOne.setProperty("contests", new HashSet<Long>());
     electionEntityOne.setProperty("propositions", new HashSet<Long>());
 
-    contestEntityOne = new Entity("Contest");
-    contestEntityOne.setProperty("name", "myContest");
-    contestEntityOne.setProperty("candidates", CANDIDATE_ID_SET);
+    contestEntityOne = new Entity("Contest", 1);
+    contestEntityOne.setProperty("name", "myFirstContest");
+    contestEntityOne.setProperty("candidates", candidateIdSet);
     contestEntityOne.setProperty("description", "This contest is important.");
+
+    contestEntityTwo = new Entity("Contest", 2);
+    contestEntityTwo.setProperty("name", "mySecondContest");
+    contestEntityTwo.setProperty("candidates", new HashSet<Long>());
+    contestEntityTwo.setProperty("description", "This contest is also important.");
 
     helper.tearDown();
   }
@@ -65,12 +71,11 @@ public class ContestServletTest {
   }
 
   @Test
-  public void singleElection_singleContest_testReturn() throws Exception {
+  public void singleElection_singleContest_testDoGet() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     long contestId = ds.put(contestEntityOne).getId();
 
     HashSet<Long> contestSet = (HashSet<Long>) electionEntityOne.getProperty("contests");
-    System.out.println(contestId);
     contestSet.add(contestId);
     ds.put(electionEntityOne);
 
@@ -82,11 +87,36 @@ public class ContestServletTest {
 
     verify(printWriter)
         .println(
-            "[{\"name\":\"myContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"}]");
+            "[{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"}]");
+  }
+
+  @Test
+  public void singleElection_twoContest_testDoGet() throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long contestOneId = ds.put(contestEntityOne).getId();
+    long contestTwoId = ds.put(contestEntityTwo).getId();
+
+    HashSet<Long> contestSet = (HashSet<Long>) electionEntityOne.getProperty("contests");
+    contestSet.add(contestOneId);
+    contestSet.add(contestTwoId);
+    ds.put(electionEntityOne);
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "[{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"},"
+                + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\"}]");
   }
 
   @After
   public void tearDown() {
     helper.tearDown();
+    electionEntityOne.setProperty("contests", new HashSet<Long>());
+    electionEntityOne.setProperty("propositions", new HashSet<Long>());
   }
 }

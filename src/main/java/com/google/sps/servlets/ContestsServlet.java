@@ -20,8 +20,6 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
 import com.google.sps.data.Contest;
 import java.io.IOException;
@@ -34,23 +32,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
- * can participate in on a given day.
+ * This servlet is used to retrieve the information of all the contest present on the election
+ * specified by query parameter.
  */
 @WebServlet("/contests")
 public class ContestsServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    int electionId = Integer.parseInt(request.getParameter("electionId"));
+    String electionId = ServletUtils.getRequestParam(request, response, "electionId").get();
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Entity electionEntity;
 
-    try {
-      electionEntity = getElectionEntityFromId(datastore, electionId);
-    } catch (Exception e) {
-      response.getWriter().println(e.getMessage());
-      return;
-    }
+    electionEntity = ServletUtils.findElectionInDatastore(datastore, electionId).get();
 
     Collection<Long> electionContestsIds =
         (Collection<Long>) electionEntity.getProperty("contests");
@@ -62,7 +55,9 @@ public class ContestsServlet extends HttpServlet {
         Entity currentContestEntity = datastore.get(currentKey);
         contestList.add(Contest.fromEntity(currentContestEntity));
       } catch (EntityNotFoundException e) {
-        response.getWriter().println("Contest was not found.");
+        response.setContentType("text/html");
+        response.getWriter().println("Contest with Id" + contestId.toString() + " was not found.");
+        response.setStatus(400);
         return;
       }
     }
@@ -72,26 +67,5 @@ public class ContestsServlet extends HttpServlet {
 
     response.setContentType("application/json;");
     response.getWriter().println(json);
-  }
-
-  // Given an election ID return the corresponding election from datastore
-  private static Entity getElectionEntityFromId(DatastoreService datastore, int electionId)
-      throws Exception {
-    Query electionQuery = new Query("Election");
-    PreparedQuery results = datastore.prepare(electionQuery);
-    Entity currentElection = null;
-    for (Entity electionEntity : results.asIterable()) {
-      int currentElectionId = Integer.parseInt((String) electionEntity.getProperty("id"));
-      if (electionId == currentElectionId) {
-        currentElection = electionEntity;
-        break;
-      }
-    }
-
-    if (currentElection == null) {
-      throw new Exception("No election with the provided election ID found.");
-    }
-
-    return currentElection;
   }
 }
