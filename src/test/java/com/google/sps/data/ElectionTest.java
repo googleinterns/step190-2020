@@ -76,7 +76,7 @@ public class ElectionTest {
             .setDate("myDate")
             .setScope("myScope")
             .setContests(new HashSet<Long>())
-            .setPropositions(new HashSet<Long>())
+            .setReferendums(new HashSet<Long>())
             .build();
 
     long updatedEntityKeyId = updatedElection.putInDatastore(ds, entity);
@@ -99,7 +99,7 @@ public class ElectionTest {
             .setDate("myDate")
             .setScope("myScope")
             .setContests(new HashSet<Long>())
-            .setPropositions(new HashSet<Long>())
+            .setReferendums(new HashSet<Long>())
             .build();
 
     long entityKeyId = election.addToDatastore(ds);
@@ -127,7 +127,7 @@ public class ElectionTest {
     Assert.assertEquals(election.getDate(), "myDate");
     Assert.assertEquals(election.getScope(), "myScope");
     Assert.assertEquals(election.getContests(), new HashSet<Long>());
-    Assert.assertEquals(election.getPropositions(), new HashSet<Long>());
+    Assert.assertEquals(election.getReferendums(), new HashSet<Long>());
   }
 
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading
@@ -142,7 +142,7 @@ public class ElectionTest {
             .setDate("myDate")
             .setScope("myScope")
             .setContests(new HashSet<Long>())
-            .setPropositions(new HashSet<Long>())
+            .setReferendums(new HashSet<Long>())
             .build();
     JSONObject voterInfoQueryJson =
         new JSONObject(

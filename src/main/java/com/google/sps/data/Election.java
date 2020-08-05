@@ -38,9 +38,9 @@ public abstract class Election {
   // their Key names.
   public abstract Set<Long> getContests();
 
-  // This Election references a collection of Proposition entities in Datastore. This HashSet
+  // This Election references a collection of Referendum entities in Datastore. This HashSet
   // represents their Key names.
-  public abstract Set<Long> getPropositions();
+  public abstract Set<Long> getReferendums();
 
   public static Builder builder() {
     return new AutoValue_Election.Builder();
@@ -52,8 +52,8 @@ public abstract class Election {
     return toBuilder().setContests(contests).build();
   }
 
-  public Election withPropositions(Set<Long> propositions) {
-    return toBuilder().setPropositions(propositions).build();
+  public Election withReferendums(Set<Long> referendums) {
+    return toBuilder().setReferendums(referendums).build();
   }
 
   @AutoValue.Builder
@@ -68,7 +68,7 @@ public abstract class Election {
 
     public abstract Builder setContests(Set<Long> contests);
 
-    public abstract Builder setPropositions(Set<Long> propositions);
+    public abstract Builder setReferendums(Set<Long> referendums);
 
     public abstract Election build();
   }
@@ -87,12 +87,12 @@ public abstract class Election {
         .setDate(electionQueryData.getString("electionDay"))
         .setScope(electionQueryData.getString("ocdDivisionId"))
         .setContests(new HashSet<Long>())
-        .setPropositions(new HashSet<Long>())
+        .setReferendums(new HashSet<Long>())
         .build();
   }
 
   /**
-   * Creates an Election object with contests and propositions fields from the corresponding
+   * Creates an Election object with contests and referendums fields from the corresponding
    * properties of "voterInfoQueryData". Copies the remaining fields from this Election object.
    * Delegates creating Contest Entities in Datastore from this Election's list of contests.
    *
@@ -104,38 +104,37 @@ public abstract class Election {
   public Election fromVoterInfoQuery(DatastoreService datastore, JSONObject voterInfoQueryData)
       throws JSONException {
     Set<Long> contestKeyList = this.getContests();
-    Set<Long> propositionKeyList = new HashSet<>();
+    Set<Long> referendumKeyList = new HashSet<>();
     if (voterInfoQueryData.has("contests")) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray("contests");
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
 
-        // Office positions and 
+        // Office positions and
         if (contest.getString("type").equals("Referendum")) {
-          long propositionEntityKeyId =
-            Proposition.fromJSONObject(datastore, contest).addToDatastore(datastore);
-          propositionKeyList.add(propositionEntityKeyId);
+          long referendumEntityKeyId = Referendum.fromJSONObject(contest).addToDatastore(datastore);
+          referendumKeyList.add(referendumEntityKeyId);
         } else {
           long contestEntityKeyId =
-            Contest.fromJSONObject(datastore, contest).addToDatastore(datastore);
+              Contest.fromJSONObject(datastore, contest).addToDatastore(datastore);
           contestKeyList.add(contestEntityKeyId);
         }
       }
     }
 
-    // TODO(caseyprice): get values for propositions
+    // TODO(caseyprice): get values for referendums
 
-    return this.withContests(contestKeyList).withPropositions(propositionKeyList);
+    return this.withContests(contestKeyList).withReferendums(referendumKeyList);
   }
 
   /**
    * Checks if an Election object has been populated by the output of a voterInfoQuery call from the
    * Google Civic Information API.
    *
-   * @return true if contests and propositions contain elements, false otherwise
+   * @return true if contests and referendums contain elements, false otherwise
    */
   public boolean isPopulatedByVoterInfoQuery() {
-    return !getContests().isEmpty() && !getPropositions().isEmpty();
+    return !getContests().isEmpty() && !getReferendums().isEmpty();
   }
 
   /**
@@ -146,13 +145,13 @@ public abstract class Election {
    */
   public static Election fromEntity(Entity entity) {
     Set<Long> contests = new HashSet<>();
-    Set<Long> propositions = new HashSet<>();
+    Set<Long> referendums = new HashSet<>();
     if (entity.getProperty("contests") != null) {
       contests = (HashSet<Long>) entity.getProperty("contests");
     }
 
-    if (entity.getProperty("propositions") != null) {
-      propositions = (HashSet<Long>) entity.getProperty("propositions");
+    if (entity.getProperty("referendums") != null) {
+      referendums = (HashSet<Long>) entity.getProperty("referendums");
     }
 
     return Election.builder()
@@ -161,7 +160,7 @@ public abstract class Election {
         .setDate((String) entity.getProperty("date"))
         .setScope((String) entity.getProperty("scope"))
         .setContests(contests)
-        .setPropositions(propositions)
+        .setReferendums(referendums)
         .build();
   }
 
@@ -193,7 +192,7 @@ public abstract class Election {
     entity.setProperty("date", this.getDate());
     entity.setProperty("scope", this.getScope());
     entity.setProperty("contests", this.getContests());
-    entity.setProperty("propositions", this.getPropositions());
+    entity.setProperty("referendums", this.getReferendums());
     datastore.put(entity);
     return entity.getKey().getId();
   }

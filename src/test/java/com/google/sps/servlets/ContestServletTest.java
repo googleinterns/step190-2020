@@ -50,7 +50,7 @@ public class ContestServletTest {
     electionEntityOne.setProperty("scope", "myScope");
     electionEntityOne.setProperty("date", "myDate");
     electionEntityOne.setProperty("contests", new HashSet<Long>());
-    electionEntityOne.setProperty("propositions", new HashSet<Long>());
+    electionEntityOne.setProperty("referendums", new HashSet<Long>());
 
     contestEntityOne = new Entity("Contest", 1);
     contestEntityOne.setProperty("name", "myFirstContest");
@@ -117,6 +117,6 @@ public class ContestServletTest {
   public void tearDown() {
     helper.tearDown();
     electionEntityOne.setProperty("contests", new HashSet<Long>());
-    electionEntityOne.setProperty("propositions", new HashSet<Long>());
+    electionEntityOne.setProperty("referendums", new HashSet<Long>());
   }
 }
