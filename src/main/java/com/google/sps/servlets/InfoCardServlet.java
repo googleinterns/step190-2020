@@ -14,8 +14,12 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.sps.data.Election;
 import java.io.IOException;
-import java.net.URL;
+import java.util.Optional;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,54 +29,72 @@ import org.json.JSONObject;
 /**
  * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
  * can participate in on a given day.
+ *
+ * <p>TODO(caseyprice): Write unit tests using Mockito framework
  */
 @WebServlet("/info-cards")
 public class InfoCardServlet extends HttpServlet {
+  private static final String BASE_URL =
+      "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?address=%s&electionId=%s&key=%s";
+  private static final String PROJECT_ID = "112408856470";
+  private static final String SECRET_MANAGER_ID = "election-api-key";
+  private static final String VERSION_ID = "1";
 
-  private static final String BASE_URL = "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?";
-
+  /**
+   * Makes an API call to voterInfoQuery in the Google Civic Information API using the user-chosen
+   * address and election ID as parameters. Puts Position and Candidate Entities in Datastore from
+   * the response. Finds the chosen Election Entity in the Datastore and fills in properties with
+   * the corresponding API response data.
+   *
+   * @param request the HTTP request containing user address and electionId as parameters
+   * @param response the HTTP response, contains error message if an error occurs
+   */
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Optional<String> optionalAddress = ServletUtils.getRequestParam(request, response, "address");
+    Optional<String> optionalElectionId =
+        ServletUtils.getRequestParam(request, response, "electionId");
 
-    // find the corresponding election and check fields
-    // TODO (anooshree): iterate through Datastore and find the election
-    //                   with the matching electionId
-    // if this election is already populated, we don't need to make another query
-
-    String address = request.getParameter("address");
-    if (address == null) {
+    if (!optionalAddress.isPresent() || !optionalElectionId.isPresent()) {
       response.setContentType("text/html");
       response
           .getWriter()
-          .println("No address in the query URL, please check why this is the case.");
+          .println("Insufficient parameters to /info-cards. Needs address and electionId.");
       response.setStatus(400);
-      return;
     }
 
-    String electionId = request.getParameter("electionId");
-    if (electionId == null) {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Optional<Entity> optionalEntity =
+        ServletUtils.findElectionInDatastore(datastore, optionalElectionId.get());
+
+    if (!optionalEntity.isPresent()) {
       response.setContentType("text/html");
       response
           .getWriter()
-          .println("No election ID in the query URL, please check why this is the case.");
+          .println(
+              "Could not find election with ID " + optionalElectionId.get() + " in Datastore.");
       response.setStatus(400);
+    }
+
+    Entity electionEntity = optionalEntity.get();
+    Election election = Election.fromEntity(electionEntity);
+    // Don't need to make the API call if this Election object has already been populated.
+    if (election.isPopulatedByVoterInfoQuery()) {
       return;
     }
 
-    URL url =
-        new URL(
-            String.format(
-                BASE_URL,
-                address,
-                electionId,
-                ServletHelper.getApiKey("112408856470", "election-api-key", "1")));
-    JSONObject obj = ServletHelper.readFromApiUrl(url, response);
+    String url =
+        String.format(
+            BASE_URL,
+            optionalAddress.get(),
+            optionalElectionId.get(),
+            ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID));
+    JSONObject voterInfoData = ServletUtils.readFromApiUrl(url);
 
-    // TODO(anooshree, caseyprice): process JSON objects from API to store as
-    //                              Datastore entities using decomposed functions
-
-    // TODO(caseyprice): populate the election entity by mapping to the
-    //                   candidates and propositions on the ballot
+    election.fromVoterInfoQuery(datastore, voterInfoData).putInDatastore(datastore, electionEntity);
+    // TODO(anooshree): write similar method for PollingStations object that reads in polling
+    // information
+    //                  and writes entities to Datastore
 
   }
 }

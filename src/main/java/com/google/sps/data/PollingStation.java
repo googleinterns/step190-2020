@@ -14,33 +14,68 @@
 
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import java.util.HashMap;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /** A polling station open for voters to vote or drop ballots off at */
 @AutoValue
 public abstract class PollingStation {
-  public abstract long getID();
-
   public abstract String getName();
 
   public abstract String getAddress();
 
-  public abstract HashMap<Long, Election> getElections();
+  public abstract HashMap<String, HashMap<String, String>> getElections();
 
   public static Builder builder() {
     return new AutoValue_PollingStation.Builder();
   }
 
+  // creates a new PollingStation object by extracting the properties from "obj"
+  public static PollingStation fromJSONObject(JSONObject obj) throws JSONException {
+    return PollingStation.builder()
+        .setName(obj.getJSONObject("address").getString("locationName"))
+        .setAddress("")
+        .setElections(new HashMap<String, HashMap<String, String>>())
+        .build();
+  }
+
+  public static PollingStation fromEntity(Entity entity) {
+    return PollingStation.builder()
+        .setName((String) entity.getProperty("name"))
+        .setAddress((String) entity.getProperty("address"))
+        .setElections((HashMap<String, HashMap<String, String>>) entity.getProperty("date"))
+        .build();
+  }
+
+  // creates a new Entity and sets the proper properties.
+  public Entity toEntity() {
+    Entity entity = new Entity("PollingStation");
+    entity.setProperty("name", this.getName());
+    entity.setProperty("address", this.getAddress());
+    entity.setProperty("elections", new HashMap<String, HashMap<String, String>>());
+    return entity;
+  }
+
+  // TODO(anooshree): write method that goes through polling stations for a
+  // given election and updates polling stations, return a list
+  //
+  // Should update polling stations that already exist in Datastore and create
+  // new ones for those that do not.
+  //
+  // public static HashSet<PollingStation> getPollingStationsForElection(String electionID)
+
+  // TODO(anooshree): add a method that either adds a set or a single PollingStation to Datastore.
+
   @AutoValue.Builder
   public abstract static class Builder {
-    public abstract Builder setID(long id);
-
     public abstract Builder setName(String name);
 
     public abstract Builder setAddress(String scope);
 
-    public abstract Builder setElections(HashMap<Long, Election> elections);
+    public abstract Builder setElections(HashMap<String, HashMap<String, String>> elections);
 
     public abstract PollingStation build();
   }

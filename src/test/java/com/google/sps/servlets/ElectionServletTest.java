@@ -10,6 +10,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.*;
@@ -17,8 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-/** An example unit test. */
-public class ExampleUnitTest {
+public class ElectionServletTest {
   private final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(
           new LocalDatastoreServiceTestConfig(), new LocalURLFetchServiceTestConfig());
@@ -39,29 +39,23 @@ public class ExampleUnitTest {
     helper.tearDown();
   }
 
-  // Example for how to use DatastoreService for servlet-only tests.
+  // Test getting election data from Datastore
   @Test
   public void testElectionGet() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Entity electionEntity = new Entity("Election");
-    electionEntity.setProperty("id", 9999);
+    electionEntity.setProperty("id", "9999");
     electionEntity.setProperty("name", "myElection");
     electionEntity.setProperty("scope", "myScope");
     electionEntity.setProperty("date", "myDate");
+    electionEntity.setProperty("contests", new HashSet<Long>());
+    electionEntity.setProperty("propositions", new HashSet<Long>());
     ds.put(electionEntity);
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
     ElectionServlet electionServlet = new ElectionServlet();
     electionServlet.doGet(httpServletRequest, httpServletResponse);
     verify(printWriter)
         .println(
-            "[{\"ID\":9999,\"name\":\"myElection\",\"scope\":\"myScope\",\"positions\":[],\"date\":\"myDate\",\"propositions\":[]}]");
-  }
-
-  @Test
-  public void testAThing() throws Exception {
-    // Just a silly example.
-    int a = 1;
-    int b = 2;
-    Assert.assertFalse(a == b);
+            "[{\"id\":\"9999\",\"name\":\"myElection\",\"date\":\"myDate\",\"scope\":\"myScope\",\"contests\":[],\"propositions\":[]}]");
   }
 }

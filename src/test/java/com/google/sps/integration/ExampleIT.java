@@ -3,7 +3,6 @@ package com.google.sps.integration;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
