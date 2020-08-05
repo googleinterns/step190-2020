@@ -60,7 +60,7 @@ public class ServletUtilsTest {
 
     Optional<String> parameter =
         ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "anInvalidKey");
-    Assert.assertTrue(!parameter.isPresent());
+    Assert.assertFalse(parameter.isPresent());
     verify(printWriter).println("No anInvalidKey in the query URL.");
   }
 
@@ -72,7 +72,7 @@ public class ServletUtilsTest {
 
     Optional<String> parameter =
         ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, null);
-    Assert.assertTrue(!parameter.isPresent());
+    Assert.assertFalse(parameter.isPresent());
     verify(printWriter).println("No null in the query URL.");
   }
 
@@ -91,7 +91,7 @@ public class ServletUtilsTest {
 
     Optional<Entity> foundEntity = ServletUtils.findElectionInDatastore(ds, "9999");
     Assert.assertTrue(foundEntity.isPresent());
-    Assert.assertEquals(foundEntity.get().getProperty("name"), "myElection");
+    Assert.assertEquals(foundEntity.get(), electionEntity);
   }
 
   // Test finding an Election Entity that does not exist in Datastore
@@ -108,6 +108,6 @@ public class ServletUtilsTest {
     ds.put(electionEntity);
 
     Optional<Entity> foundEntity = ServletUtils.findElectionInDatastore(ds, "0001");
-    Assert.assertTrue(!foundEntity.isPresent());
+    Assert.assertFalse(foundEntity.isPresent());
   }
 }
