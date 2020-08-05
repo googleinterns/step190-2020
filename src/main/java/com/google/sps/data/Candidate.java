@@ -14,6 +14,7 @@
 
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import org.json.JSONException;
@@ -34,29 +35,6 @@ public abstract class Candidate {
     return new AutoValue_Candidate.Builder();
   }
 
-  // creates a new Candidate object by extracting the properties from "obj"
-  public static Candidate fromJSONObject(JSONObject obj) throws JSONException {
-    return Candidate.builder()
-        .setName(obj.getString("name"))
-        .setPartyAffiliation(obj.getString("party"))
-
-        // TODO(caseyprice): get values for campaignSite and platformDescription
-        .setCampaignSite("")
-        .setPlatformDescription("")
-        .build();
-  }
-
-  // creates a new Entity and sets the proper properties.
-  public Entity toEntity() {
-    Entity entity = new Entity("Candidate");
-    entity.setProperty("name", this.getName());
-    entity.setProperty("partyAffiliation", this.getPartyAffiliation());
-    entity.setProperty("campaignSite", this.getCampaignSite());
-    entity.setProperty("platformDescription", this.getPlatformDescription());
-
-    return entity;
-  }
-
   @AutoValue.Builder
   public abstract static class Builder {
     public abstract Builder setName(String name);
@@ -68,5 +46,28 @@ public abstract class Candidate {
     public abstract Builder setPlatformDescription(String platformDescription);
 
     public abstract Candidate build();
+  }
+
+  // creates a new Candidate object by extracting the properties from "candidateData"
+  public static Candidate fromJSONObject(JSONObject candidateData) throws JSONException {
+    return Candidate.builder()
+        .setName(candidateData.getString("name"))
+        .setPartyAffiliation(candidateData.getString("party"))
+        // TODO(gianelgado): get values for campaignSite and platformDescription
+        .setCampaignSite("")
+        .setPlatformDescription("")
+        .build();
+  }
+
+  // Converts the Candidate into a Datastore Entity and puts the Entity into the given Datastore
+  // instance.
+  public long addToDatastore(DatastoreService datastore) {
+    Entity entity = new Entity("Candidate");
+    entity.setProperty("name", this.getName());
+    entity.setProperty("partyAffiliation", this.getPartyAffiliation());
+    entity.setProperty("campaignSite", this.getCampaignSite());
+    entity.setProperty("platformDescription", this.getPlatformDescription());
+    datastore.put(entity);
+    return entity.getKey().getId();
   }
 }
