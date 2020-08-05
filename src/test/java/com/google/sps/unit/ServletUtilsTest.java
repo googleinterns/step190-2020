@@ -3,11 +3,15 @@ package com.google.sps.unit;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import com.google.sps.servlets.ServletUtils;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,5 +74,40 @@ public class ServletUtilsTest {
         ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, null);
     Assert.assertTrue(!parameter.isPresent());
     verify(printWriter).println("No null in the query URL.");
+  }
+
+  // Test finding an Election Entity in Datastore
+  @Test
+  public void testFindExistingElectionInDatastore() throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Entity electionEntity = new Entity("Election");
+    electionEntity.setProperty("id", "9999");
+    electionEntity.setProperty("name", "myElection");
+    electionEntity.setProperty("scope", "myScope");
+    electionEntity.setProperty("date", "myDate");
+    electionEntity.setProperty("contests", new HashSet<Long>());
+    electionEntity.setProperty("propositions", new HashSet<Long>());
+    ds.put(electionEntity);
+
+    Optional<Entity> foundEntity = ServletUtils.findElectionInDatastore(ds, "9999");
+    Assert.assertTrue(foundEntity.isPresent());
+    Assert.assertEquals(foundEntity.get().getProperty("name"), "myElection");
+  }
+
+  // Test finding an Election Entity that does not exist in Datastore
+  @Test
+  public void testFindNonexistingElectionInDatastore() throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Entity electionEntity = new Entity("Election");
+    electionEntity.setProperty("id", "9999");
+    electionEntity.setProperty("name", "myElection");
+    electionEntity.setProperty("scope", "myScope");
+    electionEntity.setProperty("date", "myDate");
+    electionEntity.setProperty("contests", new HashSet<Long>());
+    electionEntity.setProperty("propositions", new HashSet<Long>());
+    ds.put(electionEntity);
+
+    Optional<Entity> foundEntity = ServletUtils.findElectionInDatastore(ds, "0001");
+    Assert.assertTrue(!foundEntity.isPresent());
   }
 }
