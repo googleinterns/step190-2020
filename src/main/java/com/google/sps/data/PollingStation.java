@@ -16,7 +16,6 @@ package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
-import java.util.ArrayList;
 import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,7 +42,13 @@ public abstract class PollingStation {
         .build();
   }
 
-  // TODO(anooshree): add a fromEntity constructor.
+  public static PollingStation fromEntity(Entity entity) {
+    return PollingStation.builder()
+        .setName((String) entity.getProperty("name"))
+        .setAddress((String) entity.getProperty("address"))
+        .setElections((HashMap<String, HashMap<String, String>>) entity.getProperty("date"))
+        .build();
+  }
 
   // creates a new Entity and sets the proper properties.
   public Entity toEntity() {
@@ -54,7 +59,7 @@ public abstract class PollingStation {
     return entity;
   }
 
-  // TODO(anooshree): write method that goes through polling stations for a 
+  // TODO(anooshree): write method that goes through polling stations for a
   // given election and updates polling stations, return a list
   //
   // Should update polling stations that already exist in Datastore and create
@@ -63,7 +68,6 @@ public abstract class PollingStation {
   // public static HashSet<PollingStation> getPollingStationsForElection(String electionID)
 
   // TODO(anooshree): add a method that either adds a set or a single PollingStation to Datastore.
-
 
   @AutoValue.Builder
   public abstract static class Builder {
