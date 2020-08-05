@@ -1,4 +1,10 @@
 target/
+config.js
+.DS_Store
+
+# API keys
+config.js
+
 
 # IntelliJ specific project files
 .idea/

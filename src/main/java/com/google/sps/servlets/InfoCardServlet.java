@@ -17,151 +17,72 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
-import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
-import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
-import com.google.cloud.secretmanager.v1.SecretVersionName;
-import com.google.gson.Gson;
 import com.google.sps.data.Election;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Optional;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
 import org.json.JSONObject;
-
-@WebServlet("/info-cards")
 
 /**
  * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
  * can participate in on a given day.
+ *
+ * <p>TODO(caseyprice): Write unit tests using Mockito framework
  */
+@WebServlet("/info-cards")
 public class InfoCardServlet extends HttpServlet {
+  private static final String BASE_URL =
+      "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?address=%s&electionId=%s&key=%s";
+  private static final String PROJECT_ID = "112408856470";
+  private static final String SECRET_MANAGER_ID = "election-api-key";
+  private static final String VERSION_ID = "1";
 
-  private static final String BASE_URL = "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?";
-  private static final Logger logger = Logger.getLogger(ElectionServlet.class.getName());
-
-  // This method is used to access the api key stored in gcloud secret manager.
-  public String getApiKey(String projectId, String secretId, String versionId) throws IOException {
-    // TODO(anooshree): Figure out how to control this difference via flag
-
-    // Running on a local server requires storing API key in environment variable.
-    // In this case, uncomment the following line, and comment out the remaining lines
-    // in this function. Do the reverse when deploying.
-    // return System.getenv("GOOGLE_API_KEY");
-
-    try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
-      SecretVersionName secretVersionName = SecretVersionName.of(projectId, secretId, versionId);
-      AccessSecretVersionResponse response = client.accessSecretVersion(secretVersionName);
-
-      return response.getPayload().getData().toStringUtf8();
-    }
-  }
-
+  /**
+   * Makes an API call to voterInfoQuery in the Google Civic Information API using the user-chosen
+   * address and election ID as parameters. Puts Position and Candidate Entities in Datastore from
+   * the response. Finds the chosen Election Entity in the Datastore and fills in properties with
+   * the corresponding API response data.
+   *
+   * @param request the HTTP request containing user address and electionId as parameters
+   * @param response the HTTP response, contains error message if an error occurs
+   */
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    Optional<String> optionalAddress = ServletUtils.getRequestParam(request, response, "address");
+    Optional<String> optionalElectionId =
+        ServletUtils.getRequestParam(request, response, "electionId");
 
-		// find the corresponding election and check fields
-		// TODO (anooshree): iterate through Datastore and find the election
-		//									 with the matching electionId
-		// if this election is already populated, we don't need to make another
-		// query
-
-		// fetchElection(electionId)
-
-    StringBuilder strBuf = new StringBuilder();
-    HttpURLConnection conn = null;
-    BufferedReader reader = null;
-
-    try {
-      String address = request.getParameter("address");
-			if (address == null) { 
-				response.setContentType("text/html");
-      	response.getWriter().println("No address in the query URL, please check why this is the case.");
-      	return;
-			}
-
-			String electionId = request.getParameter("electionId");
-			if (electionId == null) { 
-				response.setContentType("text/html");
-      	response.getWriter().println("No election ID in the query URL, please check why this is the case.");
-      	return;
-			}
-
-      URL url = new URL(BASE_URL + "address=" + address + "&electionId=" + electionId + "&key=" + 
-												getApiKey("112408856470", "election-api-key", "1"));
-
-      conn = (HttpURLConnection) url.openConnection();
-
-      conn.setRequestMethod("GET");
-      conn.setRequestProperty("Accept", "application/json");
-
-      if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-        throw new RuntimeException(
-            "HTTP GET Request Failed with Error code : " + conn.getResponseCode());
-      }
-
-      // Using IO Stream with Buffer for increased efficiency
-      reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
-      String output = null;
-
-      while ((output = reader.readLine()) != null) {
-        strBuf.append(output);
-      }
-    } catch (MalformedURLException e) {
+    if (!optionalAddress.isPresent() || !optionalElectionId.isPresent()) {
       response.setContentType("text/html");
-      response.getWriter().println("URL is incorrectly formatted");
-      return;
-    } catch (IOException e) {
-      response.setContentType("text/html");
-      response.getWriter().println("Cannot retrieve information from provided URL");
-      return;
-    } finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        } catch (IOException e) {
-          logger.log(Level.WARNING, e.getMessage());
-        }
-      }
-      if (conn != null) {
-        conn.disconnect();
-      }
+      response
+          .getWriter()
+          .println("Insufficient parameters to /info-cards. Needs address and electionId.");
+      response.setStatus(400);
     }
 
-<<<<<<< Updated upstream
-    String results = strBuf.toString();
-    JSONObject obj = new JSONObject(results);
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    Optional<Entity> optionalEntity =
+        ServletUtils.findElectionInDatastore(datastore, optionalElectionId.get());
 
-    /*JSONArray pollingLocationData = obj.getJSONArray("pollingLocations");
-		processLocations(pollingLocationData, "polling");
-		
-		JSONArray dropOffLocationData = obj.getJSONArray("dropOffLocations");
-		processLocations(dropOffLocationData, "dropOff");
+    if (!optionalEntity.isPresent()) {
+      response.setContentType("text/html");
+      response
+          .getWriter()
+          .println(
+              "Could not find election with ID " + optionalElectionId.get() + " in Datastore.");
+      response.setStatus(400);
+    }
 
-		JSONArray earlyVoteSiteData = obj.getJSONArray("earlyVoteSites");
-		processLocations(earlyVoteSiteData, "earlyVote");
+    Entity electionEntity = optionalEntity.get();
+    Election election = Election.fromEntity(electionEntity);
+    // Don't need to make the API call if this Election object has already been populated.
+    if (election.isPopulatedByVoterInfoQuery()) {
+      return;
+    }
 
-		JSONArray contestData = obj.getJSONArray("contests");
-		processCandidatesAndPropositions(contestData, electionId);*/
-
-		// TODO(caseyprice): populate the election entity by mapping to the 
-		// 									 candidates and propositions on the ballot
-
-=======
     String url =
         String.format(
             BASE_URL,
@@ -174,6 +95,5 @@ public class InfoCardServlet extends HttpServlet {
     // TODO(anooshree): write similar method for PollingStations object that reads in polling information
     //                  and writes entities to Datastore
     
->>>>>>> Stashed changes
   }
 }

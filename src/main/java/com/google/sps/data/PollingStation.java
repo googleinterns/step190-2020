@@ -64,6 +64,7 @@ public abstract class PollingStation {
 
   // TODO(anooshree): add a method that either adds a set or a single PollingStation to Datastore.
 
+
   @AutoValue.Builder
   public abstract static class Builder {
     public abstract Builder setName(String name);
