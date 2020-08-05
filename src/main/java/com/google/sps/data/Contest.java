@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.json.JSONException;
@@ -42,7 +43,7 @@ public abstract class Contest {
   public abstract static class Builder {
     public abstract Builder setName(String name);
 
-    public abstract Builder setCandidates(Set<Long> candidates);
+    public abstract Builder setCandidates(Collection<Long> candidates);
 
     public abstract Builder setDescription(String description);
 
@@ -75,9 +76,9 @@ public abstract class Contest {
   // Creates a new Contest object by using the propperties of the provided
   // contenst entity
   public static Contest fromEntity(Entity entity) {
-    HashSet<Long> candidates = new HashSet<>();
+    Collection<Long> candidates = new HashSet<>();
     if (entity.getProperty("candidates") != null) {
-      candidates = (HashSet<Long>) entity.getProperty("candidates");
+      candidates = (Collection<Long>) entity.getProperty("candidates");
     }
 
     return Contest.builder()
