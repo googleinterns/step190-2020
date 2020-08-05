@@ -92,9 +92,9 @@ public abstract class Election {
   }
 
   /**
-   * Updates this Election object's contests and propositions fields from the corresponding
-   * properties of "voterInfoQueryData". Delegates creating Contest Entities from this election's
-   * list of contests.
+   * Creates an Election object with contests and propositions fields from the corresponding
+   * properties of "voterInfoQueryData". Copies the remaining fields from this Election object.
+   * Delegates creating Contest Entities in Datastore from this Election's list of contests.
    *
    * @param datastore the Datastore to store this election's list of contests
    * @param voterInfoQueryData the JSON output of a voterInfoQuery to the Google Civic Information
