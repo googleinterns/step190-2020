@@ -110,15 +110,22 @@ public abstract class Election {
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
 
-        long contestEntityKeyId =
+        // Office positions and 
+        if (contest.getString("type").equals("Referendum")) {
+          long propositionEntityKeyId =
+            Proposition.fromJSONObject(datastore, contest).addToDatastore(datastore);
+          propositionKeyList.add(propositionEntityKeyId);
+        } else {
+          long contestEntityKeyId =
             Contest.fromJSONObject(datastore, contest).addToDatastore(datastore);
-        contestKeyList.add(contestEntityKeyId);
+          contestKeyList.add(contestEntityKeyId);
+        }
       }
     }
 
     // TODO(caseyprice): get values for propositions
 
-    return this.withContests(contestKeyList);
+    return this.withContests(contestKeyList).withPropositions(propositionKeyList);
   }
 
   /**

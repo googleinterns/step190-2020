@@ -22,7 +22,7 @@ import org.json.JSONObject;
 /** A proposition open for election on voter ballots */
 @AutoValue
 public abstract class Proposition {
-  public abstract String getName();
+  public abstract String getTitle();
 
   public abstract String getDescription();
 
@@ -33,23 +33,23 @@ public abstract class Proposition {
   // creates a new Proposition object by extracting the properties from "obj"
   public static Proposition fromJSONObject(JSONObject obj) throws JSONException {
     return Proposition.builder()
-        .setName(obj.getString("name"))
+        .setTitle(obj.getString("referendumTitle"))
         // TODO(caseyprice): get values for description
-        .setDescription("")
+        .setDescription(obj.getString("referendumSubtitle"))
         .build();
   }
 
   // creates a new Entity and sets the proper properties.
   public Entity toEntity() {
     Entity entity = new Entity("Proposition");
-    entity.setProperty("name", this.getName());
+    entity.setProperty("title", this.getTitle());
     entity.setProperty("description", this.getDescription());
     return entity;
   }
 
   @AutoValue.Builder
   public abstract static class Builder {
-    public abstract Builder setName(String name);
+    public abstract Builder setTitle(String title);
 
     public abstract Builder setDescription(String Description);
 
