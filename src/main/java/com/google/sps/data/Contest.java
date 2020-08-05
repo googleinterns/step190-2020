@@ -52,15 +52,14 @@ public abstract class Contest {
   // Creates a new Contest object by extracting the properties from "contestData". For each of its
   // "candidate" properties, creates a new Candidate object and inserts it into the given Datastore
   // instance.
-  public static Contest fromVoterInfoQuery(DatastoreService datastore, JSONObject contestData)
+  public static Contest fromJSONObject(DatastoreService datastore, JSONObject contestData)
       throws JSONException {
     Set<Long> candidateKeyIds = new HashSet<>();
 
     if (contestData.has("candidates")) {
       for (Object candidateObject : contestData.getJSONArray("candidates")) {
         JSONObject candidate = (JSONObject) candidateObject;
-        long candidateEntityKeyId =
-            Candidate.fromVoterInfoQuery(candidate).addToDatastore(datastore);
+        long candidateEntityKeyId = Candidate.fromJSONObject(candidate).addToDatastore(datastore);
         candidateKeyIds.add(candidateEntityKeyId);
       }
     }

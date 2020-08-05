@@ -92,11 +92,10 @@ public abstract class Election {
   }
 
   /**
-   * Creates a new Election object by extracting the properties from an Election object and from the
+   * Updates this Election object's contests and propositions fields from the corresponding
    * properties of "voterInfoQueryData". Delegates creating Contest Entities from this election's
    * list of contests.
    *
-   * @param election the Election object already populated by fromElectionQuery
    * @param datastore the Datastore to store this election's list of contests
    * @param voterInfoQueryData the JSON output of a voterInfoQuery to the Google Civic Information
    *     API
@@ -112,7 +111,7 @@ public abstract class Election {
         JSONObject contest = (JSONObject) contestObject;
 
         long contestEntityKeyId =
-            Contest.fromVoterInfoQuery(datastore, contest).addToDatastore(datastore);
+            Contest.fromJSONObject(datastore, contest).addToDatastore(datastore);
         contestKeyList.add(contestEntityKeyId);
       }
     }
@@ -184,8 +183,8 @@ public abstract class Election {
      * have IDs from the Civic Information API (ex. policies) */
     entity.setProperty("id", this.getId());
     entity.setProperty("name", this.getName());
-    entity.setProperty("scope", this.getScope());
     entity.setProperty("date", this.getDate());
+    entity.setProperty("scope", this.getScope());
     entity.setProperty("contests", this.getContests());
     entity.setProperty("propositions", this.getPropositions());
     datastore.put(entity);

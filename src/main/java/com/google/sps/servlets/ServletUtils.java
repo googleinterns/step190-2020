@@ -138,16 +138,14 @@ public class ServletUtils {
       DatastoreService datastore, String electionId) {
     Query query = new Query("Election");
     PreparedQuery results = datastore.prepare(query);
-    Entity targetEntity = null;
 
     for (Entity entity : results.asIterable()) {
       if (entity.getProperty("id").equals(electionId)) {
-        targetEntity = entity;
-        break;
+        return Optional.of(entity);
       }
     }
 
-    return Optional.ofNullable(targetEntity);
+    return Optional.empty();
   }
 
   /**
