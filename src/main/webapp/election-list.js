@@ -64,22 +64,19 @@ function listElections() {
   updateLinksWithQueryParams(document.links);
 }
 
-/**
- * Redirect to a given URL while maintaining the query string
- * and tracking the name, ID of the chosen state election
- */
-function redirectToStateElectionPage(electionId){
-  let electionName = document.getElementById('state-election-name').innerText;
-  goToElectionPage(electionName, electionId);
-}
-
-/**
- * Redirect to a given URL while maintaining the query string
- * and tracking the name, ID of the chosen national election
- */
-function redirectToNationalElectionPage(electionId){
-  let electionName = document.getElementById('national-election-name').innerText;
-  goToElectionPage(electionName, electionId);
+function findElectionNameById(electionId) {
+  fetch('/election')
+    .then(response => response.json())
+    .then((electionList) => {
+      electionList.forEach((election) => {
+        // It's worth noting that, on this branch, the
+        // election ID property is "ID" and not "Id"; however,
+        // I set it as "Id" here so merging into master is error-free
+        if(electionId === election.Id) {
+          goToElectionPage(election.name, electionId);
+        }
+      });
+    });
 }
 
 /**
@@ -90,7 +87,7 @@ function goToElectionPage(electionName, electionId){
   //                  query URL, as seen here: https://happycoding.io/tutorials/java-server/jsp
   addQueryParameter("electionName", electionName);
   addQueryParameter("electionId", electionId);
-
+  
   var query = window.location.search;
   window.location.href = "electionInfo.html" + query;
 }

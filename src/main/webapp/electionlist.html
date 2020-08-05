@@ -96,13 +96,11 @@
             {{#each stateElections}}
             <li class="list-group-item election-item">
               <div class="election-quick-details">
-                <div id="state-election-name">
-                  <p>{{this.name}}</p>
-                </div>
+                <p>{{this.name}}</p>
                 <p><em>{{formatDate this.date}}</em></p>
               </div>
               <a href="#" 
-                 onclick="redirectToStateElectionPage({{{this.ID}}});return false;" 
+                 onclick="findElectionNameById({{{this.ID}}});return false;" 
                  class="election-choice-js">
                 <div class="learn-more-button" id="state-learn-more-button">Learn more</div>
               </a>
@@ -117,13 +115,11 @@
             {{#each nationalElections}}
             <li class="list-group-item election-item">
               <div class="election-quick-details">
-                <div id="national-election-name">
-                  <p>{{this.name}}</p>
-                </div>
+                <p>{{this.name}}</p>
                 <p><em>{{formatDate this.date}}</em></p>
               </div>
               <a href="#" 
-                 onclick="redirectToNationalElectionPage({{{this.ID}}});return false;" 
+                 onclick="findElectionNameById({{{this.ID}}});return false;" 
                  class="election-choice-js">
                 <div class="learn-more-button" id="national-learn-more-button">Learn more</div>
               </a>
