@@ -1,6 +1,10 @@
 package com.google.sps.integration;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -65,10 +69,9 @@ public class ElectionListIT {
     String targetElectionID = "4979";
 
     Assert.assertEquals(
-        "http://localhost:9876/electionInfo.html?state=ga&electionName="
-            + targetElectionName
-            + "&electionId="
-            + targetElectionID,
+        String.format(
+            "http://localhost:9876/electionInfo.html?state=ga&electionName=%s&electionId=%s",
+            targetElectionName, targetElectionID),
         driver.getCurrentUrl());
   }
 

@@ -15,7 +15,9 @@
 
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
+    <script src="election-list.js"></script>
   </head>
+  
   <body onload="onElectionListLoad();">
     <div id="page-wrapper">
       <a href="index.html">
@@ -101,7 +103,7 @@
               </div>
               <a href="#" 
                  onclick="redirectToStateElectionPage({{{this.ID}}});return false;" 
-                 id="election-choice-js">
+                 class="election-choice-js">
                 <div class="learn-more-button" id="state-learn-more-button">Learn more</div>
               </a>
             </li>
@@ -122,7 +124,7 @@
               </div>
               <a href="#" 
                  onclick="redirectToNationalElectionPage({{{this.ID}}});return false;" 
-                 id="election-choice-js">
+                 class="election-choice-js">
                 <div class="learn-more-button" id="national-learn-more-button">Learn more</div>
               </a>
             </li>

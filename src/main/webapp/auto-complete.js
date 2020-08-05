@@ -21,6 +21,9 @@ var componentForm = {
   postal_code: 'short_name'
 };
 
+/**
+ * Initializes an autocomplete object for the address input form
+ */
 function initAutocomplete() {
   // Create the autocomplete object, restricting the search predictions to
   // geographical location types.
@@ -34,6 +37,10 @@ function initAutocomplete() {
   autocomplete.addListener('place_changed', fillInAddress);
 }
 
+/**
+ * Populate the address component boxes based on the user's
+ * selection from the autocomplete choices
+ */
 function fillInAddress() {
   var place = autocomplete.getPlace();
 
@@ -54,6 +61,10 @@ function fillInAddress() {
   }
 }
 
+/**
+ * Based on the user's location, set bounds for the addresses that
+ * can be suggested based on their distance from the location
+ */
 function positionCallback(position) {
   var geolocation = {
     lat: position.coords.latitude,
@@ -67,8 +78,10 @@ function positionCallback(position) {
   autocomplete.setBounds(circle.getBounds());
 }
 
-// Bias the autocomplete object to the user's geographical location,
-// as supplied by the browser's 'navigator.geolocation' object.
+/** 
+ * Bias the autocomplete object to the user's geographical location,
+ * as supplied by the browser's 'navigator.geolocation' object.
+ */
 function geolocate() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(positionCallback);
