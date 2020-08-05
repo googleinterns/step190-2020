@@ -14,6 +14,10 @@
 
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.PreparedQuery;
+import com.google.appengine.api.datastore.Query;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
@@ -23,14 +27,38 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
-public class ServletHelper {
+public class ServletUtils {
 
-  private static final Logger logger = Logger.getLogger(ServletHelper.class.getName());
+  private static final Logger logger = Logger.getLogger(ServletUtils.class.getName());
+
+  /**
+   * Get the value of a query parameter to an HTTP request.
+   *
+   * @param request the HTTP request to be serialized
+   * @param response the HTTP response to publish any error messages
+   * @param inputName the query parameter key
+   * @return Optional container that contains either the parameter or null
+   */
+  public static Optional<String> getRequestParam(
+      HttpServletRequest request, HttpServletResponse response, String inputName)
+      throws IOException {
+    String input = request.getParameter(inputName);
+
+    if (input == null) {
+      response.setContentType("text/html");
+      response.getWriter().println(String.format("No %s in the query URL.", inputName));
+      response.setStatus(400);
+    }
+
+    return Optional.ofNullable(input);
+  }
 
   /** Access the api key stored in gcloud secret manager. */
   public static String getApiKey(String projectId, String secretId, String versionId)
@@ -43,11 +71,16 @@ public class ServletHelper {
     }
   }
 
-  public static JSONObject readFromApiUrl(URL url, HttpServletResponse response)
-      throws IOException {
+  /**
+   * Reads the information avaiable at the provided API URL into a JSON object
+   *
+   * @param urlString a valid API URL, accessible with the project's API keys
+   */
+  public static JSONObject readFromApiUrl(String urlString) throws IOException {
     StringBuilder strBuf = new StringBuilder();
     HttpURLConnection conn = null;
     BufferedReader reader = null;
+    URL url = new URL(urlString);
 
     try {
       conn = (HttpURLConnection) url.openConnection();
@@ -89,5 +122,26 @@ public class ServletHelper {
     JSONObject obj = new JSONObject(results);
 
     return obj;
+  }
+
+  /**
+   * Find an Election Entity in the Datastore based off its electionId property.
+   *
+   * @param datastore the Datastore containing all election data
+   * @param electionId the ID of the election being queried
+   * @return Optional container that contains either the Election entity's Key or null
+   */
+  public static Optional<Entity> findElectionInDatastore(
+      DatastoreService datastore, String electionId) {
+    Query query = new Query("Election");
+    PreparedQuery results = datastore.prepare(query);
+
+    for (Entity entity : results.asIterable()) {
+      if (entity.getProperty("id").equals(electionId)) {
+        return Optional.of(entity);
+      }
+    }
+
+    return Optional.empty();
   }
 }
