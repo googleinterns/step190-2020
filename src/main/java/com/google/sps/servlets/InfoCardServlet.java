@@ -142,6 +142,7 @@ public class InfoCardServlet extends HttpServlet {
       }
     }
 
+<<<<<<< Updated upstream
     String results = strBuf.toString();
     JSONObject obj = new JSONObject(results);
 
@@ -160,5 +161,19 @@ public class InfoCardServlet extends HttpServlet {
 		// TODO(caseyprice): populate the election entity by mapping to the 
 		// 									 candidates and propositions on the ballot
 
+=======
+    String url =
+        String.format(
+            BASE_URL,
+            optionalAddress.get(),
+            optionalElectionId.get(),
+            ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID));
+    JSONObject voterInfoData = ServletUtils.readFromApiUrl(url);
+
+    election.fromVoterInfoQuery(datastore, voterInfoData).putInDatastore(datastore, electionEntity);
+    // TODO(anooshree): write similar method for PollingStations object that reads in polling information
+    //                  and writes entities to Datastore
+    
+>>>>>>> Stashed changes
   }
 }
