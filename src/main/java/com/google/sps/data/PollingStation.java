@@ -28,7 +28,7 @@ public abstract class PollingStation {
 
   public abstract String getAddress();
 
-  public abstract HashMap<Long, Election> getElections();
+  public abstract HashMap<String, HashMap<String, String>> getElections();
 
   public static Builder builder() {
     return new AutoValue_PollingStation.Builder();
@@ -38,20 +38,32 @@ public abstract class PollingStation {
   public static PollingStation fromJSONObject(JSONObject obj) throws JSONException {
     return PollingStation.builder()
         .setName(obj.getJSONObject("address").getString("locationName"))
-        // TODO(caseyprice): get values for elections and address
         .setAddress("")
-        .setElections(new HashMap<Long, Election>())
+        .setElections(new HashMap<String, HashMap<String, String>>())
         .build();
   }
+
+  // TODO(anooshree): add a fromEntity constructor.
 
   // creates a new Entity and sets the proper properties.
   public Entity toEntity() {
     Entity entity = new Entity("PollingStation");
     entity.setProperty("name", this.getName());
     entity.setProperty("address", this.getAddress());
-    entity.setProperty("elections", new ArrayList<String>());
+    entity.setProperty("elections", new HashMap<String, HashMap<String, String>>());
     return entity;
   }
+
+  // TODO(anooshree): write method that goes through polling stations for a 
+  // given election and updates polling stations, return a list
+  //
+  // Should update polling stations that already exist in Datastore and create
+  // new ones for those that do not.
+  //
+  // public static HashSet<PollingStation> getPollingStationsForElection(String electionID)
+
+  // TODO(anooshree): add a method that either adds a set or a single PollingStation to Datastore.
+
 
   @AutoValue.Builder
   public abstract static class Builder {
@@ -59,7 +71,7 @@ public abstract class PollingStation {
 
     public abstract Builder setAddress(String scope);
 
-    public abstract Builder setElections(HashMap<Long, Election> elections);
+    public abstract Builder setElections(HashMap<String, HashMap<String, String>> elections);
 
     public abstract PollingStation build();
   }

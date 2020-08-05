@@ -33,6 +33,9 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
+import java.util.HashSet;
+import java.util.HashMap;
+
 
 public class ServletUtils {
 
@@ -143,5 +146,28 @@ public class ServletUtils {
     }
 
     return Optional.empty();
+  }
+
+  /**
+   * Find the PollingStation Entities in Datastore that are applicable
+   * for a given election based on their election property.
+   *
+   * @param electionID the ID of the election being queried
+   * @return HashSet of PollingStation Entities matching the given criteria
+   */
+   public static HashSet<Entity> findPollingStationInDatastore(
+      DatastoreService datastore, String electionId) {
+    Query query = new Query("PollingStation");
+    PreparedQuery results = datastore.prepare(query);
+
+    HashSet<Entity> eligiblePollingStations = new HashSet<Entity> ();
+
+    for (Entity entity : results.asIterable()) {
+      if (entity.getProperty("elections").containsKey(electionId)) {
+        eligiblePollingStations.add(entity);
+      }
+    }
+
+    return eligiblePollingStations;
   }
 }
