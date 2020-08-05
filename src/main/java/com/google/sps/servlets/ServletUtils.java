@@ -71,6 +71,11 @@ public class ServletUtils {
     }
   }
 
+  /**
+   * Reads the information avaiable at the provided API URL into a JSON object
+   *
+   * @param urlString a valid API URL, accessible with the project's API keys
+   */
   public static JSONObject readFromApiUrl(String urlString) throws IOException {
     StringBuilder strBuf = new StringBuilder();
     HttpURLConnection conn = null;
