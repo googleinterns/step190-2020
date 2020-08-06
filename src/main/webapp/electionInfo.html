@@ -19,32 +19,34 @@
 	  <link rel="stylesheet" href="style.css">
     <script src="auto-complete.js"></script>
     <script src="script.js"></script>
+    <script src="election-info.js"></script>
 
     </head>
 
-    <body>
+    <body onload="onElectionInfoLoad();">
       <div id="page-wrapper">
-        <a href="index.html">
-          <div id="header-bar">
+        <div id="header-bar">
+          <a href="index.html" id="home-link">
             <p id="header-text">gVote</p>
-          </div>
-        </a>
+          </a>
+        </div>
 
         <div class="container" id="content">
-          <div class="row page-title-text" id="dropdown-title">
-            <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
-              <!-- TODO: Replace [CHOSEN ELECTION NAME HERE] with Handlebars.js templating -->
-              <b>To show you polling locations, candidates, and ballot items from
-                  <span class="election-name"> [CHOSEN ELECTION NAME HERE]</span>, 
-                  we'll need your registered voter address: 
-              </b>
-            </p> 
+          <div id="election-info-page-title">
+            <p style="display: inline-block; text-align: left;">
+              <b>To show you polling locations, candidates, and ballot items from the&nbsp;</b> 
+            </p>
+            <div id="chosen-election" style="display: inline-block; text-align: left;"> </div>
+            <p style="display: inline-block; text-align: left;">
+              <b>, we'll need your registered voter address: </b>
+            </p>
           </div>
+
           <div class="input-wrapper">
             <div class="panel panel-primary">
               <div class="container panel-body">
                 <div class="row location-field-wrapper">
-                  <div class="col-lg-6 col-lg-offset-3" id="locationField">
+                  <div class="col-lg-8 col-lg-offset-2" id="locationField">
                       <input id="autocomplete" placeholder="Enter your address" onFocus="geolocate()" type="text"/>
                   </div>
                 </div>
