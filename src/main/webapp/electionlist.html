@@ -15,7 +15,9 @@
 
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
+    <script src="election-list.js"></script>
   </head>
+  
   <body onload="onElectionListLoad();">
     <div id="page-wrapper">
       <div id="header-bar">
@@ -97,7 +99,11 @@
                 <p>{{this.name}}</p>
                 <p><em>{{formatDate this.date}}</em></p>
               </div>
-              <div class="learn-more-button">Learn more</div>
+              <a href="#" 
+                 onclick="findElectionNameById({{{this.ID}}});return false;" 
+                 class="election-choice-js">
+                <div class="learn-more-button" id="state-learn-more-button">Learn more</div>
+              </a>
             </li>
             {{else}}
             <p><em>No elections coming up soon.</em></p>
@@ -112,7 +118,11 @@
                 <p>{{this.name}}</p>
                 <p><em>{{formatDate this.date}}</em></p>
               </div>
-              <div class="learn-more-button">Learn more</div>
+              <a href="#" 
+                 onclick="findElectionNameById({{{this.ID}}});return false;" 
+                 class="election-choice-js">
+                <div class="learn-more-button" id="national-learn-more-button">Learn more</div>
+              </a>
             </li>
             {{else}}
             <p><em>No elections coming up soon.</em></p>
