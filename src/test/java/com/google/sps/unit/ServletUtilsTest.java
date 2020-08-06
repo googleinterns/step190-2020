@@ -43,7 +43,7 @@ public class ServletUtilsTest {
 
   // Test ServletUtils getRequestParam() function gets parameter in Optional container correctly.
   @Test
-  public void testGetRequestParamWithValidParameterName() throws Exception {
+  public void getRequestParam_validParameterName_returnParameterValue() throws Exception {
     when(httpServletRequest.getParameter("myKey")).thenReturn("myValue");
 
     Optional<String> parameter =
@@ -55,7 +55,7 @@ public class ServletUtilsTest {
   // Test ServletUtils getRequestParam() function correctly returns empty Optional container when
   // parameter key does not exist.
   @Test
-  public void testGetRequestParamWithInvalidParameterName() throws Exception {
+  public void getRequestParam_invalidParameterName_returnEmpty() throws Exception {
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     Optional<String> parameter =
@@ -67,7 +67,7 @@ public class ServletUtilsTest {
   // Test ServletUtils getRequestParam() function correctly returns empty Optional container when
   // provided parameter key is null.
   @Test
-  public void testGetRequestParamWithNullParameterName() throws Exception {
+  public void getRequestParam_nullParameterName_returnEmpty() throws Exception {
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     Optional<String> parameter =
@@ -76,9 +76,9 @@ public class ServletUtilsTest {
     verify(printWriter).println("No null in the query URL.");
   }
 
-  // Test finding an Election Entity in Datastore
+  // Test finding an Election Entity in Datastore.
   @Test
-  public void testFindElectionInDatastoreWithExistingElection() throws Exception {
+  public void findElectionInDatastore_electionExists_returnCorrespondingEntity() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Entity electionEntity = new Entity("Election");
     electionEntity.setProperty("id", "9999");
@@ -94,9 +94,9 @@ public class ServletUtilsTest {
     Assert.assertEquals(foundEntity.get(), electionEntity);
   }
 
-  // Test finding an Election Entity that does not exist in Datastore
+  // Test finding an Election Entity that does not exist in Datastore.
   @Test
-  public void testFindElectionInDatastoreWithNonexistingElection() throws Exception {
+  public void findElectionInDatastore_electionDoesntExist_returnEmpty() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Entity electionEntity = new Entity("Election");
     electionEntity.setProperty("id", "9999");
