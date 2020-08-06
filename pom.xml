@@ -156,6 +156,7 @@
             </goals>
             <phase>post-integration-test</phase>
             <configuration>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
               <filesets>
                 <fileset>
                   <directory>${integrationTest.datastoreFileDirTmp}</directory>
@@ -217,6 +218,9 @@
           </execution>
         </executions>
         <configuration>
+          <excludes>
+            <exclude>**/ElectionListIT.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
       <plugin>

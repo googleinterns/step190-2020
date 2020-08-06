@@ -1,3 +1,5 @@
+# tmp integration_db.bin
+src/test/java/com/google/sps/integration/tmp/
 target/
 config.js
 .DS_Store
