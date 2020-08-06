@@ -145,26 +145,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Delete the integration test db tmp folder after integration test is done. -->
-<!--      <plugin>-->
-<!--        <artifactId>maven-clean-plugin</artifactId>-->
-<!--        <executions>-->
-<!--          <execution>-->
-<!--            <id>delete-tmp-integration-test-datastore</id>-->
-<!--            <goals>-->
-<!--              <goal>clean</goal>-->
-<!--            </goals>-->
-<!--            <phase>post-integration-test</phase>-->
-<!--            <configuration>-->
-<!--              <filesets>-->
-<!--                <fileset>-->
-<!--                  <directory>${integrationTest.datastoreFileDirTmp}</directory>-->
-<!--                </fileset>-->
-<!--              </filesets>-->
-<!--            </configuration>-->
-<!--          </execution>-->
-<!--        </executions>-->
-<!--      </plugin>-->
       <!-- Provides `mvn package appengine:run` for local testing
            and `mvn package appengine:deploy` for deploying. -->
       <plugin>
