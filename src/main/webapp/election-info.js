@@ -22,4 +22,7 @@ function logAddressInput(){
 
   addQueryParameter("address", 
                     `${streetNumber} ${route} ${city} ${state} ${zipCode} ${country}`);
+
 }
+
+
