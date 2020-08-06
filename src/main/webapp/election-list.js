@@ -69,10 +69,10 @@ function findElectionNameById(electionId) {
     .then(response => response.json())
     .then((electionList) => {
       electionList.forEach((election) => {
-        // It's worth noting that, on this branch, the
-        // election ID property is "ID" and not "Id"; however,
-        // I set it as "Id" here so merging into master is error-free
-        if(electionId === election.Id) {
+        // It's worth noting that, on the websiteFlowUI branch, the
+        // election ID property is "ID" and not "id"; however,
+        // I set it as "id" here so merging into master is error-free
+        if(electionId === election.id) {
           goToElectionPage(election.name, electionId);
         }
       });
