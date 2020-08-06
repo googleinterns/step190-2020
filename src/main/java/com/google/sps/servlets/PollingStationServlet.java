@@ -16,9 +16,8 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
 import com.google.sps.data.PollingStation;
 import java.io.IOException;
@@ -50,16 +49,36 @@ public class PollingStationServlet extends HttpServlet {
    */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Optional<String> optionalId = ServletUtils.getRequestParam(request, response, "electionID");
+    Optional<String> electionIdOptional =
+        ServletUtils.getRequestParam(request, response, "electionId");
 
-    Query query = new Query("PollingStation");
+    if (!electionIdOptional.isPresent()) {
+      return;
+    }
+
+    String electionId = electionIdOptional.get();
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
 
+    Optional<Entity> electionEntityOptional =
+        ServletUtils.findElectionInDatastore(datastore, electionId);
+
+    if (!electionEntityOptional.isPresent()) {
+      response.setContentType("text/html");
+      response.getWriter().println("Election with id " + electionId + " was not found.");
+      response.setStatus(400);
+      return;
+    }
+
+    Entity electionEntity = electionEntityOptional.get();
+
+    List<EmbeddedEntity> pollingStationEntities =
+        (List<EmbeddedEntity>) electionEntity.getProperty("pollingStations");
     List<PollingStation> pollingStations = new ArrayList<PollingStation>();
 
-    for (Entity entity : results.asIterable()) {
+    for (EmbeddedEntity embeddedEntity : pollingStationEntities) {
+      Entity entity = new Entity(embeddedEntity.getKey());
+      entity.setPropertiesFrom(embeddedEntity);
       pollingStations.add(PollingStation.fromEntity(entity));
     }
 

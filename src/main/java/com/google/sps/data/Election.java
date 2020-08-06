@@ -15,8 +15,10 @@
 package com.google.sps.data;
 
 import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import org.json.JSONArray;
@@ -42,6 +44,8 @@ public abstract class Election {
   // represents their Key names.
   public abstract Set<Long> getPropositions();
 
+  public abstract ArrayList<EmbeddedEntity> getPollingStations();
+
   public static Builder builder() {
     return new AutoValue_Election.Builder();
   }
@@ -54,6 +58,11 @@ public abstract class Election {
 
   public Election withPropositions(Set<Long> propositions) {
     return toBuilder().setPropositions(propositions).build();
+  }
+
+  public Election withContestsAndPollingStations(
+      Set<Long> contests, ArrayList<EmbeddedEntity> pollingStations) {
+    return toBuilder().setContests(contests).setPollingStations(pollingStations).build();
   }
 
   @AutoValue.Builder
@@ -69,6 +78,8 @@ public abstract class Election {
     public abstract Builder setContests(Set<Long> contests);
 
     public abstract Builder setPropositions(Set<Long> propositions);
+
+    public abstract Builder setPollingStations(ArrayList<EmbeddedEntity> pollingStations);
 
     public abstract Election build();
   }
@@ -88,6 +99,7 @@ public abstract class Election {
         .setScope(electionQueryData.getString("ocdDivisionId"))
         .setContests(new HashSet<Long>())
         .setPropositions(new HashSet<Long>())
+        .setPollingStations(new ArrayList<EmbeddedEntity>())
         .build();
   }
 
@@ -105,6 +117,8 @@ public abstract class Election {
       throws JSONException {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> propositionKeyList = new HashSet<>();
+    ArrayList<EmbeddedEntity> pollingStations = this.getPollingStations();
+
     if (voterInfoQueryData.has("contests")) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray("contests");
       for (Object contestObject : contestListData) {
@@ -116,9 +130,54 @@ public abstract class Election {
       }
     }
 
+    if (voterInfoQueryData.has("earlyVoteSites")) {
+      JSONArray earlyVoteSiteData = voterInfoQueryData.getJSONArray("earlyVoteSites");
+      for (Object earlyVoteSite : earlyVoteSiteData) {
+        JSONObject earlyVoteSiteJSON = (JSONObject) earlyVoteSite;
+        pollingStations.add(createPollingStation(earlyVoteSiteJSON, "earlyVoteSite"));
+      }
+    }
+
+    if (voterInfoQueryData.has("dropOffLocations")) {
+      JSONArray dropOffData = voterInfoQueryData.getJSONArray("dropOffLocations");
+      for (Object dropOff : dropOffData) {
+        JSONObject dropOffJSON = (JSONObject) dropOff;
+        pollingStations.add(createPollingStation(dropOffJSON, "dropOffLocation"));
+      }
+    }
+
+    if (voterInfoQueryData.has("pollingLocations")) {
+      JSONArray pollingLocationData = voterInfoQueryData.getJSONArray("pollingLocations");
+      for (Object pollingLocation : pollingLocationData) {
+        JSONObject pollingLocationJSON = (JSONObject) pollingLocation;
+        pollingStations.add(createPollingStation(pollingLocationJSON, "pollingLocation"));
+      }
+    }
+
+    // this.setPollingStations(pollingStations);
+
     // TODO(caseyprice): get values for propositions
 
-    return this.withContests(contestKeyList);
+    return this.withContestsAndPollingStations(contestKeyList, pollingStations);
+  }
+
+  /**
+   * Creates a EmbeddedEntity to add to this object's list of polling stations given adequete
+   * information in JSON format and the type of the polling station
+   *
+   * @param pollingStationJSON the JSON from the Civic Information API call representing the polling
+   *     station
+   * @param locationType a string signifying if this location is a polling station, drop-off
+   *     location, or early vote site
+   */
+  public EmbeddedEntity createPollingStation(JSONObject pollingStationJSON, String locationType) {
+    PollingStation pollingStationObject =
+        PollingStation.fromJSONObject(pollingStationJSON, locationType);
+
+    EmbeddedEntity embeddedPollingStation = new EmbeddedEntity();
+    embeddedPollingStation.setPropertiesFrom(pollingStationObject.toEntity());
+
+    return embeddedPollingStation;
   }
 
   /**
@@ -128,7 +187,9 @@ public abstract class Election {
    * @return true if contests and propositions contain elements, false otherwise
    */
   public boolean isPopulatedByVoterInfoQuery() {
-    return !getContests().isEmpty() && !getPropositions().isEmpty();
+    return !getContests().isEmpty()
+        && !getPropositions().isEmpty()
+        && !getPollingStations().isEmpty();
   }
 
   /**
@@ -140,12 +201,18 @@ public abstract class Election {
   public static Election fromEntity(Entity entity) {
     Set<Long> contests = new HashSet<>();
     Set<Long> propositions = new HashSet<>();
+    ArrayList<EmbeddedEntity> pollingStations = new ArrayList<EmbeddedEntity>();
+
     if (entity.getProperty("contests") != null) {
       contests = (HashSet<Long>) entity.getProperty("contests");
     }
 
     if (entity.getProperty("propositions") != null) {
       propositions = (HashSet<Long>) entity.getProperty("propositions");
+    }
+
+    if (entity.getProperty("pollingStations") != null) {
+      pollingStations = (ArrayList<EmbeddedEntity>) entity.getProperty("pollingStations");
     }
 
     return Election.builder()
@@ -155,6 +222,7 @@ public abstract class Election {
         .setScope((String) entity.getProperty("scope"))
         .setContests(contests)
         .setPropositions(propositions)
+        .setPollingStations(pollingStations)
         .build();
   }
 
@@ -187,6 +255,7 @@ public abstract class Election {
     entity.setProperty("scope", this.getScope());
     entity.setProperty("contests", this.getContests());
     entity.setProperty("propositions", this.getPropositions());
+    entity.setProperty("pollingStations", this.getPollingStations());
     datastore.put(entity);
     return entity.getKey().getId();
   }
