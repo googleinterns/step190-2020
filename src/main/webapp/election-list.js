@@ -65,14 +65,12 @@ function listElections() {
 }
 
 function findElectionNameById(electionId) {
+  addQueryParameter("electionId", electionId);
   fetch('/election')
     .then(response => response.json())
     .then((electionList) => {
       electionList.forEach((election) => {
-        // It's worth noting that, on the websiteFlowUI branch, the
-        // election ID property is "ID" and not "id"; however,
-        // I set it as "id" here so merging into master is error-free
-        if(electionId === election.id) {
+        if(electionId == election.id) {
           goToElectionPage(election.name, electionId);
         }
       });
