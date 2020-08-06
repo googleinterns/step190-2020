@@ -49,15 +49,17 @@ public class ServletUtils {
   public static Optional<String> getRequestParam(
       HttpServletRequest request, HttpServletResponse response, String inputName)
       throws IOException {
+
     String input = request.getParameter(inputName);
 
     if (input == null) {
       response.setContentType("text/html");
       response.getWriter().println(String.format("No %s in the query URL.", inputName));
       response.setStatus(400);
+      return Optional.empty();
     }
 
-    return Optional.ofNullable(input);
+    return Optional.of(input);
   }
 
   /** Access the api key stored in gcloud secret manager. */
