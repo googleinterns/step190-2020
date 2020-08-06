@@ -46,7 +46,7 @@ public class ElectionTest {
     JSONObject electionQueryJsonObject =
         new JSONObject(
             "{\"elections\": [{\"id\": \"9999\",\"name\": \"myElection\","
-            + "\"electionDay\": \"myDate\","\"ocdDivisionId\": \"myScope\"}]}");
+                + "\"electionDay\": \"myDate\",\"ocdDivisionId\": \"myScope\"}]}");
     JSONArray electionQueryArray = electionQueryJsonObject.getJSONArray("elections");
     JSONObject electionJson = electionQueryArray.getJSONObject(0);
 
@@ -115,11 +115,16 @@ public class ElectionTest {
   // Test converting an Election Entity into an Election object.
   @Test
   public void testFromEntityToElectionObject() throws Exception {
+    HashSet<Long> someIds = new HashSet<>();
+    someIds.add(Long.parseLong("1"));
+    someIds.add(Long.parseLong("2"));
     Entity entity = new Entity("Election");
     entity.setProperty("id", "9999");
     entity.setProperty("name", "myElection");
     entity.setProperty("date", "myDate");
     entity.setProperty("scope", "myScope");
+    entity.setProperty("contests", someIds);
+    entity.setProperty("referendums", someIds);
 
     Election election = Election.fromEntity(entity);
 
@@ -127,8 +132,8 @@ public class ElectionTest {
     Assert.assertEquals(election.getName(), "myElection");
     Assert.assertEquals(election.getDate(), "myDate");
     Assert.assertEquals(election.getScope(), "myScope");
-    Assert.assertEquals(election.getContests(), new HashSet<Long>());
-    Assert.assertEquals(election.getReferendums(), new HashSet<Long>());
+    Assert.assertEquals(election.getContests(), someIds);
+    Assert.assertEquals(election.getReferendums(), someIds);
   }
 
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading
@@ -233,7 +238,7 @@ public class ElectionTest {
     JSONObject electionQueryJsonObject =
         new JSONObject(
             "{\"elections\": [{\"id\": \"9999\",\"name\": \"myElection\","
-            + "\"electionDay\": \"myDate\",\"ocdDivisionId\": \"myScope\"}]}");
+                + "\"electionDay\": \"myDate\",\"ocdDivisionId\": \"myScope\"}]}");
     JSONArray electionQueryArray = electionQueryJsonObject.getJSONArray("elections");
     JSONObject electionJson = electionQueryArray.getJSONObject(0);
     JSONObject voterInfoQueryJson =
