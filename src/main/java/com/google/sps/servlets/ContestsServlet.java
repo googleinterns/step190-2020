@@ -76,7 +76,7 @@ public class ContestsServlet extends HttpServlet {
         contestList.add(Contest.fromEntity(currentContestEntity));
       } catch (EntityNotFoundException e) {
         response.setContentType("text/html");
-        response.getWriter().println("Contest with Id" + contestId.toString() + " was not found.");
+        response.getWriter().println("Contest with Id " + contestId.toString() + " was not found.");
         response.setStatus(400);
         return;
       }

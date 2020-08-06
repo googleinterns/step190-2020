@@ -10,10 +10,10 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import com.google.common.collect.ImmutableSet;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.After;
@@ -33,15 +33,12 @@ public class ContestServletTest {
   @Mock HttpServletResponse httpServletResponse;
   @Mock PrintWriter printWriter;
 
-  private static final Set<Long> candidateIdSet =
-      new ImmutableSet.Builder<Long>()
-          .add(Long.valueOf(1))
-          .add(Long.valueOf(2))
-          .add(Long.valueOf(3))
-          .build();
-  private static Entity electionEntityOne;
-  private static Entity contestEntityOne;
-  private static Entity contestEntityTwo;
+  private static final ImmutableSet<Long> CANDIDATE_ID_SET =
+      new ImmutableSet.Builder<Long>().add(1L).add(2L).add(3L).build();
+
+  private Entity electionEntityOne;
+  private Entity contestEntityOne;
+  private Entity contestEntityTwo;
 
   @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -58,7 +55,7 @@ public class ContestServletTest {
 
     contestEntityOne = new Entity("Contest");
     contestEntityOne.setProperty("name", "myFirstContest");
-    contestEntityOne.setProperty("candidates", candidateIdSet);
+    contestEntityOne.setProperty("candidates", CANDIDATE_ID_SET);
     contestEntityOne.setProperty("description", "This contest is important.");
 
     contestEntityTwo = new Entity("Contest");
@@ -122,6 +119,56 @@ public class ContestServletTest {
         .println(
             "[{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"},"
                 + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\"}]");
+  }
+
+  @Test
+  public void noElectionEntityExists_testDoGet() throws IOException {
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter).println("Election with id 9999 was not found.");
+  }
+
+  @Test
+  public void queryParameterMissing_testDoGet() throws IOException {
+    when(httpServletRequest.getParameter("electionId")).thenReturn(null);
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter).println("No electionId in the query URL.");
+  }
+
+  @Test
+  public void oneElection_contestMissingInDatastore_testDoGet() throws IOException {
+    Entity electionEntity = new Entity("Election");
+    Entity firstContestEntity = new Entity("Contest", 1);
+    Entity secondContestEntity = new Entity("Contest", 2);
+
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    firstContestEntity.setPropertiesFrom(contestEntityOne);
+    secondContestEntity.setPropertiesFrom(contestEntityTwo);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long contestOneId = ds.put(firstContestEntity).getId();
+    long contestTwoId = secondContestEntity.getKey().getId();
+
+    HashSet<Long> contestSet = (HashSet<Long>) electionEntityOne.getProperty("contests");
+    contestSet.add(contestOneId);
+    contestSet.add(contestTwoId);
+    ds.put(electionEntityOne);
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter).println("Contest with Id 2 was not found.");
   }
 
   @After
