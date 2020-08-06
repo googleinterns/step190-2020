@@ -175,11 +175,6 @@
         <configuration>
           <deploy.projectId>contrib-geo-step-2020</deploy.projectId>
           <deploy.version>1</deploy.version>
-            <jvmFlags>
-              <jvmFlag>
-                  -Ddatastore.backing_store=${integrationTest.datastoreFileDir}/${integrationTest.datastoreFile}
-              </jvmFlag>
-            </jvmFlags>
         </configuration>
         <!-- Start up the dev server for integration tests -->
         <executions>
@@ -223,6 +218,9 @@
           </execution>
         </executions>
         <configuration>
+          <excludes>
+            <exclude>**/ElectionListIT.java</exclude>
+          </excludes>
         </configuration>
       </plugin>
       <plugin>
