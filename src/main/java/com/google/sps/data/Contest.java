@@ -43,7 +43,7 @@ public abstract class Contest {
   public abstract static class Builder {
     public abstract Builder setName(String name);
 
-    public abstract Builder setCandidates(Collection<Long> candidates);
+    public abstract Builder setCandidates(Set<Long> candidates);
 
     public abstract Builder setDescription(String description);
 
@@ -76,9 +76,9 @@ public abstract class Contest {
   // Creates a new Contest object by using the propperties of the provided
   // contenst entity
   public static Contest fromEntity(Entity entity) {
-    Collection<Long> candidates = new HashSet<>();
+    Set<Long> candidates = new HashSet<>();
     if (entity.getProperty("candidates") != null) {
-      candidates = (Collection<Long>) entity.getProperty("candidates");
+      candidates = ImmutableSet.copyOf((Collection<Long>) entity.getProperty("candidates"));
     }
 
     return Contest.builder()
