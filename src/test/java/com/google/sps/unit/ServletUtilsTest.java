@@ -41,9 +41,9 @@ public class ServletUtilsTest {
     helper.tearDown();
   }
 
-  // Test ServletUtils getRquestParam() function gets parameter in Optional container correctly.
+  // Test ServletUtils getRequestParam() function gets parameter in Optional container correctly.
   @Test
-  public void testHTTPRequestGetValidParameter() throws Exception {
+  public void testGetRequestParamWithValidParameterName() throws Exception {
     when(httpServletRequest.getParameter("myKey")).thenReturn("myValue");
 
     Optional<String> parameter =
@@ -52,10 +52,10 @@ public class ServletUtilsTest {
     Assert.assertEquals(parameter.get(), "myValue");
   }
 
-  // Test ServletUtils getRquestParam() function correctly returns empty Optional container when
+  // Test ServletUtils getRequestParam() function correctly returns empty Optional container when
   // parameter key does not exist.
   @Test
-  public void testHTTPRequestGetInvalidParameter() throws Exception {
+  public void testGetRequestParamWithInvalidParameterName() throws Exception {
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     Optional<String> parameter =
@@ -64,21 +64,21 @@ public class ServletUtilsTest {
     verify(printWriter).println("No anInvalidKey in the query URL.");
   }
 
-  // Test ServletUtils getRquestParam() function correctly returns empty Optional container when
+  // Test ServletUtils getRequestParam() function correctly returns empty Optional container when
   // provided parameter key is null.
   @Test
-  public void testHTTPRequestGetNullParameter() throws Exception {
+  public void testGetRequestParamWithNullParameterName() throws Exception {
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     Optional<String> parameter =
-        ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, null);
+        ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, /*inputName=*/ null);
     Assert.assertFalse(parameter.isPresent());
     verify(printWriter).println("No null in the query URL.");
   }
 
   // Test finding an Election Entity in Datastore
   @Test
-  public void testFindExistingElectionInDatastore() throws Exception {
+  public void testFindElectionInDatastoreWithExistingElection() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Entity electionEntity = new Entity("Election");
     electionEntity.setProperty("id", "9999");
@@ -96,7 +96,7 @@ public class ServletUtilsTest {
 
   // Test finding an Election Entity that does not exist in Datastore
   @Test
-  public void testFindNonexistingElectionInDatastore() throws Exception {
+  public void testFindElectionInDatastoreWithNonexistingElection() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Entity electionEntity = new Entity("Election");
     electionEntity.setProperty("id", "9999");
