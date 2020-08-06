@@ -45,7 +45,8 @@ public class ElectionTest {
   public void testAddElectionQueryData() throws Exception {
     JSONObject electionQueryJsonObject =
         new JSONObject(
-            "{\"elections\": [{\"id\": \"9999\",\"name\": \"myElection\",\"electionDay\": \"myDate\",\"ocdDivisionId\": \"myScope\"}]}");
+            "{\"elections\": [{\"id\": \"9999\",\"name\": \"myElection\","
+            + "\"electionDay\": \"myDate\","\"ocdDivisionId\": \"myScope\"}]}");
     JSONArray electionQueryArray = electionQueryJsonObject.getJSONArray("elections");
     JSONObject electionJson = electionQueryArray.getJSONObject(0);
 
@@ -133,7 +134,7 @@ public class ElectionTest {
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading
   // from it.
   @Test
-  public void testAddVoterInfoQueryData() throws Exception {
+  public void testAddContestsToElection() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Election election =
         Election.builder()
@@ -147,12 +148,118 @@ public class ElectionTest {
     JSONObject voterInfoQueryJson =
         new JSONObject(
             "{\"election\": {\"id\": \"9999\"},"
-                + "\"contests\": [{\"type\": \"typeName\",\"office\": \"officeName\","
+                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\","
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\"}]},"
+                + "{\"type\": \"type2\",\"office\": \"officeName\","
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\"},"
                 + "{\"name\": \"name2\",\"party\": \"party2\"}]}]}");
 
     Election updatedElection = election.fromVoterInfoQuery(ds, voterInfoQueryJson);
 
-    Assert.assertEquals(updatedElection.getContests().size(), 1);
+    Assert.assertEquals(updatedElection.getContests().size(), 2);
+  }
+
+  // Test putting voterInfoQuery JSON response for one election in an Election object and reading
+  // from it.
+  @Test
+  public void testAddReferendumsToElection() throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Election election =
+        Election.builder()
+            .setId("9999")
+            .setName("myElection")
+            .setDate("myDate")
+            .setScope("myScope")
+            .setContests(new HashSet<Long>())
+            .setReferendums(new HashSet<Long>())
+            .build();
+    JSONObject voterInfoQueryJson =
+        new JSONObject(
+            "{\"election\": {\"id\": \"9999\"},"
+                + "\"contests\": [{\"type\": \"Referendum\","
+                + "\"referendumTitle\": \"Proposition 1\","
+                + "\"referendumSubtitle\": \"Subtitle text for Prop 1.\"},"
+                + "{\"type\": \"Referendum\","
+                + "\"referendumTitle\": \"Proposition 2\","
+                + "\"referendumSubtitle\": \"Subtitle text for Prop 2.\"}]}]}");
+
+    Election updatedElection = election.fromVoterInfoQuery(ds, voterInfoQueryJson);
+
+    Assert.assertEquals(updatedElection.getReferendums().size(), 2);
+  }
+
+  // Test putting voterInfoQuery JSON response for one election in an Election object and reading
+  // from it.
+  @Test
+  public void testAddContestsAndReferendumsToElection() throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Election election =
+        Election.builder()
+            .setId("9999")
+            .setName("myElection")
+            .setDate("myDate")
+            .setScope("myScope")
+            .setContests(new HashSet<Long>())
+            .setReferendums(new HashSet<Long>())
+            .build();
+    JSONObject voterInfoQueryJson =
+        new JSONObject(
+            "{\"election\": {\"id\": \"9999\"},"
+                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\","
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\"}]},"
+                + "{\"type\": \"type2\",\"office\": \"officeName\","
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\"}]},"
+                + "{\"type\": \"Referendum\","
+                + "\"referendumTitle\": \"Proposition 1\","
+                + "\"referendumSubtitle\": \"Subtitle text for Prop 1.\"},"
+                + "{\"type\": \"Referendum\","
+                + "\"referendumTitle\": \"Proposition 2\","
+                + "\"referendumSubtitle\": \"Subtitle text for Prop 2.\"}]}]}");
+
+    Election updatedElection = election.fromVoterInfoQuery(ds, voterInfoQueryJson);
+
+    Assert.assertEquals(updatedElection.getContests().size(), 2);
+    Assert.assertEquals(updatedElection.getReferendums().size(), 2);
+    Assert.assertTrue(updatedElection.isPopulatedByVoterInfoQuery());
+  }
+
+  // Test putting API JSON response for one election in an Election object and reading from it.
+  @Test
+  public void testPopulatingAllFieldsOfElectionFromJson() throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    JSONObject electionQueryJsonObject =
+        new JSONObject(
+            "{\"elections\": [{\"id\": \"9999\",\"name\": \"myElection\","
+            + "\"electionDay\": \"myDate\",\"ocdDivisionId\": \"myScope\"}]}");
+    JSONArray electionQueryArray = electionQueryJsonObject.getJSONArray("elections");
+    JSONObject electionJson = electionQueryArray.getJSONObject(0);
+    JSONObject voterInfoQueryJson =
+        new JSONObject(
+            "{\"election\": {\"id\": \"9999\"},"
+                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\","
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\"}]},"
+                + "{\"type\": \"type2\",\"office\": \"officeName\","
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\"}]},"
+                + "{\"type\": \"Referendum\","
+                + "\"referendumTitle\": \"Proposition 1\","
+                + "\"referendumSubtitle\": \"Subtitle text for Prop 1.\"},"
+                + "{\"type\": \"Referendum\","
+                + "\"referendumTitle\": \"Proposition 2\","
+                + "\"referendumSubtitle\": \"Subtitle text for Prop 2.\"}]}]}");
+
+    Election election =
+        Election.fromElectionQuery(electionJson).fromVoterInfoQuery(ds, voterInfoQueryJson);
+
+    Assert.assertEquals(election.getId(), "9999");
+    Assert.assertEquals(election.getName(), "myElection");
+    Assert.assertEquals(election.getDate(), "myDate");
+    Assert.assertEquals(election.getScope(), "myScope");
+    Assert.assertEquals(election.getContests().size(), 2);
+    Assert.assertEquals(election.getReferendums().size(), 2);
   }
 }

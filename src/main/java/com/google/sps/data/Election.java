@@ -110,7 +110,7 @@ public abstract class Election {
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
 
-        // Office positions and
+        // Referendums are a separate contest type, so separate them out from the office positions.
         if (contest.getString("type").equals("Referendum")) {
           long referendumEntityKeyId = Referendum.fromJSONObject(contest).addToDatastore(datastore);
           referendumKeyList.add(referendumEntityKeyId);
@@ -121,8 +121,6 @@ public abstract class Election {
         }
       }
     }
-
-    // TODO(caseyprice): get values for referendums
 
     return this.withContests(contestKeyList).withReferendums(referendumKeyList);
   }
