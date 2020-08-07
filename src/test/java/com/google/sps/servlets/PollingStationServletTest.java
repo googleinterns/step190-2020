@@ -87,7 +87,9 @@ public class PollingStationServletTest {
 
     verify(printWriter)
         .println(
-            "[{\"name\":\"pollingStationOne\",\"address\":\"addressOne\",\"pollingHours\":\"-\",\"startDate\":\"today\",\"endDate\":\"never\",\"locationType\":\"pollingLocation\"}]");
+            "[{\"name\":\"pollingStationOne\",\"address\":\"addressOne\","
+                + "\"pollingHours\":\"-\",\"startDate\":\"today\",\"endDate\":\"never\","
+                + "\"locationType\":\"pollingLocation\"}]");
   }
 
   @Test

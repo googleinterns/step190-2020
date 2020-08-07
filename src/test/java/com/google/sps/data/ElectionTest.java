@@ -155,12 +155,16 @@ public class ElectionTest {
             "{\"election\": {\"id\": \"9999\"},"
                 + "\"contests\": [{\"type\": \"typeName\",\"office\": \"officeName\","
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\"},"
-                + "{\"name\": \"name2\",\"party\": \"party2\"}]}]}");
+                + "{\"name\": \"name2\",\"party\": \"party2\"}]}],"
+                + "\"earlyVoteSites\": [{\"id\": \"pollingId\","
+                + "\"address\": {\"locationName\": \"name\",\"line1\": \"1\","
+                + "\"line2\": \"2\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\","
+                + "\"zip\": \"zip\"},\"pollingHours\": \"-\",\"name\": \"pollingStation\","
+                + "\"startDate\": \"start\",\"endDate\": \"end\"}]}");
 
     Election updatedElection = election.fromVoterInfoQuery(ds, voterInfoQueryJson);
 
     Assert.assertEquals(updatedElection.getContests().size(), 1);
-
-    // TODO(anooshree): test that it can read the polling station objects as well.
+    Assert.assertEquals(updatedElection.getPollingStations().size(), 1);
   }
 }
