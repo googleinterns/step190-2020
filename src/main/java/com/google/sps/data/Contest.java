@@ -27,6 +27,14 @@ import org.json.JSONObject;
 /** A state or national public office position. */
 @AutoValue
 public abstract class Contest {
+  public static final String ENTITY_NAME = "Contest";
+  public static final String TYPE_JSON_KEYWORD = "type";
+  public static final String NAME_JSON_KEYWORD = "office";
+  public static final String CANDIDATES_JSON_KEYWORD = "candidates";
+  public static final String NAME_OBJECT_KEYWORD = "name";
+  public static final String CANDIDATES_OBJECT_KEYWORD = "candidates";
+  public static final String DESCRIPTION_OBJECT_KEYWORD = "description";
+
   public abstract String getName();
 
   // This Contest references a collection of Candidate entities in Datastore. This HashSet
@@ -57,8 +65,8 @@ public abstract class Contest {
       throws JSONException {
     Set<Long> candidateKeyIds = new HashSet<>();
 
-    if (contestData.has("candidates")) {
-      for (Object candidateObject : contestData.getJSONArray("candidates")) {
+    if (contestData.has(CANDIDATES_JSON_KEYWORD)) {
+      for (Object candidateObject : contestData.getJSONArray(CANDIDATES_JSON_KEYWORD)) {
         JSONObject candidate = (JSONObject) candidateObject;
         long candidateEntityKeyId = Candidate.fromJSONObject(candidate).addToDatastore(datastore);
         candidateKeyIds.add(candidateEntityKeyId);
@@ -66,7 +74,7 @@ public abstract class Contest {
     }
 
     return Contest.builder()
-        .setName(contestData.getString("office"))
+        .setName(contestData.getString(NAME_JSON_KEYWORD))
         .setCandidates(candidateKeyIds)
         // TODO(gianelgado): get value for description
         .setDescription("")
@@ -77,13 +85,14 @@ public abstract class Contest {
   // contenst entity
   public static Contest fromEntity(Entity entity) {
     ImmutableSet<Long> candidates = ImmutableSet.of();
-    if (entity.getProperty("candidates") != null) {
-      candidates = ImmutableSet.copyOf((Collection<Long>) entity.getProperty("candidates"));
+    if (entity.getProperty(CANDIDATES_OBJECT_KEYWORD) != null) {
+      candidates =
+          ImmutableSet.copyOf((Collection<Long>) entity.getProperty(CANDIDATES_OBJECT_KEYWORD));
     }
 
     return Contest.builder()
-        .setName((String) entity.getProperty("name"))
-        .setDescription((String) entity.getProperty("description"))
+        .setName((String) entity.getProperty(NAME_OBJECT_KEYWORD))
+        .setDescription((String) entity.getProperty(DESCRIPTION_OBJECT_KEYWORD))
         .setCandidates(candidates)
         .build();
   }
@@ -91,10 +100,10 @@ public abstract class Contest {
   // Converts the Contest into a Datastore Entity and puts the Entity into the given Datastore
   // instance.
   public long addToDatastore(DatastoreService datastore) {
-    Entity entity = new Entity("Contest");
-    entity.setProperty("name", this.getName());
-    entity.setProperty("candidates", this.getCandidates());
-    entity.setProperty("description", this.getDescription());
+    Entity entity = new Entity(ENTITY_NAME);
+    entity.setProperty(NAME_OBJECT_KEYWORD, this.getName());
+    entity.setProperty(CANDIDATES_OBJECT_KEYWORD, this.getCandidates());
+    entity.setProperty(DESCRIPTION_OBJECT_KEYWORD, this.getDescription());
     datastore.put(entity);
     return entity.getKey().getId();
   }

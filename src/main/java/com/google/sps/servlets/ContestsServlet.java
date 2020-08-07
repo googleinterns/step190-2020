@@ -72,7 +72,7 @@ public class ContestsServlet extends HttpServlet {
     List<Referendum> referendumList = new ArrayList<>();
 
     for (Long contestId : electionContestsIds) {
-      Key currentKey = KeyFactory.createKey("Contest", contestId.longValue());
+      Key currentKey = KeyFactory.createKey(Contest.ENTITY_NAME, contestId.longValue());
       try {
         Entity currentContestEntity = datastore.get(currentKey);
         contestList.add(Contest.fromEntity(currentContestEntity));
@@ -85,7 +85,7 @@ public class ContestsServlet extends HttpServlet {
     }
 
     for (Long referendumId : electionReferendumIds) {
-      Key currentKey = KeyFactory.createKey("Referendum", referendumId.longValue());
+      Key currentKey = KeyFactory.createKey(Referendum.ENTITY_NAME, referendumId.longValue());
       try {
         Entity currentReferendumEntity = datastore.get(currentKey);
         referendumList.add(Referendum.fromEntity(currentReferendumEntity));
@@ -106,6 +106,15 @@ public class ContestsServlet extends HttpServlet {
     response.setContentType("application/json;");
     response
         .getWriter()
-        .println("{\"contests\": " + contestJson + ",\"referendums\": " + referendumJson + "}");
+        .println(
+            "{\""
+                + Election.CONTESTS_OBJECT_KEYWORD
+                + "\": "
+                + contestJson
+                + ",\""
+                + Election.REFERENDUMS_OBJECT_KEYWORD
+                + "\": "
+                + referendumJson
+                + "}");
   }
 }

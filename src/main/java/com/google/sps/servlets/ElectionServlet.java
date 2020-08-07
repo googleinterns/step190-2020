@@ -55,19 +55,19 @@ public class ElectionServlet extends HttpServlet {
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     // Deleting the queries from yesterday in the case that they are outdated
-    Query query = new Query("Election");
+    Query query = new Query(Election.ENTITY_NAME);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
     for (Entity entity : results.asIterable()) {
-      Key electionEntityKey = KeyFactory.createKey("Election", entity.getKey().getId());
+      Key electionEntityKey = KeyFactory.createKey(Election.ENTITY_NAME, entity.getKey().getId());
       datastore.delete(electionEntityKey);
     }
 
     String electionApiKey = ServletUtils.getApiKey("112408856470", "election-api-key", "1");
 
     JSONObject obj = ServletUtils.readFromApiUrl(String.format(BASE_URL, electionApiKey));
-    JSONArray electionQueryArray = obj.getJSONArray("elections");
+    JSONArray electionQueryArray = obj.getJSONArray(Election.ELECTIONS_JSON_KEYWORD);
 
     for (Object o : electionQueryArray) {
       JSONObject election = (JSONObject) o;
@@ -85,7 +85,7 @@ public class ElectionServlet extends HttpServlet {
    */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Query query = new Query("Election");
+    Query query = new Query(Election.ENTITY_NAME);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);

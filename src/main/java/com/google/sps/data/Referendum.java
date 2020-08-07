@@ -23,6 +23,12 @@ import org.json.JSONObject;
 /** A referendum open for election on voter ballots */
 @AutoValue
 public abstract class Referendum {
+  public static final String ENTITY_NAME = "Referendum";
+  public static final String TITLE_JSON_KEYWORD = "referendumTitle";
+  public static final String DESCRIPTION_JSON_KEYWORD = "referendumSubtitle";
+  public static final String TITLE_OBJECT_KEYWORD = "title";
+  public static final String DESCRIPTION_OBJECT_KEYWORD = "description";
+
   public abstract String getTitle();
 
   public abstract String getDescription();
@@ -43,8 +49,8 @@ public abstract class Referendum {
   // creates a new Referendum object by extracting the properties from "obj"
   public static Referendum fromJSONObject(JSONObject obj) throws JSONException {
     return Referendum.builder()
-        .setTitle(obj.getString("referendumTitle"))
-        .setDescription(obj.getString("referendumSubtitle"))
+        .setTitle(obj.getString(TITLE_JSON_KEYWORD))
+        .setDescription(obj.getString(DESCRIPTION_JSON_KEYWORD))
         .build();
   }
 
@@ -52,17 +58,17 @@ public abstract class Referendum {
   // contenst entity
   public static Referendum fromEntity(Entity entity) {
     return Referendum.builder()
-        .setTitle((String) entity.getProperty("title"))
-        .setDescription((String) entity.getProperty("description"))
+        .setTitle((String) entity.getProperty(TITLE_OBJECT_KEYWORD))
+        .setDescription((String) entity.getProperty(DESCRIPTION_OBJECT_KEYWORD))
         .build();
   }
 
   // Converts the Referendum into a Datastore Entity and puts the Entity into the given Datastore
   // instance.
   public long addToDatastore(DatastoreService datastore) {
-    Entity entity = new Entity("Referendum");
-    entity.setProperty("title", this.getTitle());
-    entity.setProperty("description", this.getDescription());
+    Entity entity = new Entity(ENTITY_NAME);
+    entity.setProperty(TITLE_OBJECT_KEYWORD, this.getTitle());
+    entity.setProperty(DESCRIPTION_OBJECT_KEYWORD, this.getDescription());
     datastore.put(entity);
     return entity.getKey().getId();
   }

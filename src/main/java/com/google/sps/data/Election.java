@@ -27,6 +27,20 @@ import org.json.JSONObject;
 /** A state or national election that will appear on voter ballots */
 @AutoValue
 public abstract class Election {
+  public static final String ENTITY_NAME = "Election";
+  public static final String ELECTIONS_JSON_KEYWORD = "elections";
+  public static final String ID_JSON_KEYWORD = "id";
+  public static final String NAME_JSON_KEYWORD = "name";
+  public static final String DATE_JSON_KEYWORD = "electionDay";
+  public static final String SCOPE_JSON_KEYWORD = "ocdDivisionId";
+  public static final String CONTESTS_JSON_KEYWORD = "contests";
+  public static final String ID_OBJECT_KEYWORD = "id";
+  public static final String NAME_OBJECT_KEYWORD = "name";
+  public static final String DATE_OBJECT_KEYWORD = "date";
+  public static final String SCOPE_OBJECT_KEYWORD = "scope";
+  public static final String CONTESTS_OBJECT_KEYWORD = "contests";
+  public static final String REFERENDUMS_OBJECT_KEYWORD = "referendums";
+
   public abstract String getId();
 
   public abstract String getName();
@@ -83,10 +97,10 @@ public abstract class Election {
    */
   public static Election fromElectionQuery(JSONObject electionQueryData) throws JSONException {
     return Election.builder()
-        .setId(electionQueryData.getString("id"))
-        .setName(electionQueryData.getString("name"))
-        .setDate(electionQueryData.getString("electionDay"))
-        .setScope(electionQueryData.getString("ocdDivisionId"))
+        .setId(electionQueryData.getString(ID_JSON_KEYWORD))
+        .setName(electionQueryData.getString(NAME_JSON_KEYWORD))
+        .setDate(electionQueryData.getString(DATE_JSON_KEYWORD))
+        .setScope(electionQueryData.getString(SCOPE_JSON_KEYWORD))
         .setContests(new HashSet<Long>())
         .setReferendums(new HashSet<Long>())
         .build();
@@ -106,13 +120,14 @@ public abstract class Election {
       throws JSONException {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> referendumKeyList = this.getReferendums();
-    if (voterInfoQueryData.has("contests")) {
-      JSONArray contestListData = voterInfoQueryData.getJSONArray("contests");
+    if (voterInfoQueryData.has(CONTESTS_JSON_KEYWORD)) {
+      JSONArray contestListData = voterInfoQueryData.getJSONArray(CONTESTS_JSON_KEYWORD);
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
 
-        // Referendums are a separate contest type, so separate them out from the office positions.
-        if (contest.getString("type").equals("Referendum")) {
+        // Referendums are a separate contest type, so separate them out from the office positions
+        // and put them in their own object field.
+        if (contest.getString(Contest.TYPE_JSON_KEYWORD).equals(Referendum.ENTITY_NAME)) {
           long referendumEntityKeyId = Referendum.fromJSONObject(contest).addToDatastore(datastore);
           referendumKeyList.add(referendumEntityKeyId);
         } else {
@@ -154,10 +169,10 @@ public abstract class Election {
     }
 
     return Election.builder()
-        .setId((String) entity.getProperty("id"))
-        .setName((String) entity.getProperty("name"))
-        .setDate((String) entity.getProperty("date"))
-        .setScope((String) entity.getProperty("scope"))
+        .setId((String) entity.getProperty(ID_OBJECT_KEYWORD))
+        .setName((String) entity.getProperty(NAME_OBJECT_KEYWORD))
+        .setDate((String) entity.getProperty(DATE_OBJECT_KEYWORD))
+        .setScope((String) entity.getProperty(SCOPE_OBJECT_KEYWORD))
         .setContests(contests)
         .setReferendums(referendums)
         .build();
@@ -170,7 +185,7 @@ public abstract class Election {
    * @param datastore the DatastoreService to store the new Entity
    */
   public long addToDatastore(DatastoreService datastore) {
-    return putInDatastore(datastore, new Entity("Election"));
+    return putInDatastore(datastore, new Entity(ENTITY_NAME));
   }
 
   /**
@@ -186,12 +201,12 @@ public abstract class Election {
      * allocateIds(), but this is also difficult because election IDs are not always
      * consecutive numbers and other entities we plan to store in Datastore will not
      * have IDs from the Civic Information API (ex. policies) */
-    entity.setProperty("id", this.getId());
-    entity.setProperty("name", this.getName());
-    entity.setProperty("date", this.getDate());
-    entity.setProperty("scope", this.getScope());
-    entity.setProperty("contests", this.getContests());
-    entity.setProperty("referendums", this.getReferendums());
+    entity.setProperty(ID_OBJECT_KEYWORD, this.getId());
+    entity.setProperty(NAME_OBJECT_KEYWORD, this.getName());
+    entity.setProperty(DATE_OBJECT_KEYWORD, this.getDate());
+    entity.setProperty(SCOPE_OBJECT_KEYWORD, this.getScope());
+    entity.setProperty(CONTESTS_OBJECT_KEYWORD, this.getContests());
+    entity.setProperty(REFERENDUMS_OBJECT_KEYWORD, this.getReferendums());
     datastore.put(entity);
     return entity.getKey().getId();
   }
