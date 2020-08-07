@@ -53,6 +53,15 @@ public class ElectionListIT {
         driver.getCurrentUrl());
   }
 
+  public static void wait(int ms) {
+    try {
+      Thread.sleep(ms);
+    }
+    catch(InterruptedException ex) {
+      Thread.currentThread().interrupt();
+    }
+  }
+
   /**
    * Tests if selecting an election from the list available post-state selection changes the URL to
    * redirect to the election information page and add the query parameters 'electionName' with the
@@ -67,6 +76,8 @@ public class ElectionListIT {
 
     String targetElectionName = "Georgia+General+Primary+Runoff+Election";
     String targetElectionID = "4979";
+
+    wait(2000);
 
     Assert.assertEquals(
         String.format(
