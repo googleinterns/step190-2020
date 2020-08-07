@@ -53,22 +53,14 @@ public class ElectionListIT {
         driver.getCurrentUrl());
   }
 
-  public static void wait(int ms) {
-    try {
-      Thread.sleep(ms);
-    }
-    catch(InterruptedException ex) {
-      Thread.currentThread().interrupt();
-    }
-  }
-
   /**
    * Tests if selecting an election from the list available post-state selection changes the URL to
    * redirect to the election information page and add the query parameters 'electionName' with the
    * value being the name of the selected election and 'electionID' with the value being its ID.
    */
   @Test
-  public void electionSelection_onClick_redirectAndUpdateElectionQueryParameters() {
+  public void electionSelection_onClick_redirectAndUpdateElectionQueryParameters()
+      throws InterruptedException {
     driver.get("http://localhost:9876/electionlist.html?state=ga");
 
     WebElement learnMoreButton = driver.findElement(By.id("state-learn-more-button"));
@@ -77,7 +69,7 @@ public class ElectionListIT {
     String targetElectionName = "Georgia+General+Primary+Runoff+Election";
     String targetElectionID = "4979";
 
-    wait(2000);
+    Thread.sleep(2000);
 
     Assert.assertEquals(
         String.format(
