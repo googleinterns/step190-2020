@@ -23,9 +23,10 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.sps.data.Contest;
+import com.google.sps.data.Election;
+import com.google.sps.data.Referendum;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -63,11 +64,12 @@ public class ContestsServlet extends HttpServlet {
       return;
     }
 
-    Entity electionEntity = electionEntityOptional.get();
+    Election election = Election.fromEntity(electionEntityOptional.get());
 
-    Set<Long> electionContestsIds =
-        ImmutableSet.copyOf((Collection<Long>) electionEntity.getProperty("contests"));
+    Set<Long> electionContestsIds = ImmutableSet.copyOf(election.getContests());
+    Set<Long> electionReferendumIds = ImmutableSet.copyOf(election.getReferendums());
     List<Contest> contestList = new ArrayList<>();
+    List<Referendum> referendumList = new ArrayList<>();
 
     for (Long contestId : electionContestsIds) {
       Key currentKey = KeyFactory.createKey("Contest", contestId.longValue());
@@ -82,10 +84,28 @@ public class ContestsServlet extends HttpServlet {
       }
     }
 
+    for (Long referendumId : electionReferendumIds) {
+      Key currentKey = KeyFactory.createKey("Referendum", referendumId.longValue());
+      try {
+        Entity currentReferendumEntity = datastore.get(currentKey);
+        referendumList.add(Referendum.fromEntity(currentReferendumEntity));
+      } catch (EntityNotFoundException e) {
+        response.setContentType("text/html");
+        response
+            .getWriter()
+            .println("Referendum with Id " + referendumId.toString() + " was not found.");
+        response.setStatus(400);
+        return;
+      }
+    }
+
     Gson gson = new Gson();
-    String json = gson.toJson(contestList);
+    String contestJson = gson.toJson(contestList);
+    String referendumJson = gson.toJson(referendumList);
 
     response.setContentType("application/json;");
-    response.getWriter().println(json);
+    response
+        .getWriter()
+        .println("{\"contests\": " + contestJson + ",\"referendums\": " + referendumJson + "}");
   }
 }

@@ -86,7 +86,7 @@ public class ServletUtilsTest {
     electionEntity.setProperty("scope", "myScope");
     electionEntity.setProperty("date", "myDate");
     electionEntity.setProperty("contests", new HashSet<Long>());
-    electionEntity.setProperty("propositions", new HashSet<Long>());
+    electionEntity.setProperty("referendums", new HashSet<Long>());
     ds.put(electionEntity);
 
     Optional<Entity> foundEntity = ServletUtils.findElectionInDatastore(ds, "9999");
@@ -104,7 +104,7 @@ public class ServletUtilsTest {
     electionEntity.setProperty("scope", "myScope");
     electionEntity.setProperty("date", "myDate");
     electionEntity.setProperty("contests", new HashSet<Long>());
-    electionEntity.setProperty("propositions", new HashSet<Long>());
+    electionEntity.setProperty("referendums", new HashSet<Long>());
     ds.put(electionEntity);
 
     Optional<Entity> foundEntity = ServletUtils.findElectionInDatastore(ds, "0001");
