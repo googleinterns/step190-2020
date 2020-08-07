@@ -70,8 +70,8 @@ public class ElectionListIT {
 
     Assert.assertEquals(
         String.format(
-            "http://localhost:9876/electionInfo.html?state=ga&electionName=%s&electionId=%s",
-            targetElectionName, targetElectionID),
+            "http://localhost:9876/electionInfo.html?state=ga&electionId=%s&electionName=%s",
+            targetElectionID, targetElectionName),
         driver.getCurrentUrl());
   }
 
