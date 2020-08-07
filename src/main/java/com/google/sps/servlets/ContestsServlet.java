@@ -20,33 +20,53 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.sps.data.Contest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * This servlet is used to retrieve the information of all the contest present on the election
+ * This servlet is used to retrieve the information of all the contests present on the election
  * specified by query parameter.
  */
 @WebServlet("/contests")
 public class ContestsServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String electionId = ServletUtils.getRequestParam(request, response, "electionId").get();
+    Optional<String> electionIdOptional =
+        ServletUtils.getRequestParam(request, response, "electionId");
+
+    if (!electionIdOptional.isPresent()) {
+      return;
+    }
+
+    String electionId = electionIdOptional.get();
+
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Entity electionEntity;
 
-    electionEntity = ServletUtils.findElectionInDatastore(datastore, electionId).get();
+    Optional<Entity> electionEntityOptional =
+        ServletUtils.findElectionInDatastore(datastore, electionId);
 
-    Collection<Long> electionContestsIds =
-        (Collection<Long>) electionEntity.getProperty("contests");
+    if (!electionEntityOptional.isPresent()) {
+      response.setContentType("text/html");
+      response.getWriter().println("Election with id " + electionId + " was not found.");
+      response.setStatus(400);
+      return;
+    }
+
+    Entity electionEntity = electionEntityOptional.get();
+
+    Set<Long> electionContestsIds =
+        ImmutableSet.copyOf((Collection<Long>) electionEntity.getProperty("contests"));
     List<Contest> contestList = new ArrayList<>();
 
     for (Long contestId : electionContestsIds) {
@@ -56,7 +76,7 @@ public class ContestsServlet extends HttpServlet {
         contestList.add(Contest.fromEntity(currentContestEntity));
       } catch (EntityNotFoundException e) {
         response.setContentType("text/html");
-        response.getWriter().println("Contest with Id" + contestId.toString() + " was not found.");
+        response.getWriter().println("Contest with Id " + contestId.toString() + " was not found.");
         response.setStatus(400);
         return;
       }

@@ -21,5 +21,7 @@ function logAddressInput(){
   let country = document.getElementById('country').value;
 
   addQueryParameter("address", 
-                    `${streetNumber} ${route} ${city} ${state} ${zipcode} ${country}`);
+                    `${streetNumber} ${route} ${city} ${state} ${zipCode} ${country}`);
 }
+
+
