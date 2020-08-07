@@ -1,5 +1,6 @@
 package com.google.sps.servlets;
 
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
@@ -53,5 +54,25 @@ public class PollingStationTest {
     Assert.assertEquals(pollingStation.getStartDate(), "start");
     Assert.assertEquals(pollingStation.getEndDate(), "end");
     Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
+  }
+
+  @Test
+  public void testFromEntity() throws Exception {
+    Entity entity = new Entity("PollingStation");
+    entity.setProperty("name", "name");
+    entity.setProperty("address", "address");
+    entity.setProperty("pollingHours", "-");
+    entity.setProperty("startDate", "start");
+    entity.setProperty("endDate", "end");
+    entity.setProperty("locationType", "dropOffLocation");
+
+    PollingStation pollingStation = PollingStation.fromEntity(entity);
+
+    Assert.assertEquals(pollingStation.getName(), "name");
+    Assert.assertEquals(pollingStation.getAddress(), "address");
+    Assert.assertEquals(pollingStation.getPollingHours(), "-");
+    Assert.assertEquals(pollingStation.getStartDate(), "start");
+    Assert.assertEquals(pollingStation.getEndDate(), "end");
+    Assert.assertEquals(pollingStation.getLocationType(), "dropOffLocation");
   }
 }
