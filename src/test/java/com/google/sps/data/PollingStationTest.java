@@ -35,6 +35,7 @@ public class PollingStationTest {
     helper.tearDown();
   }
 
+  // Test taking the JSON from the API response and creating a new PollingStation object
   @Test
   public void testFromJSONObject() throws Exception {
     JSONObject pollingStationJsonObject =
@@ -56,6 +57,7 @@ public class PollingStationTest {
     Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
   }
 
+  // Test creating a new PollingStation object from an Entity in Datastore
   @Test
   public void testFromEntity() throws Exception {
     Entity entity = new Entity("PollingStation");
@@ -74,5 +76,28 @@ public class PollingStationTest {
     Assert.assertEquals(pollingStation.getStartDate(), "start");
     Assert.assertEquals(pollingStation.getEndDate(), "end");
     Assert.assertEquals(pollingStation.getLocationType(), "dropOffLocation");
+  }
+
+  // Test creating a new Entity in Datastore from a PollingLocation object
+  @Test
+  public void testToEntity() throws Exception {
+    PollingStation pollingStation =
+        PollingStation.builder()
+            .setName("name")
+            .setAddress("address")
+            .setPollingHours("-")
+            .setStartDate("start")
+            .setEndDate("end")
+            .setLocationType("earlyVoteSite")
+            .build();
+
+    Entity pollingStationEntity = pollingStation.toEntity();
+
+    Assert.assertEquals(pollingStationEntity.getProperty("name"), "name");
+    Assert.assertEquals(pollingStationEntity.getProperty("address"), "address");
+    Assert.assertEquals(pollingStationEntity.getProperty("pollingHours"), "-");
+    Assert.assertEquals(pollingStationEntity.getProperty("startDate"), "start");
+    Assert.assertEquals(pollingStationEntity.getProperty("endDate"), "end");
+    Assert.assertEquals(pollingStationEntity.getProperty("locationType"), "earlyVoteSite");
   }
 }
