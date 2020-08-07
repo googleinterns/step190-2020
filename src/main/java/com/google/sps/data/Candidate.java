@@ -23,13 +23,13 @@ import org.json.JSONObject;
 /** A candidate for a public office position that will appear on voter ballots */
 @AutoValue
 public abstract class Candidate {
-  public static final String ENTITY_NAME = "Candidate";
+  public static final String ENTITY_KIND = "Candidate";
   public static final String NAME_JSON_KEYWORD = "name";
   public static final String PARTY_JSON_KEYWORD = "party";
-  public static final String NAME_OBJECT_KEYWORD = "name";
-  public static final String PARTY_OBJECT_KEYWORD = "partyAffiliation";
-  public static final String CAMPAIGN_OBJECT_KEYWORD = "campaignSite";
-  public static final String PLATFORM_OBJECT_KEYWORD = "platformDescription";
+  public static final String NAME_ENTITY_KEYWORD = "name";
+  public static final String PARTY_ENTITY_KEYWORD = "partyAffiliation";
+  public static final String CAMPAIGN_ENTITY_KEYWORD = "campaignSite";
+  public static final String PLATFORM_ENTITY_KEYWORD = "platformDescription";
 
   public abstract String getName();
 
@@ -70,11 +70,11 @@ public abstract class Candidate {
   // Converts the Candidate into a Datastore Entity and puts the Entity into the given Datastore
   // instance.
   public long addToDatastore(DatastoreService datastore) {
-    Entity entity = new Entity(ENTITY_NAME);
-    entity.setProperty(NAME_OBJECT_KEYWORD, this.getName());
-    entity.setProperty(PARTY_OBJECT_KEYWORD, this.getPartyAffiliation());
-    entity.setProperty(CAMPAIGN_OBJECT_KEYWORD, this.getCampaignSite());
-    entity.setProperty(PLATFORM_OBJECT_KEYWORD, this.getPlatformDescription());
+    Entity entity = new Entity(ENTITY_KIND);
+    entity.setProperty(NAME_ENTITY_KEYWORD, this.getName());
+    entity.setProperty(PARTY_ENTITY_KEYWORD, this.getPartyAffiliation());
+    entity.setProperty(CAMPAIGN_ENTITY_KEYWORD, this.getCampaignSite());
+    entity.setProperty(PLATFORM_ENTITY_KEYWORD, this.getPlatformDescription());
     datastore.put(entity);
     return entity.getKey().getId();
   }

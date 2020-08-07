@@ -23,11 +23,11 @@ import org.json.JSONObject;
 /** A referendum open for election on voter ballots */
 @AutoValue
 public abstract class Referendum {
-  public static final String ENTITY_NAME = "Referendum";
+  public static final String ENTITY_KIND = "Referendum";
   public static final String TITLE_JSON_KEYWORD = "referendumTitle";
   public static final String DESCRIPTION_JSON_KEYWORD = "referendumSubtitle";
-  public static final String TITLE_OBJECT_KEYWORD = "title";
-  public static final String DESCRIPTION_OBJECT_KEYWORD = "description";
+  public static final String TITLE_ENTITY_KEYWORD = "title";
+  public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
 
   public abstract String getTitle();
 
@@ -57,17 +57,17 @@ public abstract class Referendum {
   // Creates a new Referendum object by using the propperties of the provided Referendum entity
   public static Referendum fromEntity(Entity entity) {
     return Referendum.builder()
-        .setTitle((String) entity.getProperty(TITLE_OBJECT_KEYWORD))
-        .setDescription((String) entity.getProperty(DESCRIPTION_OBJECT_KEYWORD))
+        .setTitle((String) entity.getProperty(TITLE_ENTITY_KEYWORD))
+        .setDescription((String) entity.getProperty(DESCRIPTION_ENTITY_KEYWORD))
         .build();
   }
 
   // Converts the Referendum into a Datastore Entity and puts the Entity into the given Datastore
   // instance.
   public long addToDatastore(DatastoreService datastore) {
-    Entity entity = new Entity(ENTITY_NAME);
-    entity.setProperty(TITLE_OBJECT_KEYWORD, this.getTitle());
-    entity.setProperty(DESCRIPTION_OBJECT_KEYWORD, this.getDescription());
+    Entity entity = new Entity(ENTITY_KIND);
+    entity.setProperty(TITLE_ENTITY_KEYWORD, this.getTitle());
+    entity.setProperty(DESCRIPTION_ENTITY_KEYWORD, this.getDescription());
     datastore.put(entity);
     return entity.getKey().getId();
   }

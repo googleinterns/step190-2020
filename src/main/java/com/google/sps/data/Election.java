@@ -27,19 +27,19 @@ import org.json.JSONObject;
 /** A state or national election that will appear on voter ballots */
 @AutoValue
 public abstract class Election {
-  public static final String ENTITY_NAME = "Election";
+  public static final String ENTITY_KIND = "Election";
   public static final String ELECTIONS_JSON_KEYWORD = "elections";
   public static final String ID_JSON_KEYWORD = "id";
   public static final String NAME_JSON_KEYWORD = "name";
   public static final String DATE_JSON_KEYWORD = "electionDay";
   public static final String SCOPE_JSON_KEYWORD = "ocdDivisionId";
   public static final String CONTESTS_JSON_KEYWORD = "contests";
-  public static final String ID_OBJECT_KEYWORD = "id";
-  public static final String NAME_OBJECT_KEYWORD = "name";
-  public static final String DATE_OBJECT_KEYWORD = "date";
-  public static final String SCOPE_OBJECT_KEYWORD = "scope";
-  public static final String CONTESTS_OBJECT_KEYWORD = "contests";
-  public static final String REFERENDUMS_OBJECT_KEYWORD = "referendums";
+  public static final String ID_ENTITY_KEYWORD = "id";
+  public static final String NAME_ENTITY_KEYWORD = "name";
+  public static final String DATE_ENTITY_KEYWORD = "date";
+  public static final String SCOPE_ENTITY_KEYWORD = "scope";
+  public static final String CONTESTS_ENTITY_KEYWORD = "contests";
+  public static final String REFERENDUMS_ENTITY_KEYWORD = "referendums";
 
   public abstract String getId();
 
@@ -127,7 +127,7 @@ public abstract class Election {
 
         // Referendums are a separate contest type, so separate them out from the office positions
         // and put them in their own object field.
-        if (contest.getString(Contest.TYPE_JSON_KEYWORD).equals(Referendum.ENTITY_NAME)) {
+        if (contest.getString(Contest.TYPE_JSON_KEYWORD).equals(Referendum.ENTITY_KIND)) {
           long referendumEntityKeyId = Referendum.fromJSONObject(contest).addToDatastore(datastore);
           referendumKeyList.add(referendumEntityKeyId);
         } else {
@@ -169,10 +169,10 @@ public abstract class Election {
     }
 
     return Election.builder()
-        .setId((String) entity.getProperty(ID_OBJECT_KEYWORD))
-        .setName((String) entity.getProperty(NAME_OBJECT_KEYWORD))
-        .setDate((String) entity.getProperty(DATE_OBJECT_KEYWORD))
-        .setScope((String) entity.getProperty(SCOPE_OBJECT_KEYWORD))
+        .setId((String) entity.getProperty(ID_ENTITY_KEYWORD))
+        .setName((String) entity.getProperty(NAME_ENTITY_KEYWORD))
+        .setDate((String) entity.getProperty(DATE_ENTITY_KEYWORD))
+        .setScope((String) entity.getProperty(SCOPE_ENTITY_KEYWORD))
         .setContests(contests)
         .setReferendums(referendums)
         .build();
@@ -185,7 +185,7 @@ public abstract class Election {
    * @param datastore the DatastoreService to store the new Entity
    */
   public long addToDatastore(DatastoreService datastore) {
-    return putInDatastore(datastore, new Entity(ENTITY_NAME));
+    return putInDatastore(datastore, new Entity(ENTITY_KIND));
   }
 
   /**
@@ -201,12 +201,12 @@ public abstract class Election {
      * allocateIds(), but this is also difficult because election IDs are not always
      * consecutive numbers and other entities we plan to store in Datastore will not
      * have IDs from the Civic Information API (ex. policies) */
-    entity.setProperty(ID_OBJECT_KEYWORD, this.getId());
-    entity.setProperty(NAME_OBJECT_KEYWORD, this.getName());
-    entity.setProperty(DATE_OBJECT_KEYWORD, this.getDate());
-    entity.setProperty(SCOPE_OBJECT_KEYWORD, this.getScope());
-    entity.setProperty(CONTESTS_OBJECT_KEYWORD, this.getContests());
-    entity.setProperty(REFERENDUMS_OBJECT_KEYWORD, this.getReferendums());
+    entity.setProperty(ID_ENTITY_KEYWORD, this.getId());
+    entity.setProperty(NAME_ENTITY_KEYWORD, this.getName());
+    entity.setProperty(DATE_ENTITY_KEYWORD, this.getDate());
+    entity.setProperty(SCOPE_ENTITY_KEYWORD, this.getScope());
+    entity.setProperty(CONTESTS_ENTITY_KEYWORD, this.getContests());
+    entity.setProperty(REFERENDUMS_ENTITY_KEYWORD, this.getReferendums());
     datastore.put(entity);
     return entity.getKey().getId();
   }

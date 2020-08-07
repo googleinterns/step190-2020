@@ -55,12 +55,12 @@ public class ElectionServlet extends HttpServlet {
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
     // Deleting the queries from yesterday in the case that they are outdated
-    Query query = new Query(Election.ENTITY_NAME);
+    Query query = new Query(Election.ENTITY_KIND);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
     for (Entity entity : results.asIterable()) {
-      Key electionEntityKey = KeyFactory.createKey(Election.ENTITY_NAME, entity.getKey().getId());
+      Key electionEntityKey = KeyFactory.createKey(Election.ENTITY_KIND, entity.getKey().getId());
       datastore.delete(electionEntityKey);
     }
 
@@ -85,7 +85,7 @@ public class ElectionServlet extends HttpServlet {
    */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Query query = new Query(Election.ENTITY_NAME);
+    Query query = new Query(Election.ENTITY_KIND);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);

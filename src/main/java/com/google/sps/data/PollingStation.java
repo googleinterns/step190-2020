@@ -23,13 +23,13 @@ import org.json.JSONObject;
 /** A polling station open for voters to vote or drop ballots off at */
 @AutoValue
 public abstract class PollingStation {
-  public static final String ENTITY_NAME = "PollingStation";
+  public static final String ENTITY_KIND = "PollingStation";
   public static final String NAME_JSON_KEYWORD = "locationName";
   public static final String ADDRESS_JSON_KEYWORD = "address";
-  public static final String NAME_OBJECT_KEYWORD = "name";
-  public static final String ADDRESS_OBJECT_KEYWORD = "address";
-  public static final String DATE_OBJECT_KEYWORD = "date";
-  public static final String ELECTIONS_OBJECT_KEYWORD = "elections";
+  public static final String NAME_ENTITY_KEYWORD = "name";
+  public static final String ADDRESS_ENTITY_KEYWORD = "address";
+  public static final String DATE_ENTITY_KEYWORD = "date";
+  public static final String ELECTIONS_ENTITY_KEYWORD = "elections";
 
   public abstract String getName();
 
@@ -52,19 +52,19 @@ public abstract class PollingStation {
 
   public static PollingStation fromEntity(Entity entity) {
     return PollingStation.builder()
-        .setName((String) entity.getProperty(NAME_OBJECT_KEYWORD))
-        .setAddress((String) entity.getProperty(ADDRESS_OBJECT_KEYWORD))
+        .setName((String) entity.getProperty(NAME_ENTITY_KEYWORD))
+        .setAddress((String) entity.getProperty(ADDRESS_ENTITY_KEYWORD))
         .setElections(
-            (HashMap<String, HashMap<String, String>>) entity.getProperty(DATE_OBJECT_KEYWORD))
+            (HashMap<String, HashMap<String, String>>) entity.getProperty(DATE_ENTITY_KEYWORD))
         .build();
   }
 
   // creates a new Entity and sets the proper properties.
   public Entity toEntity() {
-    Entity entity = new Entity(ENTITY_NAME);
-    entity.setProperty(NAME_OBJECT_KEYWORD, this.getName());
-    entity.setProperty(ADDRESS_OBJECT_KEYWORD, this.getAddress());
-    entity.setProperty(ELECTIONS_OBJECT_KEYWORD, new HashMap<String, HashMap<String, String>>());
+    Entity entity = new Entity(ENTITY_KIND);
+    entity.setProperty(NAME_ENTITY_KEYWORD, this.getName());
+    entity.setProperty(ADDRESS_ENTITY_KEYWORD, this.getAddress());
+    entity.setProperty(ELECTIONS_ENTITY_KEYWORD, new HashMap<String, HashMap<String, String>>());
     return entity;
   }
 

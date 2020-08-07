@@ -52,7 +52,7 @@ public class PollingStationServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Optional<String> optionalId = ServletUtils.getRequestParam(request, response, "electionID");
 
-    Query query = new Query(PollingStation.ENTITY_NAME);
+    Query query = new Query(PollingStation.ENTITY_KIND);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);

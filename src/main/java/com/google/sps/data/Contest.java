@@ -27,13 +27,13 @@ import org.json.JSONObject;
 /** A state or national public office position. */
 @AutoValue
 public abstract class Contest {
-  public static final String ENTITY_NAME = "Contest";
+  public static final String ENTITY_KIND = "Contest";
   public static final String TYPE_JSON_KEYWORD = "type";
   public static final String NAME_JSON_KEYWORD = "office";
   public static final String CANDIDATES_JSON_KEYWORD = "candidates";
-  public static final String NAME_OBJECT_KEYWORD = "name";
-  public static final String CANDIDATES_OBJECT_KEYWORD = "candidates";
-  public static final String DESCRIPTION_OBJECT_KEYWORD = "description";
+  public static final String NAME_ENTITY_KEYWORD = "name";
+  public static final String CANDIDATES_ENTITY_KEYWORD = "candidates";
+  public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
 
   public abstract String getName();
 
@@ -84,14 +84,14 @@ public abstract class Contest {
   // Creates a new Contest object by using the propperties of the provided Contest entity
   public static Contest fromEntity(Entity entity) {
     ImmutableSet<Long> candidates = ImmutableSet.of();
-    if (entity.getProperty(CANDIDATES_OBJECT_KEYWORD) != null) {
+    if (entity.getProperty(CANDIDATES_ENTITY_KEYWORD) != null) {
       candidates =
-          ImmutableSet.copyOf((Collection<Long>) entity.getProperty(CANDIDATES_OBJECT_KEYWORD));
+          ImmutableSet.copyOf((Collection<Long>) entity.getProperty(CANDIDATES_ENTITY_KEYWORD));
     }
 
     return Contest.builder()
-        .setName((String) entity.getProperty(NAME_OBJECT_KEYWORD))
-        .setDescription((String) entity.getProperty(DESCRIPTION_OBJECT_KEYWORD))
+        .setName((String) entity.getProperty(NAME_ENTITY_KEYWORD))
+        .setDescription((String) entity.getProperty(DESCRIPTION_ENTITY_KEYWORD))
         .setCandidates(candidates)
         .build();
   }
@@ -99,10 +99,10 @@ public abstract class Contest {
   // Converts the Contest into a Datastore Entity and puts the Entity into the given Datastore
   // instance.
   public long addToDatastore(DatastoreService datastore) {
-    Entity entity = new Entity(ENTITY_NAME);
-    entity.setProperty(NAME_OBJECT_KEYWORD, this.getName());
-    entity.setProperty(CANDIDATES_OBJECT_KEYWORD, this.getCandidates());
-    entity.setProperty(DESCRIPTION_OBJECT_KEYWORD, this.getDescription());
+    Entity entity = new Entity(ENTITY_KIND);
+    entity.setProperty(NAME_ENTITY_KEYWORD, this.getName());
+    entity.setProperty(CANDIDATES_ENTITY_KEYWORD, this.getCandidates());
+    entity.setProperty(DESCRIPTION_ENTITY_KEYWORD, this.getDescription());
     datastore.put(entity);
     return entity.getKey().getId();
   }

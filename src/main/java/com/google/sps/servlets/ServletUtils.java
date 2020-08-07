@@ -147,11 +147,11 @@ public class ServletUtils {
    */
   public static Optional<Entity> findElectionInDatastore(
       DatastoreService datastore, String electionId) {
-    Query query = new Query(Election.ENTITY_NAME);
+    Query query = new Query(Election.ENTITY_KIND);
     PreparedQuery results = datastore.prepare(query);
 
     for (Entity entity : results.asIterable()) {
-      if (entity.getProperty(Election.ID_OBJECT_KEYWORD).equals(electionId)) {
+      if (entity.getProperty(Election.ID_ENTITY_KEYWORD).equals(electionId)) {
         return Optional.of(entity);
       }
     }
