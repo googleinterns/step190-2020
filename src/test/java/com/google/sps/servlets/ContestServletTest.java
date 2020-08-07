@@ -161,6 +161,48 @@ public class ContestServletTest {
   }
 
   @Test
+  public void singleElection_twoContestsTwoReferendums_testDoGet() throws Exception {
+    Entity electionEntity = new Entity("Election");
+    Entity firstContestEntity = new Entity("Contest");
+    Entity secondContestEntity = new Entity("Contest");
+    Entity firstReferendumEntity = new Entity("Referendum");
+    Entity secondReferendumEntity = new Entity("Referendum");
+
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    firstContestEntity.setPropertiesFrom(contestEntityOne);
+    secondContestEntity.setPropertiesFrom(contestEntityTwo);
+    firstReferendumEntity.setPropertiesFrom(referendumEntityOne);
+    secondReferendumEntity.setPropertiesFrom(referendumEntityTwo);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long contestOneId = ds.put(firstContestEntity).getId();
+    long contestTwoId = ds.put(secondContestEntity).getId();
+    long referendumOneId = ds.put(firstReferendumEntity).getId();
+    long referendumTwoId = ds.put(secondReferendumEntity).getId();
+
+    HashSet<Long> contestSet = (HashSet<Long>) electionEntityOne.getProperty("contests");
+    contestSet.add(contestOneId);
+    contestSet.add(contestTwoId);
+    HashSet<Long> referendumSet = (HashSet<Long>) electionEntityOne.getProperty("referendums");
+    referendumSet.add(referendumOneId);
+    referendumSet.add(referendumTwoId);
+    ds.put(electionEntityOne);
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "{\"contests\": [{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"},"
+                + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\"}],"
+                + "\"referendums\": [{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\"},"
+                + "{\"title\":\"mySecondReferendum\",\"description\":\"This is another referendum.\"}]}");
+  }
+
+  @Test
   public void noElectionEntityExists_testDoGet() throws IOException {
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
