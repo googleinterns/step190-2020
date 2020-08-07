@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.json.JSONException;
@@ -75,9 +76,9 @@ public abstract class Contest {
   // Creates a new Contest object by using the propperties of the provided
   // contenst entity
   public static Contest fromEntity(Entity entity) {
-    HashSet<Long> candidates = new HashSet<>();
+    ImmutableSet<Long> candidates = ImmutableSet.of();
     if (entity.getProperty("candidates") != null) {
-      candidates = (HashSet<Long>) entity.getProperty("candidates");
+      candidates = ImmutableSet.copyOf((Collection<Long>) entity.getProperty("candidates"));
     }
 
     return Contest.builder()
