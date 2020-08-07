@@ -156,6 +156,7 @@
             </goals>
             <phase>post-integration-test</phase>
             <configuration>
+              <excludeDefaultDirectories>true</excludeDefaultDirectories>
               <filesets>
                 <fileset>
                   <directory>${integrationTest.datastoreFileDirTmp}</directory>
@@ -216,8 +217,6 @@
             </goals>
           </execution>
         </executions>
-        <configuration>
-        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
