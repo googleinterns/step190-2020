@@ -57,7 +57,6 @@ public class PollingStationServlet extends HttpServlet {
     }
 
     String electionId = electionIdOptional.get();
-
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     Optional<Entity> electionEntityOptional =

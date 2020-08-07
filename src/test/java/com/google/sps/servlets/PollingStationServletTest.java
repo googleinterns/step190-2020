@@ -5,17 +5,15 @@ import static org.mockito.Mockito.when;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EmbeddedEntity;
+import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
-import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.ArrayList;
+import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.After;
@@ -26,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-public class ContestServletTest {
+public class PollingStationServletTest {
   private static final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(
           new LocalDatastoreServiceTestConfig(), new LocalURLFetchServiceTestConfig());
@@ -35,12 +33,9 @@ public class ContestServletTest {
   @Mock HttpServletResponse httpServletResponse;
   @Mock PrintWriter printWriter;
 
-  private static final ImmutableSet<Long> CANDIDATE_ID_SET =
-      new ImmutableSet.Builder<Long>().add(1L).add(2L).add(3L).build();
-
   private Entity electionEntityOne;
-  private Entity contestEntityOne;
-  private Entity contestEntityTwo;
+  private Entity pollingStationOne;
+  private Entity pollingStationTwo;
 
   @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -55,74 +50,44 @@ public class ContestServletTest {
     electionEntityOne.setProperty("date", "myDate");
     electionEntityOne.setProperty("contests", new HashSet<Long>());
     electionEntityOne.setProperty("propositions", new HashSet<Long>());
+    electionEntityOne.setProperty("pollingStations", new ArrayList<EmbeddedEntity>());
 
-    contestEntityOne = new Entity("Contest");
-    contestEntityOne.setProperty("name", "myFirstContest");
-    contestEntityOne.setProperty("candidates", CANDIDATE_ID_SET);
-    contestEntityOne.setProperty("description", "This contest is important.");
-
-    contestEntityTwo = new Entity("Contest");
-    contestEntityTwo.setProperty("name", "mySecondContest");
-    contestEntityTwo.setProperty("candidates", new HashSet<Long>());
-
-    contestEntityTwo.setProperty("description", "This contest is also important.");
+    pollingStationOne = new Entity("PollingStation");
+    pollingStationOne.setProperty("name", "pollingStationOne");
+    pollingStationOne.setProperty("address", "addressOne");
+    pollingStationOne.setProperty("pollingHours", "-");
+    pollingStationOne.setProperty("startDate", "today");
+    pollingStationOne.setProperty("endDate", "never");
+    pollingStationOne.setProperty("locationType", "pollingLocation");
   }
 
   @Test
-  public void singleElection_singleContest_testDoGet() throws Exception {
-      Entity electionEntity = new Entity("Election");
-    Entity contestEntity = new Entity("Contest");
+  public void singleElection_singlePollingStation_testDoGet() throws Exception {
+    Entity electionEntity = new Entity("Election");
+    Entity pollingStationEntity = new Entity("PollingStation");
 
     electionEntity.setPropertiesFrom(electionEntityOne);
-    contestEntity.setPropertiesFrom(contestEntityOne);
+    pollingStationEntity.setPropertiesFrom(pollingStationOne);
 
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    long contestId = ds.put(contestEntity).getId();
 
-    Collection<Long> contestSet = (Collection<Long>) electionEntity.getProperty("contests");
-    contestSet.add(contestId);
+    ArrayList<EmbeddedEntity> pollingStations =
+        (ArrayList<EmbeddedEntity>) electionEntity.getProperty("pollingStations");
+    EmbeddedEntity embeddedPollingStationEntity = new EmbeddedEntity();
+    embeddedPollingStationEntity.setPropertiesFrom(pollingStationEntity);
+    pollingStations.add(embeddedPollingStationEntity);
+
     ds.put(electionEntity);
 
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
-    ContestsServlet contestServlet = new ContestsServlet();
-    contestServlet.doGet(httpServletRequest, httpServletResponse);
+    PollingStationServlet pollingStationServlet = new PollingStationServlet();
+    pollingStationServlet.doGet(httpServletRequest, httpServletResponse);
 
     verify(printWriter)
         .println(
-            "[{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"}]");
-  }
-
-  @Test
-  public void singleElection_twoContest_testDoGet() throws Exception {
-    Entity electionEntity = new Entity("Election");
-    Entity firstContestEntity = new Entity("Contest", 1);
-    Entity secondContestEntity = new Entity("Contest", 2);
-
-    electionEntity.setPropertiesFrom(electionEntityOne);
-    firstContestEntity.setPropertiesFrom(contestEntityOne);
-    secondContestEntity.setPropertiesFrom(contestEntityTwo);
-
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    long contestOneId = ds.put(firstContestEntity).getId();
-    long contestTwoId = ds.put(secondContestEntity).getId();
-
-    HashSet<Long> contestSet = (HashSet<Long>) electionEntityOne.getProperty("contests");
-    contestSet.add(contestOneId);
-    contestSet.add(contestTwoId);
-    ds.put(electionEntityOne);
-
-    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
-    when(httpServletResponse.getWriter()).thenReturn(printWriter);
-
-    ContestsServlet contestServlet = new ContestsServlet();
-    contestServlet.doGet(httpServletRequest, httpServletResponse);
-
-    verify(printWriter)
-        .println(
-            "[{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"},"
-                + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\"}]");
+            "[{\"name\":\"pollingStationOne\",\"address\":\"addressOne\",\"pollingHours\":\"-\",\"startDate\":\"today\",\"endDate\":\"never\",\"locationType\":\"pollingLocation\"}]");
   }
 
   @Test
@@ -130,8 +95,8 @@ public class ContestServletTest {
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
-    ContestsServlet contestServlet = new ContestsServlet();
-    contestServlet.doGet(httpServletRequest, httpServletResponse);
+    PollingStationServlet pollingStationServlet = new PollingStationServlet();
+    pollingStationServlet.doGet(httpServletRequest, httpServletResponse);
 
     verify(printWriter).println("Election with id 9999 was not found.");
   }
@@ -141,38 +106,10 @@ public class ContestServletTest {
     when(httpServletRequest.getParameter("electionId")).thenReturn(null);
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
-    ContestsServlet contestServlet = new ContestsServlet();
-    contestServlet.doGet(httpServletRequest, httpServletResponse);
+    PollingStationServlet pollingStationServlet = new PollingStationServlet();
+    pollingStationServlet.doGet(httpServletRequest, httpServletResponse);
 
     verify(printWriter).println("No electionId in the query URL.");
-  }
-
-  @Test
-  public void oneElection_contestMissingInDatastore_testDoGet() throws IOException {
-    Entity electionEntity = new Entity("Election");
-    Entity firstContestEntity = new Entity("Contest", 1);
-    Entity secondContestEntity = new Entity("Contest", 2);
-
-    electionEntity.setPropertiesFrom(electionEntityOne);
-    firstContestEntity.setPropertiesFrom(contestEntityOne);
-    secondContestEntity.setPropertiesFrom(contestEntityTwo);
-
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    long contestOneId = ds.put(firstContestEntity).getId();
-    long contestTwoId = secondContestEntity.getKey().getId();
-
-    HashSet<Long> contestSet = (HashSet<Long>) electionEntityOne.getProperty("contests");
-    contestSet.add(contestOneId);
-    contestSet.add(contestTwoId);
-    ds.put(electionEntityOne);
-
-    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
-    when(httpServletResponse.getWriter()).thenReturn(printWriter);
-
-    ContestsServlet contestServlet = new ContestsServlet();
-    contestServlet.doGet(httpServletRequest, httpServletResponse);
-
-    verify(printWriter).println("Contest with Id 2 was not found.");
   }
 
   @After
