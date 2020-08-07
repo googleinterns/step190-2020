@@ -217,11 +217,6 @@
             </goals>
           </execution>
         </executions>
-        <configuration>
-          <excludes>
-            <exclude>**/ElectionListIT.java</exclude>
-          </excludes>
-        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
