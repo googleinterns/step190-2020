@@ -174,10 +174,5 @@ public class ContestServletTest {
   @After
   public void tearDown() {
     helper.tearDown();
-<<<<<<< HEAD
-    electionEntityOne.setProperty("contests", new HashSet<Long>());
-    electionEntityOne.setProperty("referendums", new HashSet<Long>());
-=======
->>>>>>> 4e443bc64d06fafb29b3c586f41cbd7328f432e6
   }
 }
