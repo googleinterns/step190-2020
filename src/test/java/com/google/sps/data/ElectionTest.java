@@ -160,5 +160,7 @@ public class ElectionTest {
     Election updatedElection = election.fromVoterInfoQuery(ds, voterInfoQueryJson);
 
     Assert.assertEquals(updatedElection.getContests().size(), 1);
+
+    // TODO(anooshree): test that it can read the polling station objects as well.
   }
 }

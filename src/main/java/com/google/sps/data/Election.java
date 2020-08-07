@@ -154,8 +154,6 @@ public abstract class Election {
       }
     }
 
-    // this.setPollingStations(pollingStations);
-
     // TODO(caseyprice): get values for propositions
 
     return this.withContestsAndPollingStations(contestKeyList, pollingStations);
