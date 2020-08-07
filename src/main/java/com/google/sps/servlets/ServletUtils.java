@@ -38,6 +38,11 @@ public class ServletUtils {
 
   private static final Logger logger = Logger.getLogger(ServletUtils.class.getName());
 
+  // Private constructor to prevent instantiation.
+  private ServletUtils() {
+    throw new AssertionError();
+  }
+
   /**
    * Get the value of a query parameter to an HTTP request.
    *
@@ -49,15 +54,17 @@ public class ServletUtils {
   public static Optional<String> getRequestParam(
       HttpServletRequest request, HttpServletResponse response, String inputName)
       throws IOException {
+
     String input = request.getParameter(inputName);
 
     if (input == null) {
       response.setContentType("text/html");
       response.getWriter().println(String.format("No %s in the query URL.", inputName));
       response.setStatus(400);
+      return Optional.empty();
     }
 
-    return Optional.ofNullable(input);
+    return Optional.of(input);
   }
 
   /**
