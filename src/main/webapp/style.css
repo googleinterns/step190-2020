@@ -324,3 +324,9 @@ body{
 #chosen-election {
     color: #000000;
 }
+
+
+.info-card{
+ border-style: solid;
+ border-color: #E5E5E5;
+}
