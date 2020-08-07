@@ -56,7 +56,7 @@ public abstract class Candidate {
     public abstract Candidate build();
   }
 
-  // creates a new Candidate object by extracting the properties from "candidateData"
+  // Creates a new Candidate object by extracting the properties from "candidateData"
   public static Candidate fromJSONObject(JSONObject candidateData) throws JSONException {
     return Candidate.builder()
         .setName(candidateData.getString(NAME_JSON_KEYWORD))
