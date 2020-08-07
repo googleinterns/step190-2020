@@ -38,6 +38,8 @@ public abstract class PollingStation {
     return new AutoValue_PollingStation.Builder();
   }
 
+  // TODO(anooshree): create enum with constants for types of polling locations
+
   /**
    * Creates a new PollingStation object using the information stored in a JSON object as well as
    * additional information on the election(s) it is valid for.

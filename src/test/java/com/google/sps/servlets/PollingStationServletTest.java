@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.After;
@@ -71,12 +72,11 @@ public class PollingStationServletTest {
 
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
-    ArrayList<EmbeddedEntity> pollingStations =
-        (ArrayList<EmbeddedEntity>) electionEntity.getProperty("pollingStations");
+    List<EmbeddedEntity> pollingStations =
+        (List<EmbeddedEntity>) electionEntity.getProperty("pollingStations");
     EmbeddedEntity embeddedPollingStationEntity = new EmbeddedEntity();
     embeddedPollingStationEntity.setPropertiesFrom(pollingStationEntity);
     pollingStations.add(embeddedPollingStationEntity);
-
     ds.put(electionEntity);
 
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");

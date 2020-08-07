@@ -2,15 +2,14 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
+import com.google.common.collect.ImmutableSet;
 import com.google.sps.data.Election;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -79,7 +78,7 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setPropositions(new HashSet<Long>())
-            .setPollingStations(new ArrayList<EmbeddedEntity>())
+            .setPollingStations(ImmutableSet.of())
             .build();
 
     long updatedEntityKeyId = updatedElection.putInDatastore(ds, entity);
@@ -103,7 +102,7 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setPropositions(new HashSet<Long>())
-            .setPollingStations(new ArrayList<EmbeddedEntity>())
+            .setPollingStations(ImmutableSet.of())
             .build();
 
     long entityKeyId = election.addToDatastore(ds);
@@ -132,7 +131,7 @@ public class ElectionTest {
     Assert.assertEquals(election.getScope(), "myScope");
     Assert.assertEquals(election.getContests(), new HashSet<Long>());
     Assert.assertEquals(election.getPropositions(), new HashSet<Long>());
-    Assert.assertEquals(election.getPollingStations(), new ArrayList<EmbeddedEntity>());
+    Assert.assertEquals(election.getPollingStations(), ImmutableSet.of());
   }
 
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading
@@ -148,7 +147,7 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setPropositions(new HashSet<Long>())
-            .setPollingStations(new ArrayList<EmbeddedEntity>())
+            .setPollingStations(ImmutableSet.of())
             .build();
     JSONObject voterInfoQueryJson =
         new JSONObject(

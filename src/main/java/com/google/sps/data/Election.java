@@ -18,7 +18,9 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import org.json.JSONArray;
@@ -44,7 +46,7 @@ public abstract class Election {
   // represents their Key names.
   public abstract Set<Long> getPropositions();
 
-  public abstract ArrayList<EmbeddedEntity> getPollingStations();
+  public abstract ImmutableSet<EmbeddedEntity> getPollingStations();
 
   public static Builder builder() {
     return new AutoValue_Election.Builder();
@@ -61,7 +63,7 @@ public abstract class Election {
   }
 
   public Election withContestsAndPollingStations(
-      Set<Long> contests, ArrayList<EmbeddedEntity> pollingStations) {
+      Set<Long> contests, ImmutableSet<EmbeddedEntity> pollingStations) {
     return toBuilder().setContests(contests).setPollingStations(pollingStations).build();
   }
 
@@ -79,7 +81,7 @@ public abstract class Election {
 
     public abstract Builder setPropositions(Set<Long> propositions);
 
-    public abstract Builder setPollingStations(ArrayList<EmbeddedEntity> pollingStations);
+    public abstract Builder setPollingStations(ImmutableSet<EmbeddedEntity> pollingStations);
 
     public abstract Election build();
   }
@@ -99,7 +101,7 @@ public abstract class Election {
         .setScope(electionQueryData.getString("ocdDivisionId"))
         .setContests(new HashSet<Long>())
         .setPropositions(new HashSet<Long>())
-        .setPollingStations(new ArrayList<EmbeddedEntity>())
+        .setPollingStations(ImmutableSet.of())
         .build();
   }
 
@@ -117,7 +119,8 @@ public abstract class Election {
       throws JSONException {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> propositionKeyList = new HashSet<>();
-    ArrayList<EmbeddedEntity> pollingStations = this.getPollingStations();
+    ArrayList<EmbeddedEntity> pollingStations =
+        new ArrayList<EmbeddedEntity>(this.getPollingStations());
 
     if (voterInfoQueryData.has("contests")) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray("contests");
@@ -156,7 +159,8 @@ public abstract class Election {
 
     // TODO(caseyprice): get values for propositions
 
-    return this.withContestsAndPollingStations(contestKeyList, pollingStations);
+    return this.withContestsAndPollingStations(
+        contestKeyList, ImmutableSet.copyOf(pollingStations));
   }
 
   /**
@@ -199,7 +203,7 @@ public abstract class Election {
   public static Election fromEntity(Entity entity) {
     Set<Long> contests = new HashSet<>();
     Set<Long> propositions = new HashSet<>();
-    ArrayList<EmbeddedEntity> pollingStations = new ArrayList<EmbeddedEntity>();
+    ImmutableSet<EmbeddedEntity> pollingStationSet = ImmutableSet.of();
 
     if (entity.getProperty("contests") != null) {
       contests = (HashSet<Long>) entity.getProperty("contests");
@@ -210,7 +214,8 @@ public abstract class Election {
     }
 
     if (entity.getProperty("pollingStations") != null) {
-      pollingStations = (ArrayList<EmbeddedEntity>) entity.getProperty("pollingStations");
+      pollingStationSet =
+          ImmutableSet.copyOf((Collection<EmbeddedEntity>) entity.getProperty("pollingStations"));
     }
 
     return Election.builder()
@@ -220,7 +225,7 @@ public abstract class Election {
         .setScope((String) entity.getProperty("scope"))
         .setContests(contests)
         .setPropositions(propositions)
-        .setPollingStations(pollingStations)
+        .setPollingStations(pollingStationSet)
         .build();
   }
 
@@ -253,7 +258,7 @@ public abstract class Election {
     entity.setProperty("scope", this.getScope());
     entity.setProperty("contests", this.getContests());
     entity.setProperty("propositions", this.getPropositions());
-    entity.setProperty("pollingStations", this.getPollingStations());
+    entity.setProperty("pollingStations", new ArrayList<EmbeddedEntity>(this.getPollingStations()));
     datastore.put(entity);
     return entity.getKey().getId();
   }
