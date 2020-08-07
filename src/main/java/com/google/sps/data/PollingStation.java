@@ -51,10 +51,15 @@ public abstract class PollingStation {
       throws JSONException {
     String address =
         obj.getJSONObject("address").getString("line1")
+            + " "
             + obj.getJSONObject("address").getString("line2")
+            + " "
             + obj.getJSONObject("address").getString("line3")
+            + " "
             + obj.getJSONObject("address").getString("city")
+            + " "
             + obj.getJSONObject("address").getString("state")
+            + " "
             + obj.getJSONObject("address").getString("zip");
 
     return PollingStation.builder()
