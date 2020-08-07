@@ -1,4 +1,4 @@
-package com.google.sps.servlets;
+package com.google.sps.data;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
@@ -11,12 +11,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.sps.data.Election;
 import java.io.PrintWriter;
 import java.util.HashSet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.*;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -24,10 +21,6 @@ public class ElectionTest {
   private final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(
           new LocalDatastoreServiceTestConfig(), new LocalURLFetchServiceTestConfig());
-
-  @Mock HttpServletRequest httpServletRequest;
-  @Mock HttpServletResponse httpServletResponse;
-  @Mock PrintWriter printWriter;
 
   @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
