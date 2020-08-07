@@ -54,7 +54,7 @@ public abstract class Referendum {
         .build();
   }
 
-  // Creates a new Referendum object by using the propperties of the provided Contest entity
+  // Creates a new Referendum object by using the propperties of the provided Referendum entity
   public static Referendum fromEntity(Entity entity) {
     return Referendum.builder()
         .setTitle((String) entity.getProperty(TITLE_OBJECT_KEYWORD))

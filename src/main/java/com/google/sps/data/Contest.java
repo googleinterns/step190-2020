@@ -81,7 +81,7 @@ public abstract class Contest {
         .build();
   }
 
-  // Creates a new Contest object by using the propperties of the provided contest entity
+  // Creates a new Contest object by using the propperties of the provided Contest entity
   public static Contest fromEntity(Entity entity) {
     ImmutableSet<Long> candidates = ImmutableSet.of();
     if (entity.getProperty(CANDIDATES_OBJECT_KEYWORD) != null) {
