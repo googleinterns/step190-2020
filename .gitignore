@@ -5,8 +5,7 @@ config.js
 .DS_Store
 
 # API keys
-config.js
-
+**/config.js
 
 # IntelliJ specific project files
 .idea/
