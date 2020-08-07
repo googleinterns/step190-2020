@@ -93,8 +93,8 @@ public class ContestServletTest {
   @Test
   public void singleElection_twoContest_testDoGet() throws Exception {
     Entity electionEntity = new Entity("Election");
-    Entity firstContestEntity = new Entity("Contest", 1);
-    Entity secondContestEntity = new Entity("Contest", 2);
+    Entity firstContestEntity = new Entity("Contest");
+    Entity secondContestEntity = new Entity("Contest");
 
     electionEntity.setPropertiesFrom(electionEntityOne);
     firstContestEntity.setPropertiesFrom(contestEntityOne);
@@ -146,7 +146,7 @@ public class ContestServletTest {
   @Test
   public void oneElection_contestMissingInDatastore_testDoGet() throws IOException {
     Entity electionEntity = new Entity("Election");
-    Entity firstContestEntity = new Entity("Contest", 1);
+    Entity firstContestEntity = new Entity("Contest");
     Entity secondContestEntity = new Entity("Contest", 2);
 
     electionEntity.setPropertiesFrom(electionEntityOne);
@@ -168,7 +168,7 @@ public class ContestServletTest {
     ContestsServlet contestServlet = new ContestsServlet();
     contestServlet.doGet(httpServletRequest, httpServletResponse);
 
-    verify(printWriter).println("Contest with Id 2 was not found.");
+    verify(printWriter).println("Contest with Id " + contestTwoId + " was not found.");
   }
 
   @After

@@ -63,7 +63,7 @@ public class ServletUtilsTest {
     Assert.assertFalse(parameter.isPresent());
     verify(printWriter).println("No anInvalidKey in the query URL.");
   }
-  
+
   // Test ServletUtils getRequestParam() function correctly returns empty Optional container when
   // provided parameter key is null.
   @Test

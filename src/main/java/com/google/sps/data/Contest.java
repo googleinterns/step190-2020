@@ -76,7 +76,7 @@ public abstract class Contest {
   // Creates a new Contest object by using the propperties of the provided
   // contenst entity
   public static Contest fromEntity(Entity entity) {
-    Set<Long> candidates = new HashSet<>();
+    ImmutableSet<Long> candidates = ImmutableSet.of();
     if (entity.getProperty("candidates") != null) {
       candidates = ImmutableSet.copyOf((Collection<Long>) entity.getProperty("candidates"));
     }
