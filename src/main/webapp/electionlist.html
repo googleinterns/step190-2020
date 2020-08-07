@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
     <script src="election-list.js"></script>
+    
   </head>
   
   <body onload="onElectionListLoad();">
@@ -100,7 +101,7 @@
                 <p><em>{{formatDate this.date}}</em></p>
               </div>
               <a href="#" 
-                 onclick="findElectionNameById({{{this.ID}}});return false;" 
+                 onclick="findElectionNameById({{{this.id}}});return false;" 
                  class="election-choice-js">
                 <div class="learn-more-button" id="state-learn-more-button">Learn more</div>
               </a>
@@ -119,7 +120,7 @@
                 <p><em>{{formatDate this.date}}</em></p>
               </div>
               <a href="#" 
-                 onclick="findElectionNameById({{{this.ID}}});return false;" 
+                 onclick="findElectionNameById({{{this.id}}});return false;" 
                  class="election-choice-js">
                 <div class="learn-more-button" id="national-learn-more-button">Learn more</div>
               </a>

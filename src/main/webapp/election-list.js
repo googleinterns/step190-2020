@@ -65,14 +65,12 @@ function listElections() {
 }
 
 function findElectionNameById(electionId) {
+  addQueryParameter("electionId", electionId);
   fetch('/election')
     .then(response => response.json())
     .then((electionList) => {
       electionList.forEach((election) => {
-        // It's worth noting that, on this branch, the
-        // election ID property is "ID" and not "Id"; however,
-        // I set it as "Id" here so merging into master is error-free
-        if(electionId === election.Id) {
+        if(electionId == election.id) {
           goToElectionPage(election.name, electionId);
         }
       });

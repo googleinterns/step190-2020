@@ -59,7 +59,8 @@ public class ElectionListIT {
    * value being the name of the selected election and 'electionID' with the value being its ID.
    */
   @Test
-  public void electionSelection_onClick_redirectAndUpdateElectionQueryParameters() {
+  public void electionSelection_onClick_redirectAndUpdateElectionQueryParameters()
+      throws InterruptedException {
     driver.get("http://localhost:9876/electionlist.html?state=ga");
 
     WebElement learnMoreButton = driver.findElement(By.id("state-learn-more-button"));
@@ -67,6 +68,8 @@ public class ElectionListIT {
 
     String targetElectionName = "Georgia+General+Primary+Runoff+Election";
     String targetElectionID = "4979";
+
+    Thread.sleep(2000);
 
     Assert.assertEquals(
         String.format(

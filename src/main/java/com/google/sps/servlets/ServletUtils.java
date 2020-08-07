@@ -62,7 +62,13 @@ public class ServletUtils {
     return Optional.of(input);
   }
 
-  /** Access the api key stored in gcloud secret manager. */
+  /**
+   * Access the api key stored in gcloud secret manager.
+   *
+   * @param projectId the GCP project ID, available through the Cloud Dashboard
+   * @param secretId the ID of the "secret" containing the API key in GCP Secret Manager
+   * @param versionId the version of the secret we want to access
+   */
   public static String getApiKey(String projectId, String secretId, String versionId)
       throws IOException {
     try (SecretManagerServiceClient client = SecretManagerServiceClient.create()) {
