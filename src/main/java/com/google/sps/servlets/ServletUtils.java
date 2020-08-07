@@ -38,6 +38,11 @@ public class ServletUtils {
 
   private static final Logger logger = Logger.getLogger(ServletUtils.class.getName());
 
+  // Private constructor to prevent instantiation.
+  private ServletUtils() {
+    throw new AssertionError();
+  }
+
   /**
    * Get the value of a query parameter to an HTTP request.
    *
