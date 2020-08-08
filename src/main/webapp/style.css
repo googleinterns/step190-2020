@@ -322,11 +322,34 @@ body{
 }
 
 #chosen-election {
-    color: #000000;
+  color: #000000;
 }
 
+.info-cards-wrapper {
+  width: 100%;
+}
 
-.info-card{
+.info-card-title {
+  font-weight: bold;
+  font-size: 150% ;
+  padding: 2%;
+}
+
+.info-card {
  border-style: solid;
  border-color: #E5E5E5;
+}
+
+.candidate {
+  background-color: #E5E5E5;
+  margin: 3%;
+}
+
+.candidate-name {
+  font-weight: bold;
+  padding: 3%;
+}
+
+.referendum-description{
+  padding: 2%;
 }
