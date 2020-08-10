@@ -78,6 +78,7 @@ public class InfoCardServlet extends HttpServlet {
 
     Entity electionEntity = optionalEntity.get();
     Election election = Election.fromEntity(electionEntity);
+
     // Don't need to make the API call if this Election object has already been populated.
     if (election.isPopulatedByVoterInfoQuery()) {
       return;
@@ -92,9 +93,5 @@ public class InfoCardServlet extends HttpServlet {
     JSONObject voterInfoData = ServletUtils.readFromApiUrl(url);
 
     election.fromVoterInfoQuery(datastore, voterInfoData).putInDatastore(datastore, electionEntity);
-    // TODO(anooshree): write similar method for PollingStations object that reads in polling
-    // information
-    //                  and writes entities to Datastore
-
   }
 }
