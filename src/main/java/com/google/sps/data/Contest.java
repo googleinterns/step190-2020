@@ -93,6 +93,8 @@ public abstract class Contest {
         .build();
   }
 
+  // Convert this Contest object to a String in JSON format. Serializes its list of Candiate Entity
+  // key names into JSON objects that correspond to each Candidate's attributes.
   public String toJsonString(DatastoreService datastore) {
     Gson gson = new Gson();
     JsonArray candidateJsonArray = new JsonArray();

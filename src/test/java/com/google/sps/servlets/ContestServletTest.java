@@ -32,9 +32,6 @@ public class ContestServletTest {
   @Mock HttpServletResponse httpServletResponse;
   @Mock PrintWriter printWriter;
 
-  // private static final ImmutableSet<Long> CANDIDATE_ID_SET =
-  //     new ImmutableSet.Builder<Long>().add(1L).add(2L).add(3L).build();
-
   private Entity electionEntityOne;
   private Entity contestEntityOne;
   private Entity contestEntityTwo;

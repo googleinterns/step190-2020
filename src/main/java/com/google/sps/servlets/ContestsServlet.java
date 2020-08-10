@@ -101,7 +101,7 @@ public class ContestsServlet extends HttpServlet {
 
     Gson gson = new Gson();
     // The toJson function reserializes the already serialized JSON strings, so remove the extra
-    // escape characters.
+    // escaped characters.
     String contestJson =
         gson.toJson(contestJsonList).replace("\\", "").replace("\"{", "{").replace("}\"", "}");
     String referendumJson =
