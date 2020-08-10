@@ -17,19 +17,16 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.sps.data.Contest;
 import com.google.sps.data.Election;
 import com.google.sps.data.Referendum;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -65,43 +62,26 @@ public class ContestsServlet extends HttpServlet {
     }
 
     Election election = Election.fromEntity(electionEntityOptional.get());
+    
+    List<String> contestJsonList =
+        ImmutableSet.copyOf(election.getContests())
+            .stream()
+            .map(id -> KeyFactory.createKey(Contest.ENTITY_KIND, id.longValue()))
+            .map(key -> ServletUtils.getFromDatastore(datastore, key))
+            .map(entity -> Contest.fromEntity(entity).toJsonString(datastore))
+            .collect(ImmutableList.toImmutableList());
 
-    Set<Long> electionContestsIds = ImmutableSet.copyOf(election.getContests());
-    Set<Long> electionReferendumIds = ImmutableSet.copyOf(election.getReferendums());
-    List<String> contestJsonList = new ArrayList<>();
-    List<String> referendumJsonList = new ArrayList<>();
+    List<String> referendumJsonList =
+        ImmutableSet.copyOf(election.getReferendums())
+            .stream()
+            .map(id -> KeyFactory.createKey(Referendum.ENTITY_KIND, id.longValue()))
+            .map(key -> ServletUtils.getFromDatastore(datastore, key))
+            .map(entity -> Referendum.fromEntity(entity).toJsonString())
+            .collect(ImmutableList.toImmutableList());
 
-    for (Long contestId : electionContestsIds) {
-      Key currentKey = KeyFactory.createKey(Contest.ENTITY_KIND, contestId.longValue());
-      try {
-        Entity currentContestEntity = datastore.get(currentKey);
-        contestJsonList.add(Contest.fromEntity(currentContestEntity).toJsonString(datastore));
-      } catch (EntityNotFoundException e) {
-        response.setContentType("text/html");
-        response.getWriter().println("Contest with Id " + contestId.toString() + " was not found.");
-        response.setStatus(400);
-        return;
-      }
-    }
-
-    for (Long referendumId : electionReferendumIds) {
-      Key currentKey = KeyFactory.createKey(Referendum.ENTITY_KIND, referendumId.longValue());
-      try {
-        Entity currentReferendumEntity = datastore.get(currentKey);
-        referendumJsonList.add(Referendum.fromEntity(currentReferendumEntity).toJsonString());
-      } catch (EntityNotFoundException e) {
-        response.setContentType("text/html");
-        response
-            .getWriter()
-            .println("Referendum with Id " + referendumId.toString() + " was not found.");
-        response.setStatus(400);
-        return;
-      }
-    }
-
-    Gson gson = new Gson();
     // The toJson function reserializes the already serialized JSON strings, so remove the extra
     // escaped characters.
+    Gson gson = new Gson();
     String contestJson =
         gson.toJson(contestJsonList).replace("\\", "").replace("\"{", "{").replace("}\"", "}");
     String referendumJson =
