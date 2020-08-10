@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.Query;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient;
 import com.google.cloud.secretmanager.v1.SecretVersionName;
+import com.google.sps.data.Election;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -146,11 +147,11 @@ public class ServletUtils {
    */
   public static Optional<Entity> findElectionInDatastore(
       DatastoreService datastore, String electionId) {
-    Query query = new Query("Election");
+    Query query = new Query(Election.ENTITY_KIND);
     PreparedQuery results = datastore.prepare(query);
 
     for (Entity entity : results.asIterable()) {
-      if (entity.getProperty("id").equals(electionId)) {
+      if (entity.getProperty(Election.ID_ENTITY_KEYWORD).equals(electionId)) {
         return Optional.of(entity);
       }
     }
