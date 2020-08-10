@@ -99,7 +99,7 @@ public abstract class Contest {
     Gson gson = new Gson();
     JsonArray candidateJsonArray = new JsonArray();
 
-    // Since a Contest object's "candidates" collection consists only of their Datastore key names,
+    // Since a Contest object's "candidates" collection consists only of their Datastore key IDs,
     // iterate through each one to get the actual Candidate field data in JSON format.
     Set<Long> contestCandidateIds = ImmutableSet.copyOf(this.getCandidates());
     for (Long candidateId : contestCandidateIds) {
