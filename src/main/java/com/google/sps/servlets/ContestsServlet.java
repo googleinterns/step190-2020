@@ -68,14 +68,14 @@ public class ContestsServlet extends HttpServlet {
 
     Set<Long> electionContestsIds = ImmutableSet.copyOf(election.getContests());
     Set<Long> electionReferendumIds = ImmutableSet.copyOf(election.getReferendums());
-    List<Contest> contestList = new ArrayList<>();
-    List<Referendum> referendumList = new ArrayList<>();
+    List<String> contestJsonList = new ArrayList<>();
+    List<String> referendumJsonList = new ArrayList<>();
 
     for (Long contestId : electionContestsIds) {
       Key currentKey = KeyFactory.createKey(Contest.ENTITY_KIND, contestId.longValue());
       try {
         Entity currentContestEntity = datastore.get(currentKey);
-        contestList.add(Contest.fromEntity(currentContestEntity));
+        contestJsonList.add(Contest.fromEntity(currentContestEntity).toJsonString(datastore));
       } catch (EntityNotFoundException e) {
         response.setContentType("text/html");
         response.getWriter().println("Contest with Id " + contestId.toString() + " was not found.");
@@ -88,7 +88,7 @@ public class ContestsServlet extends HttpServlet {
       Key currentKey = KeyFactory.createKey(Referendum.ENTITY_KIND, referendumId.longValue());
       try {
         Entity currentReferendumEntity = datastore.get(currentKey);
-        referendumList.add(Referendum.fromEntity(currentReferendumEntity));
+        referendumJsonList.add(Referendum.fromEntity(currentReferendumEntity).toJsonString());
       } catch (EntityNotFoundException e) {
         response.setContentType("text/html");
         response
@@ -100,8 +100,12 @@ public class ContestsServlet extends HttpServlet {
     }
 
     Gson gson = new Gson();
-    String contestJson = gson.toJson(contestList);
-    String referendumJson = gson.toJson(referendumList);
+    // The toJson function reserializes the already serialized JSON strings, so remove the extra
+    // escaped characters.
+    String contestJson =
+        gson.toJson(contestJsonList).replace("\\", "").replace("\"{", "{").replace("}\"", "}");
+    String referendumJson =
+        gson.toJson(referendumJsonList).replace("\\", "").replace("\"{", "{").replace("}\"", "}");
 
     response.setContentType("application/json;");
     response
@@ -109,11 +113,11 @@ public class ContestsServlet extends HttpServlet {
         .println(
             "{\""
                 + Election.CONTESTS_ENTITY_KEYWORD
-                + "\": "
+                + "\":"
                 + contestJson
                 + ",\""
                 + Election.REFERENDUMS_ENTITY_KEYWORD
-                + "\": "
+                + "\":"
                 + referendumJson
                 + "}");
   }

@@ -17,6 +17,7 @@ package com.google.sps.data;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -64,6 +65,21 @@ public abstract class Candidate {
         // TODO(gianelgado): get values for campaignSite and platformDescription
         .setCampaignSite("")
         .setPlatformDescription("")
+        .build();
+  }
+
+  // Converts this Candidate object to a JSON string.
+  public String toJsonString() {
+    return new Gson().toJson(this);
+  }
+
+  // Creates a new Candidate object by using the propperties of the provided Candidate entity
+  public static Candidate fromEntity(Entity entity) {
+    return Candidate.builder()
+        .setName((String) entity.getProperty(NAME_ENTITY_KEYWORD))
+        .setPartyAffiliation((String) entity.getProperty(PARTY_ENTITY_KEYWORD))
+        .setCampaignSite((String) entity.getProperty(CAMPAIGN_ENTITY_KEYWORD))
+        .setPlatformDescription((String) entity.getProperty(PLATFORM_ENTITY_KEYWORD))
         .build();
   }
 
