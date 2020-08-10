@@ -27,7 +27,7 @@ import org.json.JSONObject;
 /** A state or national public office position. */
 @AutoValue
 public abstract class Contest {
-  // TODO(caseyprice): Refactor Contest to a name that better fits public office position and 
+  // TODO(caseyprice): Refactor Contest to a name that better fits public office position and
   // doesn't get confusing with the API.
   public static final String ENTITY_KIND = "Contest";
   public static final String TYPE_JSON_KEYWORD = "type";
