@@ -93,17 +93,25 @@ $(document).ready(function(){
 });
 
 var geocoder;
+var map;
+
 function initializeMap() {
   geocoder = new google.maps.Geocoder();
 
   const urlParams = new URLSearchParams(window.location.search);
   const address = urlParams.get('address');
   
-  map = new google.maps.Map(document.getElementById("map"), {
-    center: { lat: 37.3382, lng: -121.8863 },
-    zoom: 8
+  geocoder.geocode( { 'address': address}, function(results, status) {
+    if (status == 'OK') {
+      map = new google.maps.Map(document.getElementById("map"), {
+        center: restuls[0].geometry.location,
+        zoom: 8
+      });
+    } else {
+      alert('Geocode was not successful for the following reason: ' + status);
+    }
   });
-
+  
   fetch('/polling-stations')
     .then(response => response.json())
     .then((pollingStationList) => {
