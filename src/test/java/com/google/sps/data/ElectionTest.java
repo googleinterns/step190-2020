@@ -7,6 +7,7 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
+import com.google.common.collect.ImmutableSet;
 import java.util.HashSet;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -68,6 +69,7 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setPropositions(new HashSet<Long>())
+            .setPollingStations(ImmutableSet.of())
             .build();
 
     long updatedEntityKeyId = updatedElection.putInDatastore(ds, entity);
@@ -91,6 +93,7 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setPropositions(new HashSet<Long>())
+            .setPollingStations(ImmutableSet.of())
             .build();
 
     long entityKeyId = election.addToDatastore(ds);
@@ -119,6 +122,7 @@ public class ElectionTest {
     Assert.assertEquals(election.getScope(), "myScope");
     Assert.assertEquals(election.getContests(), new HashSet<Long>());
     Assert.assertEquals(election.getPropositions(), new HashSet<Long>());
+    Assert.assertEquals(election.getPollingStations(), ImmutableSet.of());
   }
 
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading
@@ -134,16 +138,23 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setPropositions(new HashSet<Long>())
+            .setPollingStations(ImmutableSet.of())
             .build();
     JSONObject voterInfoQueryJson =
         new JSONObject(
             "{\"election\": {\"id\": \"9999\"},"
                 + "\"contests\": [{\"type\": \"typeName\",\"office\": \"officeName\","
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\"},"
-                + "{\"name\": \"name2\",\"party\": \"party2\"}]}]}");
+                + "{\"name\": \"name2\",\"party\": \"party2\"}]}],"
+                + "\"earlyVoteSites\": [{\"id\": \"pollingId\","
+                + "\"address\": {\"locationName\": \"name\",\"line1\": \"1\","
+                + "\"line2\": \"2\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\","
+                + "\"zip\": \"zip\"},\"pollingHours\": \"-\",\"name\": \"pollingStation\","
+                + "\"startDate\": \"start\",\"endDate\": \"end\"}]}");
 
     Election updatedElection = election.fromVoterInfoQuery(ds, voterInfoQueryJson);
 
     Assert.assertEquals(updatedElection.getContests().size(), 1);
+    Assert.assertEquals(updatedElection.getPollingStations().size(), 1);
   }
 }
