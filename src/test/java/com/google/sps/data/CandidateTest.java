@@ -1,5 +1,10 @@
 package com.google.sps.data;
 
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
@@ -46,5 +51,31 @@ public class CandidateTest {
     Assert.assertEquals(newCandidate.getName(), "Jane Doe");
     Assert.assertEquals(newCandidate.getPartyAffiliation(), "Green Party");
     Assert.assertEquals(newCandidate.getCampaignSite(), "www.janedoe.org");
+  }
+
+  @Test
+  public void testAddToDatastore() throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Candidate newCandidate =
+        Candidate.builder()
+            .setName("Jane Doe")
+            .setPartyAffiliation("Green")
+            .setPlatformDescription("")
+            .setCampaignSite("www.janedoe.org")
+            .build();
+    long candidateId = newCandidate.addToDatastore(ds);
+    Key candidateKey = KeyFactory.createKey(Candidate.ENTITY_KIND, candidateId);
+    Entity candidateEntity = ds.get(candidateKey);
+    Assert.assertEquals(
+        candidateEntity.getProperty(Candidate.NAME_ENTITY_KEYWORD), newCandidate.getName());
+    Assert.assertEquals(
+        candidateEntity.getProperty(Candidate.PARTY_ENTITY_KEYWORD),
+        newCandidate.getPartyAffiliation());
+    Assert.assertEquals(
+        candidateEntity.getProperty(Candidate.CAMPAIGN_ENTITY_KEYWORD),
+        newCandidate.getCampaignSite());
+    Assert.assertEquals(
+        candidateEntity.getProperty(Candidate.PLATFORM_ENTITY_KEYWORD),
+        newCandidate.getPlatformDescription());
   }
 }
