@@ -93,31 +93,41 @@
           </div>
 
           <div class="row info-cards-wrapper">
+          <script id="contests-referendums-template" type="text/x-handlebars-template">
+            <h3 id="info-cards-title">What's on the Ballot?</h3>
             <div class="col-md-4 col-lg-offset-2 contests-wrapper">
+              {{#each contests}}
               <div class="info-card">
                 <div class="info-card-title">
-                  Governor
+                  {{this.name}}
                 </div>
                 <div class="candidates-wrapper">
+                  {{#each this.candidates}}
                   <div class="candidate">
-                    <div class="candidate-name">John Doe</div>
+                    <div class="candidate-name">{{this.name}}</div>
                   </div>
-                  <div class="candidate">
-                    <div class="candidate-name">Jane Doe</div>
-                  </div>
+                  {{/each}}
                 </div>
               </div>
+              {{else}}
+              <p><em>No Contests</em></p>
+              {{/each}}
             </div>
             <div class="col-md-4 referendums-wrapper">
+              {{#each referendums}}
               <div class="info-card">
                 <div class="info-card-title">
-                  Proposition One
+                  {{this.name}}
                 </div>
                 <div class="referendum-description">
-                  First Proposition I guess this looks fine.
+                  {{this.description}}
                 </div>
               </div>
+              {{else}}
+              <p><em>No referendums</em></p>
+              {{/each}}
             </div>
+          </script>
           </div>
         </div>
 			</div>
