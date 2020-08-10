@@ -22,14 +22,6 @@ import org.json.JSONObject;
 /** A polling station open for voters to vote or drop ballots off at */
 @AutoValue
 public abstract class PollingStation {
-  public static final String ENTITY_KIND = "PollingStation";
-  public static final String NAME_JSON_KEYWORD = "locationName";
-  public static final String ADDRESS_JSON_KEYWORD = "address";
-  public static final String NAME_ENTITY_KEYWORD = "name";
-  public static final String ADDRESS_ENTITY_KEYWORD = "address";
-  public static final String DATE_ENTITY_KEYWORD = "date";
-  public static final String ELECTIONS_ENTITY_KEYWORD = "elections";
-
   public abstract String getName();
 
   public abstract String getAddress();
@@ -44,6 +36,23 @@ public abstract class PollingStation {
 
   public static Builder builder() {
     return new AutoValue_PollingStation.Builder();
+  }
+
+  @AutoValue.Builder
+  public abstract static class Builder {
+    public abstract Builder setName(String name);
+
+    public abstract Builder setAddress(String scope);
+
+    public abstract Builder setPollingHours(String hours);
+
+    public abstract Builder setStartDate(String start);
+
+    public abstract Builder setEndDate(String end);
+
+    public abstract Builder setLocationType(String type);
+
+    public abstract PollingStation build();
   }
 
   // TODO(anooshree): create enum with constants for types of polling locations
@@ -112,22 +121,5 @@ public abstract class PollingStation {
     entity.setProperty("endDate", this.getEndDate());
     entity.setProperty("locationType", this.getLocationType());
     return entity;
-  }
-
-  @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setName(String name);
-
-    public abstract Builder setAddress(String scope);
-
-    public abstract Builder setPollingHours(String hours);
-
-    public abstract Builder setStartDate(String start);
-
-    public abstract Builder setEndDate(String end);
-
-    public abstract Builder setLocationType(String type);
-
-    public abstract PollingStation build();
-  }
+  }  
 }
