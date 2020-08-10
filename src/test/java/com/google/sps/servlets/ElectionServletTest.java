@@ -51,7 +51,7 @@ public class ElectionServletTest {
     electionEntity.setProperty("scope", "myScope");
     electionEntity.setProperty("date", "myDate");
     electionEntity.setProperty("contests", new HashSet<Long>());
-    electionEntity.setProperty("propositions", new HashSet<Long>());
+    electionEntity.setProperty("referendums", new HashSet<Long>());
     electionEntity.setProperty("pollingStations", new ArrayList<EmbeddedEntity>());
     ds.put(electionEntity);
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
@@ -59,6 +59,6 @@ public class ElectionServletTest {
     electionServlet.doGet(httpServletRequest, httpServletResponse);
     verify(printWriter)
         .println(
-            "[{\"id\":\"9999\",\"name\":\"myElection\",\"date\":\"myDate\",\"scope\":\"myScope\",\"contests\":[],\"propositions\":[],\"pollingStations\":[]}]");
+            "[{\"id\":\"9999\",\"name\":\"myElection\",\"date\":\"myDate\",\"scope\":\"myScope\",\"contests\":[],\"referendums\":[],\"pollingStations\":[]}]");
   }
 }
