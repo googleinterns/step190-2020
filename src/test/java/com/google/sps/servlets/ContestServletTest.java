@@ -39,6 +39,8 @@ public class ContestServletTest {
   private Entity electionEntityOne;
   private Entity contestEntityOne;
   private Entity contestEntityTwo;
+  private Entity referendumEntityOne;
+  private Entity referendumEntityTwo;
 
   @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -51,7 +53,7 @@ public class ContestServletTest {
     electionEntityOne.setProperty("scope", "myScope");
     electionEntityOne.setProperty("date", "myDate");
     electionEntityOne.setProperty("contests", new HashSet<Long>());
-    electionEntityOne.setProperty("propositions", new HashSet<Long>());
+    electionEntityOne.setProperty("referendums", new HashSet<Long>());
 
     contestEntityOne = new Entity("Contest");
     contestEntityOne.setProperty("name", "myFirstContest");
@@ -62,6 +64,14 @@ public class ContestServletTest {
     contestEntityTwo.setProperty("name", "mySecondContest");
     contestEntityTwo.setProperty("candidates", new HashSet<Long>());
     contestEntityTwo.setProperty("description", "This contest is also important.");
+
+    referendumEntityOne = new Entity("Referendum");
+    referendumEntityOne.setProperty("title", "myFirstReferendum");
+    referendumEntityOne.setProperty("description", "This is a referendum.");
+
+    referendumEntityTwo = new Entity("Referendum");
+    referendumEntityTwo.setProperty("title", "mySecondReferendum");
+    referendumEntityTwo.setProperty("description", "This is another referendum.");
   }
 
   @Test
@@ -87,7 +97,8 @@ public class ContestServletTest {
 
     verify(printWriter)
         .println(
-            "[{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"}]");
+            "{\"contests\": [{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"}],"
+                + "\"referendums\": []}");
   }
 
   @Test
@@ -117,8 +128,78 @@ public class ContestServletTest {
 
     verify(printWriter)
         .println(
-            "[{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"},"
-                + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\"}]");
+            "{\"contests\": [{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"},"
+                + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\"}],"
+                + "\"referendums\": []}");
+  }
+
+  @Test
+  public void singleElection_singleReferendum_testDoGet() throws Exception {
+    Entity electionEntity = new Entity("Election");
+    Entity referendumEntity = new Entity("Referendum");
+
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    referendumEntity.setPropertiesFrom(referendumEntityOne);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long referendumId = ds.put(referendumEntity).getId();
+
+    Collection<Long> referendumSet = (Collection<Long>) electionEntity.getProperty("referendums");
+    referendumSet.add(referendumId);
+    ds.put(electionEntity);
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "{\"contests\": [],"
+                + "\"referendums\": [{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\"}]}");
+  }
+
+  @Test
+  public void singleElection_twoContestsTwoReferendums_testDoGet() throws Exception {
+    Entity electionEntity = new Entity("Election");
+    Entity firstContestEntity = new Entity("Contest");
+    Entity secondContestEntity = new Entity("Contest");
+    Entity firstReferendumEntity = new Entity("Referendum");
+    Entity secondReferendumEntity = new Entity("Referendum");
+
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    firstContestEntity.setPropertiesFrom(contestEntityOne);
+    secondContestEntity.setPropertiesFrom(contestEntityTwo);
+    firstReferendumEntity.setPropertiesFrom(referendumEntityOne);
+    secondReferendumEntity.setPropertiesFrom(referendumEntityTwo);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long contestOneId = ds.put(firstContestEntity).getId();
+    long contestTwoId = ds.put(secondContestEntity).getId();
+    long referendumOneId = ds.put(firstReferendumEntity).getId();
+    long referendumTwoId = ds.put(secondReferendumEntity).getId();
+
+    HashSet<Long> contestSet = (HashSet<Long>) electionEntityOne.getProperty("contests");
+    contestSet.add(contestOneId);
+    contestSet.add(contestTwoId);
+    HashSet<Long> referendumSet = (HashSet<Long>) electionEntityOne.getProperty("referendums");
+    referendumSet.add(referendumOneId);
+    referendumSet.add(referendumTwoId);
+    ds.put(electionEntityOne);
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "{\"contests\": [{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"},"
+                + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\"}],"
+                + "\"referendums\": [{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\"},"
+                + "{\"title\":\"mySecondReferendum\",\"description\":\"This is another referendum.\"}]}");
   }
 
   @Test

@@ -38,6 +38,23 @@ public abstract class PollingStation {
     return new AutoValue_PollingStation.Builder();
   }
 
+  @AutoValue.Builder
+  public abstract static class Builder {
+    public abstract Builder setName(String name);
+
+    public abstract Builder setAddress(String scope);
+
+    public abstract Builder setPollingHours(String hours);
+
+    public abstract Builder setStartDate(String start);
+
+    public abstract Builder setEndDate(String end);
+
+    public abstract Builder setLocationType(String type);
+
+    public abstract PollingStation build();
+  }
+
   // TODO(anooshree): create enum with constants for types of polling locations
 
   /**
@@ -104,22 +121,5 @@ public abstract class PollingStation {
     entity.setProperty("endDate", this.getEndDate());
     entity.setProperty("locationType", this.getLocationType());
     return entity;
-  }
-
-  @AutoValue.Builder
-  public abstract static class Builder {
-    public abstract Builder setName(String name);
-
-    public abstract Builder setAddress(String scope);
-
-    public abstract Builder setPollingHours(String hours);
-
-    public abstract Builder setStartDate(String start);
-
-    public abstract Builder setEndDate(String end);
-
-    public abstract Builder setLocationType(String type);
-
-    public abstract PollingStation build();
-  }
+  }  
 }
