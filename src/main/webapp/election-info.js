@@ -89,7 +89,7 @@ function populateClassesForTemplate(){
 }
 
 $(document).ready(function(){
-    $('#address-input-js').on('click',initializeMap)
+    $('#address-input-js').on('click', initializeMap)
 });
 
 var geocoder;
@@ -111,12 +111,33 @@ function initializeMap() {
       alert('Geocode was not successful for the following reason: ' + status);
     }
   });
-  
+
   fetch('/polling-stations')
     .then(response => response.json())
     .then((pollingStationList) => {
       pollingStationList.forEach((pollingStation) => {
-        // addPollingStation call
+        var type;
+        if (pollingStation.locationType == "dropOffLocation") {
+          type = "Drop off only.";
+        } else if (pollingStation.locationType == "earlyVoteSite") {
+          type = "Early vote site only.";
+        } else if (pollingStation.locationType == "pollingLocation") {
+          type = "Standard polling location.";
+        }
+
+        const description =
+          '<div id="content">' +
+          '<div id="siteNotice">' +
+          "</div>" +
+          '<h1 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h1>' +
+          '<div id="bodyContent">' +
+          "<p>Hours: Open " + pollingStation.pollingHours + " beginning " + pollingStation.startDate + 
+          " and until " + pollingStation.endDate + ".</p>" +
+          "<p>" + type + "</p>" +
+          "</div>" +
+          "</div>";
+
+        addPollingStation(pollingStation.address, map, pollingStation.name, description);
       });
     });
 }
@@ -130,7 +151,7 @@ function addPollingStation(address, map, title, description) {
     componentRestrictions: {country: 'US'},
     'address': address}, function(results, status) {
       if (status == 'OK') {
-        addLandmark(map, results[0].geometry.location, title, description);
+        addPollingStationMarker(map, results[0].geometry.location, title, description);
       } else {
         alert('Geocode was not successful for the following reason: ' + status);
       }
@@ -140,7 +161,7 @@ function addPollingStation(address, map, title, description) {
 /** 
  * Adds a marker that shows an info window when clicked. 
  */
-function addLandmark(map, position, title, description) {
+function addPollingStationMarker(map, position, title, description) {
   const marker = new google.maps.Marker(
       {position: position, map: map, title: title});
 
