@@ -16,11 +16,20 @@ package com.google.sps.data;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.sps.servlets.ServletUtils;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,6 +45,7 @@ public abstract class Contest {
   public static final String NAME_ENTITY_KEYWORD = "name";
   public static final String CANDIDATES_ENTITY_KEYWORD = "candidates";
   public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
+  private static final Logger logger = Logger.getLogger(ServletUtils.class.getName());
 
   public abstract String getName();
 
@@ -81,6 +91,30 @@ public abstract class Contest {
         // TODO(gianelgado): get value for description
         .setDescription("")
         .build();
+  }
+
+  // Convert this Contest object to a String in JSON format. Serializes its list of Candiate Entity
+  // key names into JSON objects that correspond to each Candidate's attributes.
+  public String toJsonString(DatastoreService datastore) {
+    Gson gson = new Gson();
+    JsonArray candidateJsonArray = new JsonArray();
+
+    // Since a Contest object's "candidates" collection consists only of their Datastore key names,
+    // iterate through each one to get the actual Candidate field data in JSON format.
+    Set<Long> contestCandidateIds = ImmutableSet.copyOf(this.getCandidates());
+    for (Long candidateId : contestCandidateIds) {
+      Key currentKey = KeyFactory.createKey(Candidate.ENTITY_KIND, candidateId.longValue());
+      try {
+        Entity currentCandidateEntity = datastore.get(currentKey);
+        candidateJsonArray.add(Candidate.fromEntity(currentCandidateEntity).toJsonString());
+      } catch (EntityNotFoundException e) {
+        logger.log(Level.WARNING, "Contest with Id " + candidateId.toString() + " was not found.");
+      }
+    }
+
+    JsonObject contestJsonObject = gson.fromJson(gson.toJson(this), JsonObject.class);
+    contestJsonObject.add("candidates", candidateJsonArray);
+    return gson.toJson(contestJsonObject);
   }
 
   // Creates a new Contest object by using the propperties of the provided Contest entity

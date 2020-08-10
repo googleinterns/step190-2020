@@ -17,6 +17,7 @@ package com.google.sps.data;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -52,6 +53,11 @@ public abstract class Referendum {
         .setTitle(obj.getString(TITLE_JSON_KEYWORD))
         .setDescription(obj.getString(DESCRIPTION_JSON_KEYWORD))
         .build();
+  }
+
+  // Converts this Referendum object to a JSON string.
+  public String toJsonString() {
+    return new Gson().toJson(this);
   }
 
   // Creates a new Referendum object by using the propperties of the provided Referendum entity
