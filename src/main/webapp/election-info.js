@@ -35,16 +35,19 @@ function logAddressInput(){
   addQueryParameter("address", 
                     `${streetNumber} ${route} ${city} ${state} ${zipCode} ${country}`);
 
-  callInfoCardServlet();
-  populateClassesForTemplate();
+  let searchParams = new URLSearchParams(window.location.search);
+  
+  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"));
+  populateClassesForTemplate(searchParams.get("electionId"));
 }
 
 /**
  * Call GET on the Info Card Servlet to retrieve the information needed to populate
  * this page
  */
-function callInfoCardServlet(){
-  let response = await fetch('/info-cards');
+function callInfoCardServlet(electionId, address){
+  let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
+  let response = await fetch(servletUrl);
 
   if (response.ok) { // if HTTP-status is 200-299
     console.log('Called Info Card servlet successfully');
@@ -57,13 +60,15 @@ function callInfoCardServlet(){
  * Make a GET request to the ContestsServlet and then update the values of the arrays
  * used by the Handlebars template.
  */
-function populateClassesForTemplate(){
+function populateClassesForTemplate(electionId){
   let contests = [];
   let candidates = [];
   let referendums = [];
 
-  fetch('/contests')
-    .then(response => response.json())
+  let servletUrl = "/contests?electionId=" + electionId;
+
+  fetch(servletUrl)
+    .then(response => response.json(servletUrl))
     .then((JSONobject) => {
       JSONobject.contests.forEach((contest) => {
         contests.push(contest);
@@ -112,7 +117,10 @@ function initializeMap() {
     }
   });
 
-  fetch('/polling-stations')
+  let searchParams = new URLSearchParams(window.location.search);
+  let servletUrl = "/polling-stations?electionId=" + searchParams.get("electionId");
+
+  fetch(servletUrl)
     .then(response => response.json())
     .then((pollingStationList) => {
       pollingStationList.forEach((pollingStation) => {
