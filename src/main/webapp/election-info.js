@@ -42,42 +42,37 @@ function callInfoCardServlet(){
   }
 }
 
+/**
+ * Make a GET request to the ContestsServlet and then update the values of the arrays
+ * used by the Handlebars template.
+ */
 function populateClassesForTemplate(){
   let contests = [];
   let candidates = [];
   let referendums = [];
 
-  fetch('/election')
+  fetch('/contests')
     .then(response => response.json())
-    .then((electionList) => {
-      // ocdDivisionId is in the form "ocd-division/country:us/state:<state_code>"
-      // For example, Lousiana's ID is "ocd-division/country:us/state:la"
-      let regex = /ocd\-division\/country\:us(\/(state|district)\:([a-z][a-z]))?/;
+    .then((JSONobject) => {
+      JSONobject.contests.forEach((contest) => {
+        contests.push(contest);
 
-      // For every election returned, store it if the state matches or if national election,
-      // to later display the details to the user.
-      electionList.forEach((election) => {
-        let ocdId = election.scope;
-
-        // Match the OCD Division ID with the regular expressions to check if this election
-        // is a state election, district election, or national election.
-        let regexMatch = regex.exec(ocdId);
-
-        if (regexMatch != null && regexMatch[3] == selectedStateId) {
-          stateElections.push(election);
-        } else if (regexMatch != null && regexMatch[1] == undefined) {
-          nationalElections.push(election);
-        }
+        contest.candidates.forEach((candidate) => {
+          candidates.push(candidate);
+        });
       });
 
-      let source = document.getElementById('election-list-template').innerHTML;
-      let template = Handlebars.compile(source);
-      let context = { state: selectedStateName, 
-                      stateElections: stateElections, 
-                      nationalElections: nationalElections };
+      JSONobject.referendums.forEach((referendum) => {
+          referendums.push(referendum);
+      });
 
-      let electionListContainerElement = document.getElementById('election-list-content');
-      electionListContainerElement.innerHTML = template(context);
+      let source = document.getElementById('contests-referendums-template').innerHTML;
+      let template = Handlebars.compile(source);
+      let context = { contests: contests, 
+                      candidates: candidates, 
+                      referendums: referendums };
+
+      let infoCardContainerElement = document.getElementById('contests-referendums-content');
+      infoCardContainerElement.innerHTML = template(context);
   });
-  updateLinksWithQueryParams(document.links);
 }
