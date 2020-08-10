@@ -5,11 +5,13 @@ import static org.mockito.Mockito.when;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -50,12 +52,13 @@ public class ElectionServletTest {
     electionEntity.setProperty("date", "myDate");
     electionEntity.setProperty("contests", new HashSet<Long>());
     electionEntity.setProperty("referendums", new HashSet<Long>());
+    electionEntity.setProperty("pollingStations", new ArrayList<EmbeddedEntity>());
     ds.put(electionEntity);
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
     ElectionServlet electionServlet = new ElectionServlet();
     electionServlet.doGet(httpServletRequest, httpServletResponse);
     verify(printWriter)
         .println(
-            "[{\"id\":\"9999\",\"name\":\"myElection\",\"date\":\"myDate\",\"scope\":\"myScope\",\"contests\":[],\"referendums\":[]}]");
+            "[{\"id\":\"9999\",\"name\":\"myElection\",\"date\":\"myDate\",\"scope\":\"myScope\",\"contests\":[],\"referendums\":[],\"pollingStations\":[]}]");
   }
 }

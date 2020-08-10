@@ -16,7 +16,6 @@ package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
-import java.util.HashMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,48 +34,85 @@ public abstract class PollingStation {
 
   public abstract String getAddress();
 
-  public abstract HashMap<String, HashMap<String, String>> getElections();
+  public abstract String getPollingHours();
+
+  public abstract String getStartDate();
+
+  public abstract String getEndDate();
+
+  public abstract String getLocationType();
 
   public static Builder builder() {
     return new AutoValue_PollingStation.Builder();
   }
 
-  // creates a new PollingStation object by extracting the properties from "obj"
-  public static PollingStation fromJSONObject(JSONObject obj) throws JSONException {
+  // TODO(anooshree): create enum with constants for types of polling locations
+
+  /**
+   * Creates a new PollingStation object using the information stored in a JSON object as well as
+   * additional information on the election(s) it is valid for.
+   *
+   * @param obj the JSON oject we are reading the PollingStation object from, retrieved from a call
+   *     to the Google Civic Information API
+   * @param electionId the election ID of an election the polling station can be used for
+   * @param locationType the type of station this is for the election signified by electionId.
+   */
+  public static PollingStation fromJSONObject(JSONObject obj, String locationType)
+      throws JSONException {
+    String address =
+        obj.getJSONObject("address").getString("line1")
+            + " "
+            + obj.getJSONObject("address").getString("line2")
+            + " "
+            + obj.getJSONObject("address").getString("line3")
+            + " "
+            + obj.getJSONObject("address").getString("city")
+            + " "
+            + obj.getJSONObject("address").getString("state")
+            + " "
+            + obj.getJSONObject("address").getString("zip");
+
     return PollingStation.builder()
-        .setName(obj.getJSONObject(ADDRESS_JSON_KEYWORD).getString(NAME_JSON_KEYWORD))
-        .setAddress("")
-        .setElections(new HashMap<String, HashMap<String, String>>())
+        .setName(obj.getString("name"))
+        .setAddress(address)
+        .setPollingHours(obj.getString("pollingHours"))
+        .setStartDate(obj.getString("startDate"))
+        .setEndDate(obj.getString("endDate"))
+        .setLocationType(locationType)
         .build();
   }
 
+  /**
+   * Creates a PollingStation object from an Entity in Datastore
+   *
+   * @param entity the Entity in Datastore that represents a PollingStation
+   */
   public static PollingStation fromEntity(Entity entity) {
     return PollingStation.builder()
-        .setName((String) entity.getProperty(NAME_ENTITY_KEYWORD))
-        .setAddress((String) entity.getProperty(ADDRESS_ENTITY_KEYWORD))
-        .setElections(
-            (HashMap<String, HashMap<String, String>>) entity.getProperty(DATE_ENTITY_KEYWORD))
+        .setName((String) entity.getProperty("name"))
+        .setAddress((String) entity.getProperty("address"))
+        .setPollingHours((String) entity.getProperty("pollingHours"))
+        .setStartDate((String) entity.getProperty("startDate"))
+        .setEndDate((String) entity.getProperty("endDate"))
+        .setLocationType((String) entity.getProperty("locationType"))
         .build();
   }
 
-  // creates a new Entity and sets the proper properties.
+  /**
+   * Creates a new Entity and sets the proper properties.
+   *
+   * @return an Entity that can be stored in Datastore
+   */
   public Entity toEntity() {
-    Entity entity = new Entity(ENTITY_KIND);
-    entity.setProperty(NAME_ENTITY_KEYWORD, this.getName());
-    entity.setProperty(ADDRESS_ENTITY_KEYWORD, this.getAddress());
-    entity.setProperty(ELECTIONS_ENTITY_KEYWORD, new HashMap<String, HashMap<String, String>>());
+    Entity entity = new Entity("PollingStation");
+    entity.setProperty("name", this.getName());
+    entity.setProperty("address", this.getAddress());
+    entity.setProperty("pollingHours", this.getPollingHours());
+    entity.setProperty("startDate", this.getStartDate());
+    entity.setProperty("endDate", this.getEndDate());
+    entity.setProperty("locationType", this.getLocationType());
     return entity;
   }
-
-  // TODO(anooshree): write method that goes through polling stations for a
-  // given election and updates polling stations, return a list
-  //
-  // Should update polling stations that already exist in Datastore and create
-  // new ones for those that do not.
-  //
-  // public static HashSet<PollingStation> getPollingStationsForElection(String electionID)
-
-  // TODO(anooshree): add a method that either adds a set or a single PollingStation to Datastore.
 
   @AutoValue.Builder
   public abstract static class Builder {
@@ -84,7 +120,13 @@ public abstract class PollingStation {
 
     public abstract Builder setAddress(String scope);
 
-    public abstract Builder setElections(HashMap<String, HashMap<String, String>> elections);
+    public abstract Builder setPollingHours(String hours);
+
+    public abstract Builder setStartDate(String start);
+
+    public abstract Builder setEndDate(String end);
+
+    public abstract Builder setLocationType(String type);
 
     public abstract PollingStation build();
   }
