@@ -33,16 +33,14 @@
         </div>
 
         <div class="container" id="content">
-          <div class="row" id="election-info-page-title">
-            <p style="display: inline-block; text-align: left;">
-              <b>To show you polling locations, candidates, and ballot items from the&nbsp;</b> 
+          <div class="row" id="election-info-page-title"></div>
+          <script id="election-name-template" type="text/x-handlebars-template">
+            <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
+              To show you polling locations, and ballot items from the <span id="chosen-election">{{electionName}}</span>, we'll need your 
+              registered voter address:
             </p>
-            <div id="chosen-election" style="display: inline-block; text-align: left;"> </div>
-            <p style="display: inline-block; text-align: left;">
-              <b>, we'll need your registered voter address: </b>
-            </p>
-          </div>
-
+          </script>
+          
           <div class="row input-wrapper">
             <div class="panel panel-primary">
               <div class="container panel-body">
@@ -109,7 +107,9 @@
                   <div class="candidates-wrapper">
                     {{#each this.candidates}}
                     <div class="candidate">
-                      <button type="button" class="candidate-name collapsible"><b>{{this.name}} </b>({{{this.partyAffiliation}}})</button>
+                      <button type="button" class="candidate-name collapsible">
+                        <b>{{this.name}} </b>({{this.partyAffiliation}})
+                      </button>
                       <div class="collapsible-content candidate-info">
                         <p><b>Website: </b>{{this.campaignSite}}</p>
                         <p>{{this.platformDescription}}</p>
@@ -125,7 +125,9 @@
               <div class="col-md-4 referendums-wrapper">
                 {{#each referendums}}
                 <div class="info-card">
-                  <button type="button" class="info-card-title referendum-name collapsible">{{this.title}}</button>
+                  <button type="button" class="info-card-title referendum-name collapsible">
+                    {{this.title}}
+                  </button>
                   <div class="collapsible-content">
                     <p class="referendum-description">
                       {{this.description}}

@@ -2,9 +2,15 @@ function onElectionInfoLoad(){
   let searchParams = new URLSearchParams(window.location.search);
   let selectedElection = searchParams.get("electionName"); 
 
-  if(selectedElection != null){
-    const chosenElection = document.getElementById('chosen-election');
-    chosenElection.innerText = selectedElection;
+  if (selectedElection != null) {
+    let source = document.getElementById('election-name-template').innerHTML;
+    console.log("gud")
+    let template = Handlebars.compile(source);
+    let context = { electionName: selectedElection };
+
+    let titleTextElement = document.getElementById('election-info-page-title');
+    console.log("double gud")
+    titleTextElement.innerHTML = template(context);
   }
 }
 
