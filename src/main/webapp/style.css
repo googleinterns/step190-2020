@@ -326,7 +326,6 @@ body{
 
 #info-cards-title {
   margin-left: 17%;
-  font-weight: bold;
   margin-bottom: 20px;
   margin-top: 40px;
 }
@@ -342,8 +341,10 @@ body{
 }
 
 .info-card {
- border-style: solid;
- border-color: #E5E5E5;
+  background-color: white;
+  border: 1.5px solid #E5E5E5;
+  border-radius: 7px;
+  padding: 10px;
 }
 
 .candidate {
@@ -352,10 +353,65 @@ body{
 }
 
 .candidate-name {
-  font-weight: bold;
   padding: 3%;
+  background-color: #E5E5E5;
+  color: #444;
+  border: none;
+}
+
+.referendum-name {
+  background-color: white;
+  border: none;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  outline: none;
 }
 
 .referendum-description{
   padding: 2%;
+  
+}
+
+/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  outline: none;
+}
+
+/* Add a background color to the candidate button if it is clicked on (add the .active class with JS), 
+   and when you move the mouse over it (hover) */
+.candidate-name.active, .candidate-name.collapsible:hover {
+  background-color: #ccc;
+}
+
+/* Style the collapsible content. Note: hidden by default */
+.collapsible-content {
+  padding: 0px 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.candidate-info {
+  background-color: #EFEFEF;
+}
+
+.collapsible:after {
+  content: '\02795'; /* Unicode character for "plus" sign (+) */
+  font-size: 13px;
+  color: black;
+  float: right;
+  margin-left: 5px;
+}
+
+.collapsible-content p {
+  margin: 18px 0;
+}
+
+.active:after {
+  content: "\2796"; /* Unicode character for "minus" sign (-) */
 }
