@@ -6,6 +6,5 @@
   <static-files>
     <!-- prevent unwanted caching when accessing via the web preview server -->
     <include path="/**" expiration="0s" />
-    <exclude path="/config.js"/>
   </static-files>
 </appengine-web-app>
