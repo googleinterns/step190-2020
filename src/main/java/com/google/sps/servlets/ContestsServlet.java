@@ -74,7 +74,6 @@ public class ContestsServlet extends HttpServlet {
             .map(jsonString -> JsonParser.parseString(jsonString))
             .collect(ImmutableList.toImmutableList());
 
-
     List<JsonElement> referendumJsonList =
         ImmutableSet.copyOf(election.getReferendums())
             .stream()
@@ -85,10 +84,8 @@ public class ContestsServlet extends HttpServlet {
             .collect(ImmutableList.toImmutableList());
 
     Gson gson = new Gson();
-    String contestJson =
-        gson.toJson(contestJsonList).replace("\\", "").replace("\"{", "{").replace("}\"", "}");
-    String referendumJson =
-        gson.toJson(referendumJsonList).replace("\\", "").replace("\"{", "{").replace("}\"", "}");
+    String contestJson = gson.toJson(contestJsonList).replace("\"{", "{").replace("}\"", "}");
+    String referendumJson = gson.toJson(referendumJsonList).replace("\"{", "{").replace("}\"", "}");
 
     response.setContentType("application/json;");
     response
