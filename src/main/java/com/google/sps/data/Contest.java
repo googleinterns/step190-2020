@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.sps.servlets.ServletUtils;
 import java.util.Collection;
 import java.util.HashSet;
@@ -105,7 +106,10 @@ public abstract class Contest {
         .map(key -> ServletUtils.getFromDatastore(datastore, key))
         // Have to use forEach to have void return. Can't use Collection to collect because
         // JsonArray can't addAll() with String as parameter.
-        .forEach(entity -> candidateJsonArray.add(Candidate.fromEntity(entity).toJsonString()));
+        .forEach(
+            entity ->
+                candidateJsonArray.add(
+                    JsonParser.parseString(Candidate.fromEntity(entity).toJsonString())));
 
     contestJsonObject.add("candidates", candidateJsonArray);
     return gson.toJson(contestJsonObject);
