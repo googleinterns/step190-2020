@@ -43,10 +43,9 @@ public class CandidateTest {
                 + "\":\"Jane Doe\",\""
                 + Candidate.PARTY_JSON_KEYWORD
                 + "\":\"Green Party\",\""
-                + Candidate.CAMPAIGN_JSON_KEYWORD
+                + Candidate.CAMPAIGN_URL_JSON_KEYWORD
                 + "\":\"www.janedoe.org\"}");
 
-    System.out.println(candidateJSON);
     Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
     Assert.assertEquals(newCandidate.getName(), "Jane Doe");
     Assert.assertEquals(newCandidate.getPartyAffiliation(), "Green Party");
@@ -72,7 +71,7 @@ public class CandidateTest {
         candidateEntity.getProperty(Candidate.PARTY_ENTITY_KEYWORD),
         newCandidate.getPartyAffiliation());
     Assert.assertEquals(
-        candidateEntity.getProperty(Candidate.CAMPAIGN_ENTITY_KEYWORD),
+        candidateEntity.getProperty(Candidate.CAMPAIGN_URL_ENTITY_KEYWORD),
         newCandidate.getCampaignSite());
     Assert.assertEquals(
         candidateEntity.getProperty(Candidate.PLATFORM_ENTITY_KEYWORD),

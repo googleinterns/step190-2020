@@ -63,7 +63,7 @@ public class ContestTest {
   }
 
   @Test
-  public void oneContest_twoCandidates_JsonString() {
+  public void oneContest_twoCandidates_toJsonString() {
     Candidate candidateOne =
         Candidate.builder()
             .setName("Jane Doe")
@@ -115,7 +115,7 @@ public class ContestTest {
 
   @Test
   public void testFromEntity() {
-    ImmutableSet<Long> idSet = ImmutableSet.<Long>builder().add(1L).add(2L).build();
+    ImmutableSet<Long> idSet = ImmutableSet.of(1L, 2L);
     Entity newContestEntity = new Entity(Contest.ENTITY_KIND);
     newContestEntity.setProperty(Contest.NAME_ENTITY_KEYWORD, "Governer");
     newContestEntity.setProperty(Contest.CANDIDATES_ENTITY_KEYWORD, idSet);
@@ -131,7 +131,7 @@ public class ContestTest {
 
   @Test
   public void testAddToDatastore() throws Exception {
-    ImmutableSet<Long> idSet = ImmutableSet.<Long>builder().add(1L).add(2L).build();
+    ImmutableSet<Long> idSet = ImmutableSet.of(1L, 2L);
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
 
     Contest newContest =
