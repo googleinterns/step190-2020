@@ -299,7 +299,7 @@ public class ContestServletTest {
     verify(printWriter).println("No electionId in the query URL.");
   }
 
-  @Test
+  @Test(expected = RuntimeException.class)
   public void oneElection_contestMissingInDatastore_testDoGet() throws IOException {
     Entity electionEntity = new Entity("Election");
     Entity firstContestEntity = new Entity("Contest");
@@ -319,12 +319,9 @@ public class ContestServletTest {
     ds.put(electionEntityOne);
 
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
-    when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     ContestsServlet contestServlet = new ContestsServlet();
     contestServlet.doGet(httpServletRequest, httpServletResponse);
-
-    verify(printWriter).println("Contest with Id " + contestTwoId + " was not found.");
   }
 
   @After
