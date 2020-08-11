@@ -16,8 +16,6 @@ package com.google.sps.data;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
@@ -28,7 +26,6 @@ import com.google.sps.servlets.ServletUtils;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -97,22 +94,19 @@ public abstract class Contest {
   // key names into JSON objects that correspond to each Candidate's attributes.
   public String toJsonString(DatastoreService datastore) {
     Gson gson = new Gson();
+    JsonObject contestJsonObject = gson.fromJson(gson.toJson(this), JsonObject.class);
     JsonArray candidateJsonArray = new JsonArray();
 
-    // Since a Contest object's "candidates" collection consists only of their Datastore key names,
+    // Since a Contest object's "candidates" collection consists only of their Datastore key IDs,
     // iterate through each one to get the actual Candidate field data in JSON format.
-    Set<Long> contestCandidateIds = ImmutableSet.copyOf(this.getCandidates());
-    for (Long candidateId : contestCandidateIds) {
-      Key currentKey = KeyFactory.createKey(Candidate.ENTITY_KIND, candidateId.longValue());
-      try {
-        Entity currentCandidateEntity = datastore.get(currentKey);
-        candidateJsonArray.add(Candidate.fromEntity(currentCandidateEntity).toJsonString());
-      } catch (EntityNotFoundException e) {
-        logger.log(Level.WARNING, "Contest with Id " + candidateId.toString() + " was not found.");
-      }
-    }
+    ImmutableSet.copyOf(this.getCandidates())
+        .stream()
+        .map(id -> KeyFactory.createKey(Candidate.ENTITY_KIND, id.longValue()))
+        .map(key -> ServletUtils.getFromDatastore(datastore, key))
+        // Have to use forEach to have void return. Can't use Collection to collect because
+        // JsonArray can't addAll() with String as parameter.
+        .forEach(entity -> candidateJsonArray.add(Candidate.fromEntity(entity).toJsonString()));
 
-    JsonObject contestJsonObject = gson.fromJson(gson.toJson(this), JsonObject.class);
     contestJsonObject.add("candidates", candidateJsonArray);
     return gson.toJson(contestJsonObject);
   }
