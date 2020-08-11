@@ -16,6 +16,8 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
@@ -157,5 +159,21 @@ public class ServletUtils {
     }
 
     return Optional.empty();
+  }
+
+  /**
+   * Gets an Entity from the Datastore using the given key. Throws a RuntimeException if the Entity
+   * is not found.
+   *
+   * @param datastore the Datastore containing all election data
+   * @param key the key corresponding to the Entity being queried
+   * @return the found Entity
+   */
+  public static Entity getFromDatastore(DatastoreService datastore, Key key) {
+    try {
+      return datastore.get(key);
+    } catch (EntityNotFoundException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

@@ -121,5 +121,5 @@ public abstract class PollingStation {
     entity.setProperty("endDate", this.getEndDate());
     entity.setProperty("locationType", this.getLocationType());
     return entity;
-  }  
+  }
 }
