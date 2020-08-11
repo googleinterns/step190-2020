@@ -50,7 +50,7 @@ public class PollingStationTest {
         PollingStation.fromJSONObject(pollingStationJsonObject, "pollingLocation");
 
     Assert.assertEquals(pollingStation.getName(), "pollingStation");
-    Assert.assertEquals(pollingStation.getAddress(), "1 2 3 city state zip");
+    Assert.assertEquals(pollingStation.getAddress(), "1 2 3, city, state zip");
     Assert.assertEquals(pollingStation.getPollingHours(), "-");
     Assert.assertEquals(pollingStation.getStartDate(), "start");
     Assert.assertEquals(pollingStation.getEndDate(), "end");

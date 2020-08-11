@@ -78,6 +78,8 @@ function populateClassesForTemplate(electionId){
           referendums.push(referendum);
       });
 
+      // TODO(anooshree): sort referendums by number?
+
       let source = document.getElementById('contests-referendums-template').innerHTML;
       let template = Handlebars.compile(source);
       let context = { contests: contests, 
