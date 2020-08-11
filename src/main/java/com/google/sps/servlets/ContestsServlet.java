@@ -70,9 +70,8 @@ public class ContestsServlet extends HttpServlet {
             .stream()
             .map(id -> KeyFactory.createKey(Contest.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
-            .map(
-                entity ->
-                    JsonParser.parseString(Contest.fromEntity(entity).toJsonString(datastore)))
+            .map(entity -> Contest.fromEntity(entity).toJsonString(datastore))
+            .map(jsonString -> JsonParser.parseString(jsonString))
             .collect(ImmutableList.toImmutableList());
 
     List<JsonElement> referendumJsonList =
@@ -80,11 +79,10 @@ public class ContestsServlet extends HttpServlet {
             .stream()
             .map(id -> KeyFactory.createKey(Referendum.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
-            .map(entity -> JsonParser.parseString(Referendum.fromEntity(entity).toJsonString()))
+            .map(entity -> Referendum.fromEntity(entity).toJsonString())
+            .map(jsonString -> JsonParser.parseString(jsonString))
             .collect(ImmutableList.toImmutableList());
 
-    // The toJson function reserializes the already serialized JSON strings, so remove the extra
-    // escaped characters.
     Gson gson = new Gson();
     String contestJson = gson.toJson(contestJsonList);
     String referendumJson = gson.toJson(referendumJsonList);

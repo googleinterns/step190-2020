@@ -104,12 +104,10 @@ public abstract class Contest {
         .stream()
         .map(id -> KeyFactory.createKey(Candidate.ENTITY_KIND, id.longValue()))
         .map(key -> ServletUtils.getFromDatastore(datastore, key))
+        .map(entity -> JsonParser.parseString(Candidate.fromEntity(entity).toJsonString()))
         // Have to use forEach to have void return. Can't use Collection to collect because
         // JsonArray can't addAll() with String as parameter.
-        .forEach(
-            entity ->
-                candidateJsonArray.add(
-                    JsonParser.parseString(Candidate.fromEntity(entity).toJsonString())));
+        .forEach(jsonElement -> candidateJsonArray.add(jsonElement));
 
     contestJsonObject.add("candidates", candidateJsonArray);
     return gson.toJson(contestJsonObject);

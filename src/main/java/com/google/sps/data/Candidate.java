@@ -27,10 +27,10 @@ public abstract class Candidate {
   public static final String ENTITY_KIND = "Candidate";
   public static final String NAME_JSON_KEYWORD = "name";
   public static final String PARTY_JSON_KEYWORD = "party";
-  public static final String CAMPAIGN_JSON_KEYWORD = "candidateUrl";
+  public static final String CAMPAIGN_URL_JSON_KEYWORD = "candidateUrl";
   public static final String NAME_ENTITY_KEYWORD = "name";
   public static final String PARTY_ENTITY_KEYWORD = "partyAffiliation";
-  public static final String CAMPAIGN_ENTITY_KEYWORD = "campaignSite";
+  public static final String CAMPAIGN_URL_ENTITY_KEYWORD = "campaignSite";
   public static final String PLATFORM_ENTITY_KEYWORD = "platformDescription";
 
   public abstract String getName();
@@ -63,7 +63,7 @@ public abstract class Candidate {
     return Candidate.builder()
         .setName(candidateData.getString(NAME_JSON_KEYWORD))
         .setPartyAffiliation(candidateData.getString(PARTY_JSON_KEYWORD))
-        .setCampaignSite(candidateData.getString(CAMPAIGN_JSON_KEYWORD))
+        .setCampaignSite(candidateData.getString(CAMPAIGN_URL_JSON_KEYWORD))
         // TODO(gianelgado): get value for platformDescription
         .setPlatformDescription("")
         .build();
@@ -79,7 +79,7 @@ public abstract class Candidate {
     return Candidate.builder()
         .setName((String) entity.getProperty(NAME_ENTITY_KEYWORD))
         .setPartyAffiliation((String) entity.getProperty(PARTY_ENTITY_KEYWORD))
-        .setCampaignSite((String) entity.getProperty(CAMPAIGN_ENTITY_KEYWORD))
+        .setCampaignSite((String) entity.getProperty(CAMPAIGN_URL_ENTITY_KEYWORD))
         .setPlatformDescription((String) entity.getProperty(PLATFORM_ENTITY_KEYWORD))
         .build();
   }
@@ -90,7 +90,7 @@ public abstract class Candidate {
     Entity entity = new Entity(ENTITY_KIND);
     entity.setProperty(NAME_ENTITY_KEYWORD, this.getName());
     entity.setProperty(PARTY_ENTITY_KEYWORD, this.getPartyAffiliation());
-    entity.setProperty(CAMPAIGN_ENTITY_KEYWORD, this.getCampaignSite());
+    entity.setProperty(CAMPAIGN_URL_ENTITY_KEYWORD, this.getCampaignSite());
     entity.setProperty(PLATFORM_ENTITY_KEYWORD, this.getPlatformDescription());
     datastore.put(entity);
     return entity.getKey().getId();
