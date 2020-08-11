@@ -2,23 +2,15 @@ function onElectionInfoLoad(){
   let searchParams = new URLSearchParams(window.location.search);
   let selectedElection = searchParams.get("electionName"); 
 
-  if(selectedElection != null){
-    const chosenElection = document.getElementById('chosen-election');
-    chosenElection.innerText = selectedElection;
-  }
+  if (selectedElection != null) {
+    let source = document.getElementById('election-name-template').innerHTML;
+    console.log("gud")
+    let template = Handlebars.compile(source);
+    let context = { electionName: selectedElection };
 
-  let collapsibles = document.getElementsByClassName("collapsible");
-
-  for (let i = 0; i < collapsibles.length; i++) {
-    collapsibles[i].addEventListener("click", function() {
-      this.classList.toggle("active");
-      let content = this.nextElementSibling;
-      if (content.style.maxHeight){
-        content.style.maxHeight = null;
-      } else {
-        content.style.maxHeight = content.scrollHeight + 36 + "px";
-      }
-    });
+    let titleTextElement = document.getElementById('election-info-page-title');
+    console.log("double gud")
+    titleTextElement.innerHTML = template(context);
   }
 }
 
@@ -96,6 +88,20 @@ function populateClassesForTemplate(electionId){
 
       let infoCardContainerElement = document.getElementById('contests-referendums-content');
       infoCardContainerElement.innerHTML = template(context);
+
+      let collapsibles = document.getElementsByClassName("collapsible");
+
+      for (let i = 0; i < collapsibles.length; i++) {
+        collapsibles[i].addEventListener("click", function() {
+          this.classList.toggle("active");
+          let content = this.nextElementSibling;
+          if (content.style.maxHeight){
+            content.style.maxHeight = null;
+          } else {
+            content.style.maxHeight = content.scrollHeight + 36 + "px";
+          }
+        });
+      }
   });
 }
 
