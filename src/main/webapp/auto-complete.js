@@ -5,7 +5,7 @@ var mapKey = (typeof config === 'undefined' || config === null)
 var script = document.createElement('script');
 script.type = 'text/javascript';
 script.src = 'https://maps.googleapis.com/maps/api/js?key='
-             + mapKey + '&libraries=places&callback=initAutocomplete';
+             + mapKey + '&libraries=places,geometry&callback=initAutocomplete';
 script.defer = true;
 
 document.head.appendChild(script);

@@ -1,15 +1,3 @@
-// The config file contains the unrestricted key for use on localhost
-var mapKey = (typeof config === 'undefined' || config === null) 
-                ? 'AIzaSyCBrkGl891qgFHNFz3VGi3N-CEXGLp-DIU' : config.PLACES_API_KEY;
-
-var script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = 'https://maps.googleapis.com/maps/api/js?key='
-             + mapKey + '&callback=initializeMap&libraries=&v=weekly';
-script.defer = true;
-
-document.head.appendChild(script);
-
 function onElectionInfoLoad(){
   let searchParams = new URLSearchParams(window.location.search);
   let selectedElection = searchParams.get("electionName"); 
@@ -35,16 +23,25 @@ function logAddressInput(){
   addQueryParameter("address", 
                     `${streetNumber} ${route} ${city} ${state} ${zipCode} ${country}`);
 
-  callInfoCardServlet();
-  populateClassesForTemplate();
+  let searchParams = new URLSearchParams(window.location.search);
+  
+  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"));
+  populateClassesForTemplate(searchParams.get("electionId"));
 }
 
 /**
- * Call GET on the Info Card Servlet to retrieve the information needed to populate
+ * Call PUT on the Info Card Servlet to retrieve the information needed to populate
  * this page
  */
-function callInfoCardServlet(){
-  let response = await fetch('/info-cards');
+function callInfoCardServlet(electionId, address){
+  let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
+  let response = fetch(servletUrl, {
+    method: 'PUT',
+    credentials: 'same-origin', 
+    headers: new Headers({
+      'Content-Type': 'application/json'
+    })
+  });
 
   if (response.ok) { // if HTTP-status is 200-299
     console.log('Called Info Card servlet successfully');
@@ -57,13 +54,15 @@ function callInfoCardServlet(){
  * Make a GET request to the ContestsServlet and then update the values of the arrays
  * used by the Handlebars template.
  */
-function populateClassesForTemplate(){
+function populateClassesForTemplate(electionId){
   let contests = [];
   let candidates = [];
   let referendums = [];
 
-  fetch('/contests')
-    .then(response => response.json())
+  let servletUrl = "/contests?electionId=" + electionId;
+
+  fetch(servletUrl)
+    .then(response => response.json(servletUrl))
     .then((JSONobject) => {
       JSONobject.contests.forEach((contest) => {
         contests.push(contest);
@@ -88,8 +87,8 @@ function populateClassesForTemplate(){
   });
 }
 
-$(document).ready(function(){
-    $('#address-input-js').on('click',initializeMap)
+/*$(document).ready(function(){
+    $('#address-input-js').on('click', initializeMap)
 });
 
 var geocoder;
@@ -103,44 +102,67 @@ function initializeMap() {
   
   geocoder.geocode( { 'address': address}, function(results, status) {
     if (status == 'OK') {
-      map = new google.maps.Map(document.getElementById("map"), {
-        center: restuls[0].geometry.location,
+      map = new google.maps.Map(document.getElementById("polling-stations-map"), {
+        center: results[0].geometry.location,
         zoom: 8
       });
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
     }
   });
-  
-  fetch('/polling-stations')
+
+  let servletUrl = "/polling-stations?electionId=" + urlParams.get("electionId");
+
+  fetch(servletUrl)
     .then(response => response.json())
     .then((pollingStationList) => {
       pollingStationList.forEach((pollingStation) => {
-        // addPollingStation call
+        var type;
+        if (pollingStation.locationType == "dropOffLocation") {
+          type = "Drop off only.";
+        } else if (pollingStation.locationType == "earlyVoteSite") {
+          type = "Early vote site only.";
+        } else if (pollingStation.locationType == "pollingLocation") {
+          type = "Standard polling location.";
+        }
+
+        const description =
+          '<div id="content">' +
+          '<div id="siteNotice">' +
+          "</div>" +
+          '<h1 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h1>' +
+          '<div id="bodyContent">' +
+          "<p>Hours: Open " + pollingStation.pollingHours + " beginning " + pollingStation.startDate + 
+          " and until " + pollingStation.endDate + ".</p>" +
+          "<p>" + type + "</p>" +
+          "</div>" +
+          "</div>";
+
+        addPollingStation(pollingStation.address, map, pollingStation.name, description);
       });
     });
-}
+}*/
 
 /**
  * Adds a polling station as a marker on the map, with an info card
  * that displays upon click to show more information about the station
  */
-function addPollingStation(address, map, title, description) {
+/*function addPollingStation(address, map, title, description) {
   geocoder.geocode({
     componentRestrictions: {country: 'US'},
     'address': address}, function(results, status) {
       if (status == 'OK') {
-        addLandmark(map, results[0].geometry.location, title, description);
+        addPollingStationMarker(map, results[0].geometry.location, title, description);
       } else {
         alert('Geocode was not successful for the following reason: ' + status);
       }
   });
-}
+}*/
 
 /** 
  * Adds a marker that shows an info window when clicked. 
  */
-function addLandmark(map, position, title, description) {
+/*function addPollingStationMarker(map, position, title, description) {
   const marker = new google.maps.Marker(
       {position: position, map: map, title: title});
 
@@ -148,4 +170,4 @@ function addLandmark(map, position, title, description) {
   marker.addListener('click', () => {
     infoWindow.open(map, marker);
   });
-}
+}*/
