@@ -27,6 +27,7 @@ public abstract class Candidate {
   public static final String ENTITY_KIND = "Candidate";
   public static final String NAME_JSON_KEYWORD = "name";
   public static final String PARTY_JSON_KEYWORD = "party";
+  public static final String CAMPAIGN_JSON_KEYWORD = "candidateUrl";
   public static final String NAME_ENTITY_KEYWORD = "name";
   public static final String PARTY_ENTITY_KEYWORD = "partyAffiliation";
   public static final String CAMPAIGN_ENTITY_KEYWORD = "campaignSite";
@@ -62,8 +63,8 @@ public abstract class Candidate {
     return Candidate.builder()
         .setName(candidateData.getString(NAME_JSON_KEYWORD))
         .setPartyAffiliation(candidateData.getString(PARTY_JSON_KEYWORD))
-        // TODO(gianelgado): get values for campaignSite and platformDescription
-        .setCampaignSite("")
+        .setCampaignSite(candidateData.getString(CAMPAIGN_JSON_KEYWORD))
+        // TODO(gianelgado): get value for platformDescription
         .setPlatformDescription("")
         .build();
   }

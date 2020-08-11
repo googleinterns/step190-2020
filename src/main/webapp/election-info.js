@@ -26,7 +26,6 @@ function logAddressInput(){
   let searchParams = new URLSearchParams(window.location.search);
   
   callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"));
-  populateClassesForTemplate(searchParams.get("electionId"));
 }
 
 /**
@@ -35,19 +34,16 @@ function logAddressInput(){
  */
 function callInfoCardServlet(electionId, address){
   let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
-  let response = fetch(servletUrl, {
-    method: 'PUT',
-    credentials: 'same-origin', 
-    headers: new Headers({
-      'Content-Type': 'application/json'
-    })
+  fetch(servletUrl, {
+    method: 'PUT'
+  }).then((response) => {
+      if (response.ok) { // if HTTP-status is 200-299
+        console.log('Called Info Card servlet successfully');
+        populateClassesForTemplate(electionId);
+      } else {
+        alert("HTTP-Error: " + response.status);
+      }
   });
-
-  if (response.ok) { // if HTTP-status is 200-299
-    console.log('Called Info Card servlet successfully');
-  } else {
-    alert("HTTP-Error: " + response.status);
-  }
 }
 
 /**
