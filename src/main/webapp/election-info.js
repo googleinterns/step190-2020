@@ -1,14 +1,3 @@
-// The config file contains the unrestricted key for use on localhost
-var mapKey = (typeof config === 'undefined' || config === null) 
-                ? 'AIzaSyCBrkGl891qgFHNFz3VGi3N-CEXGLp-DIU' : config.PLACES_API_KEY;
-
-var script = document.createElement('script');
-script.type = 'text/javascript';
-script.src = 'https://maps.googleapis.com/maps/api/js?key='
-             + mapKey + '&libraries=geometry&v=weekly';
-
-document.head.appendChild(script);
-
 function onElectionInfoLoad(){
   let searchParams = new URLSearchParams(window.location.search);
   let selectedElection = searchParams.get("electionName"); 
@@ -98,7 +87,7 @@ function populateClassesForTemplate(electionId){
   });
 }
 
-$(document).ready(function(){
+/*$(document).ready(function(){
     $('#address-input-js').on('click', initializeMap)
 });
 
@@ -113,7 +102,7 @@ function initializeMap() {
   
   geocoder.geocode( { 'address': address}, function(results, status) {
     if (status == 'OK') {
-      map = new google.maps.Map(document.getElementById("map"), {
+      map = new google.maps.Map(document.getElementById("polling-stations-map"), {
         center: results[0].geometry.location,
         zoom: 8
       });
@@ -152,13 +141,13 @@ function initializeMap() {
         addPollingStation(pollingStation.address, map, pollingStation.name, description);
       });
     });
-}
+}*/
 
 /**
  * Adds a polling station as a marker on the map, with an info card
  * that displays upon click to show more information about the station
  */
-function addPollingStation(address, map, title, description) {
+/*function addPollingStation(address, map, title, description) {
   geocoder.geocode({
     componentRestrictions: {country: 'US'},
     'address': address}, function(results, status) {
@@ -168,12 +157,12 @@ function addPollingStation(address, map, title, description) {
         alert('Geocode was not successful for the following reason: ' + status);
       }
   });
-}
+}*/
 
 /** 
  * Adds a marker that shows an info window when clicked. 
  */
-function addPollingStationMarker(map, position, title, description) {
+/*function addPollingStationMarker(map, position, title, description) {
   const marker = new google.maps.Marker(
       {position: position, map: map, title: title});
 
@@ -181,4 +170,4 @@ function addPollingStationMarker(map, position, title, description) {
   marker.addListener('click', () => {
     infoWindow.open(map, marker);
   });
-}
+}*/

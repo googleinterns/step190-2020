@@ -132,8 +132,10 @@ public abstract class Election {
       throws JSONException {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> referendumKeyList = this.getReferendums();
+
     ArrayList<EmbeddedEntity> pollingStations =
         new ArrayList<EmbeddedEntity>(this.getPollingStations());
+    ImmutableSet<EmbeddedEntity> pollingStationSet = ImmutableSet.of();
 
     if (voterInfoQueryData.has(CONTESTS_JSON_KEYWORD)) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray(CONTESTS_JSON_KEYWORD);
@@ -177,9 +179,13 @@ public abstract class Election {
       }
     }
 
+    if (pollingStations.size() > 0) {
+      pollingStationSet = ImmutableSet.copyOf((Collection<EmbeddedEntity>) pollingStations);
+    }
+
     return this.withContests(contestKeyList)
         .withReferendums(referendumKeyList)
-        .withPollingStations(ImmutableSet.copyOf(pollingStations));
+        .withPollingStations(pollingStationSet);
   }
 
   /**
