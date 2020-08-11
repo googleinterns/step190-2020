@@ -62,7 +62,7 @@ public class ContestsServlet extends HttpServlet {
     }
 
     Election election = Election.fromEntity(electionEntityOptional.get());
-    
+
     List<String> contestJsonList =
         ImmutableSet.copyOf(election.getContests())
             .stream()

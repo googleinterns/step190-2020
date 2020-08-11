@@ -73,7 +73,6 @@ public abstract class Candidate {
     return new Gson().toJson(this);
   }
 
-
   // Creates a new Candidate object by using the properties of the provided Candidate entity
   public static Candidate fromEntity(Entity entity) {
     return Candidate.builder()

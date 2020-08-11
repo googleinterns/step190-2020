@@ -5,8 +5,7 @@ var mapKey = (typeof config === 'undefined' || config === null)
 var script = document.createElement('script');
 script.type = 'text/javascript';
 script.src = 'https://maps.googleapis.com/maps/api/js?key='
-             + mapKey + '&callback=initializeMap&libraries=&v=weekly';
-script.defer = true;
+             + mapKey + '&libraries=geometry&v=weekly';
 
 document.head.appendChild(script);
 
@@ -42,12 +41,18 @@ function logAddressInput(){
 }
 
 /**
- * Call GET on the Info Card Servlet to retrieve the information needed to populate
+ * Call PUT on the Info Card Servlet to retrieve the information needed to populate
  * this page
  */
 function callInfoCardServlet(electionId, address){
   let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
-  let response = await fetch(servletUrl);
+  let response = fetch(servletUrl, {
+    method: 'PUT',
+    credentials: 'same-origin', 
+    headers: new Headers({
+      'Content-Type': 'application/json'
+    })
+  });
 
   if (response.ok) { // if HTTP-status is 200-299
     console.log('Called Info Card servlet successfully');
@@ -109,7 +114,7 @@ function initializeMap() {
   geocoder.geocode( { 'address': address}, function(results, status) {
     if (status == 'OK') {
       map = new google.maps.Map(document.getElementById("map"), {
-        center: restuls[0].geometry.location,
+        center: results[0].geometry.location,
         zoom: 8
       });
     } else {
@@ -117,8 +122,7 @@ function initializeMap() {
     }
   });
 
-  let searchParams = new URLSearchParams(window.location.search);
-  let servletUrl = "/polling-stations?electionId=" + searchParams.get("electionId");
+  let servletUrl = "/polling-stations?electionId=" + urlParams.get("electionId");
 
   fetch(servletUrl)
     .then(response => response.json())
