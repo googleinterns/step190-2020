@@ -68,25 +68,90 @@ public abstract class PollingStation {
    */
   public static PollingStation fromJSONObject(JSONObject obj, String locationType)
       throws JSONException {
+
+    String line1;
+    String line2;
+    String line3;
+    String streetName = "";
+    String zipCode;
+
+    String name;
+    String pollingHours;
+    String startDate;
+    String endDate;
+
+    try {
+      line1 = obj.getJSONObject("address").getString("line1");
+      streetName += line1;
+    } catch (JSONException e) {
+      line1 = "";
+    }
+
+    try {
+      line2 = obj.getJSONObject("address").getString("line2");
+      if (!streetName.isEmpty()) {
+        streetName += " ";
+      }
+      streetName += line2;
+    } catch (JSONException e) {
+      line2 = "";
+    }
+
+    try {
+      line3 = obj.getJSONObject("address").getString("line3");
+      if (!streetName.isEmpty()) {
+        streetName += " ";
+      }
+      streetName += line3;
+    } catch (JSONException e) {
+      line3 = "";
+    }
+
+    try {
+      zipCode = obj.getJSONObject("address").getString("zip");
+    } catch (JSONException e) {
+      zipCode = "";
+    }
+
+    try {
+      name = obj.getString("name");
+    } catch (JSONException e) {
+      name = "Polling Station";
+    }
+
+    try {
+      pollingHours = obj.getString("pollingHours");
+    } catch (JSONException e) {
+      pollingHours = "daily";
+    }
+
+    try {
+      startDate = obj.getString("startDate");
+    } catch (JSONException e) {
+      startDate = "on an unknown start date";
+    }
+
+    try {
+      endDate = obj.getString("endDate");
+    } catch (JSONException e) {
+      endDate = "on an unknown end date";
+    }
+
     String address =
-        obj.getJSONObject("address").getString("line1")
-            + " "
-            + obj.getJSONObject("address").getString("line2")
-            + " "
-            + obj.getJSONObject("address").getString("line3")
-            + " "
+        streetName
+            + ", "
             + obj.getJSONObject("address").getString("city")
-            + " "
+            + ", "
             + obj.getJSONObject("address").getString("state")
             + " "
-            + obj.getJSONObject("address").getString("zip");
+            + zipCode;
 
     return PollingStation.builder()
-        .setName(obj.getString("name"))
+        .setName(name)
         .setAddress(address)
-        .setPollingHours(obj.getString("pollingHours"))
-        .setStartDate(obj.getString("startDate"))
-        .setEndDate(obj.getString("endDate"))
+        .setPollingHours(pollingHours)
+        .setStartDate(startDate)
+        .setEndDate(endDate)
         .setLocationType(locationType)
         .build();
   }
