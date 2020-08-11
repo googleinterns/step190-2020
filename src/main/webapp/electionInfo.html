@@ -33,18 +33,16 @@
         </div>
 
         <div class="container" id="content">
-          <div class="row" id="election-info-page-title">
-            <p style="display: inline-block; text-align: left;">
-              <b>To show you polling locations, candidates, and ballot items from the&nbsp;</b> 
+          <div class="row" id="election-info-page-title"></div>
+          <script id="election-name-template" type="text/x-handlebars-template">
+            <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
+              To show you polling locations, and ballot items from the <span id="chosen-election">{{electionName}}</span>, we'll need your 
+              registered voter address:
             </p>
-            <div id="chosen-election" style="display: inline-block; text-align: left;"> </div>
-            <p style="display: inline-block; text-align: left;">
-              <b>, we'll need your registered voter address: </b>
-            </p>
-          </div>
-
+          </script>
+          
           <div class="row input-wrapper">
-            <div class="panel panel-primary">
+            <div class="panel noborder panel-primary">
               <div class="container panel-body">
                 <div class="row location-field-wrapper">
                   <div class="col-lg-8 col-lg-offset-2" id="locationField">
@@ -95,44 +93,52 @@
 
           <div class="row info-cards-wrapper">
 
-          <div id="polling-stations-map"></div>
-          <div class="container-fluid" id="contests-referendums-content"></div>
+            <div id="polling-stations-map"></div>
+            <div class="container-fluid" id="contests-referendums-content"></div>
 
-          <script id="contests-referendums-template" type="text/x-handlebars-template">
-            <h3 id="info-cards-title">What's on the Ballot?</h3>
-            <div class="col-md-4 col-lg-offset-2 contests-wrapper">
-              {{#each contests}}
-              <div class="info-card">
-                <div class="info-card-title">
-                  {{this.name}}
-                </div>
-                <div class="candidates-wrapper">
-                  {{#each this.candidates}}
-                  <div class="candidate">
-                    <div class="candidate-name">{{this.name}}</div>
+            <script id="contests-referendums-template" type="text/x-handlebars-template">
+              <h3 id="info-cards-title">What's on the ballot</h3>
+              <div class="col-md-4 col-lg-offset-2 contests-wrapper">
+                {{#each contests}}
+                <div class="info-card">
+                  <div class="info-card-title">
+                    {{this.name}}
                   </div>
-                  {{/each}}
+                  <div class="candidates-wrapper">
+                    {{#each this.candidates}}
+                    <div class="candidate">
+                      <button type="button" class="candidate-name collapsible">
+                        <b>{{this.name}} </b>({{this.partyAffiliation}})
+                      </button>
+                      <div class="collapsible-content candidate-info">
+                        <p><b>Website: </b>{{this.campaignSite}}</p>
+                        <p>{{this.platformDescription}}</p>
+                      </div>
+                    </div>
+                    {{/each}}
+                  </div>
                 </div>
+                {{else}}
+                <p><em>No contests</em></p>
+                {{/each}}
               </div>
-              {{else}}
-              <p><em>No Contests</em></p>
-              {{/each}}
-            </div>
-            <div class="col-md-4 referendums-wrapper">
-              {{#each referendums}}
-              <div class="info-card">
-                <div class="info-card-title">
-                  {{this.name}}
+              <div class="col-md-4 referendums-wrapper">
+                {{#each referendums}}
+                <div class="info-card">
+                  <button type="button" class="info-card-title referendum-name collapsible">
+                    {{this.title}}
+                  </button>
+                  <div class="collapsible-content">
+                    <p class="referendum-description">
+                      {{this.description}}
+                    </p>
+                  </div>
                 </div>
-                <div class="referendum-description">
-                  {{this.description}}
-                </div>
+                {{else}}
+                <p><em>No referendums</em></p>
+                {{/each}}
               </div>
-              {{else}}
-              <p><em>No referendums</em></p>
-              {{/each}}
-            </div>
-          </script>
+            </script>
           </div>
         </div>
 			</div>
