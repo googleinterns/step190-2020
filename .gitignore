@@ -10,3 +10,6 @@ config.js
 # IntelliJ specific project files
 .idea/
 portfolio.iml
+
+# vim swap files
+**/*.swp

@@ -21,6 +21,8 @@ import com.google.appengine.api.datastore.KeyFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.sps.data.Contest;
 import com.google.sps.data.Election;
 import com.google.sps.data.Referendum;
@@ -62,30 +64,28 @@ public class ContestsServlet extends HttpServlet {
     }
 
     Election election = Election.fromEntity(electionEntityOptional.get());
-    
-    List<String> contestJsonList =
+
+    List<JsonElement> contestJsonList =
         ImmutableSet.copyOf(election.getContests())
             .stream()
             .map(id -> KeyFactory.createKey(Contest.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
             .map(entity -> Contest.fromEntity(entity).toJsonString(datastore))
+            .map(jsonString -> JsonParser.parseString(jsonString))
             .collect(ImmutableList.toImmutableList());
 
-    List<String> referendumJsonList =
+    List<JsonElement> referendumJsonList =
         ImmutableSet.copyOf(election.getReferendums())
             .stream()
             .map(id -> KeyFactory.createKey(Referendum.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
             .map(entity -> Referendum.fromEntity(entity).toJsonString())
+            .map(jsonString -> JsonParser.parseString(jsonString))
             .collect(ImmutableList.toImmutableList());
 
-    // The toJson function reserializes the already serialized JSON strings, so remove the extra
-    // escaped characters.
     Gson gson = new Gson();
-    String contestJson =
-        gson.toJson(contestJsonList).replace("\\", "").replace("\"{", "{").replace("}\"", "}");
-    String referendumJson =
-        gson.toJson(referendumJsonList).replace("\\", "").replace("\"{", "{").replace("}\"", "}");
+    String contestJson = gson.toJson(contestJsonList);
+    String referendumJson = gson.toJson(referendumJsonList);
 
     response.setContentType("application/json;");
     response
