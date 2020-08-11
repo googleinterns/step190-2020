@@ -17,7 +17,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.sps.data.Election;
+import com.google.sps.data.*;
 import java.io.IOException;
 import java.util.Optional;
 import javax.servlet.annotation.WebServlet;
@@ -51,6 +51,12 @@ public class InfoCardServlet extends HttpServlet {
    */
   @Override
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    ServletUtils.deleteAllEntitiesOfKind(datastore, Contest.ENTITY_KIND);
+    ServletUtils.deleteAllEntitiesOfKind(datastore, Candidate.ENTITY_KIND);
+    ServletUtils.deleteAllEntitiesOfKind(datastore, Referendum.ENTITY_KIND);
+    ServletUtils.deleteAllEntitiesOfKind(datastore, "PollingStation");
+
     Optional<String> optionalAddress = ServletUtils.getRequestParam(request, response, "address");
     Optional<String> optionalElectionId =
         ServletUtils.getRequestParam(request, response, "electionId");
@@ -63,7 +69,6 @@ public class InfoCardServlet extends HttpServlet {
       response.setStatus(400);
     }
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     Optional<Entity> optionalEntity =
         ServletUtils.findElectionInDatastore(datastore, optionalElectionId.get());
 
