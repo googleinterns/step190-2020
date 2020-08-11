@@ -60,10 +60,32 @@ public abstract class Candidate {
 
   // Creates a new Candidate object by extracting the properties from "candidateData"
   public static Candidate fromJSONObject(JSONObject candidateData) throws JSONException {
+    String candidateName;
+    String candidateParty;
+    String candidateUrl;
+
+    try {
+      candidateName = candidateData.getString(NAME_JSON_KEYWORD);
+    } catch (JSONException e) {
+      candidateName = "";
+    }
+
+    try {
+      candidateParty = candidateData.getString(PARTY_JSON_KEYWORD);
+    } catch (JSONException e) {
+      candidateParty = "";
+    }
+
+    try {
+      candidateUrl = candidateData.getString(CAMPAIGN_URL_JSON_KEYWORD);
+    } catch (JSONException e) {
+      candidateUrl = "";
+    }
+
     return Candidate.builder()
-        .setName(candidateData.getString(NAME_JSON_KEYWORD))
-        .setPartyAffiliation(candidateData.getString(PARTY_JSON_KEYWORD))
-        .setCampaignSite(candidateData.getString(CAMPAIGN_URL_JSON_KEYWORD))
+        .setName(candidateName)
+        .setPartyAffiliation(candidateParty)
+        .setCampaignSite(candidateUrl)
         // TODO(gianelgado): get value for platformDescription
         .setPlatformDescription("")
         .build();
