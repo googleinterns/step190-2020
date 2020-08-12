@@ -1,4 +1,5 @@
 function onElectionInfoLoad(){
+  $("#loading").hide();
   let searchParams = new URLSearchParams(window.location.search);
   let selectedElection = searchParams.get("electionName"); 
 
@@ -56,6 +57,7 @@ function logAddressInput() {
  * @param {String} address the user's address
  */
 function callInfoCardServlet(electionId, address){
+  $("#loading").show();
   let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
   fetch(servletUrl, {
     method: 'PUT'
@@ -68,6 +70,7 @@ function callInfoCardServlet(electionId, address){
         alert("HTTP-Error: " + response.status);
       }
   });
+  $("#loading").hide();
 }
 
 /**
@@ -223,19 +226,4 @@ function addPollingStationMarker(map, position, title, description) {
   marker.addListener('click', () => {
     infoWindow.open(map, marker);
   });
-}
-
-/**
- * Call GET on the Info Card Servlet to retrieve the information needed to populate
- * this page
- */
-function callInfoCardServlet() {
-  let response = await fetch('/info-cards');
-
-  if (response.ok) { // if HTTP-status is 200-299
-    console.log('Called Info Card servlet successfully');
-    // call servlets for individual types of data to populate site
-  } else {
-    alert("HTTP-Error: " + response.status);
-  }
 }
