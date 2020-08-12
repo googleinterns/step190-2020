@@ -83,7 +83,7 @@ public class ContestsServlet extends HttpServlet {
             .stream()
             .map(id -> KeyFactory.createKey(Referendum.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
-            .map(entity -> Referendum.entityToJsonString(entity, datastore))
+            .map(entity -> Referendum.entityToJsonString(entity))
             .map(jsonString -> JsonParser.parseString(jsonString))
             .collect(Collectors.toList());
 

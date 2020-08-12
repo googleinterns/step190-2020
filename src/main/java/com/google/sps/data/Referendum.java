@@ -80,12 +80,11 @@ public abstract class Referendum {
     return entity.getKey().getId();
   }
 
-  public static String entityToJsonString(
-      Optional<Entity> electionEntity, DatastoreService datastore) {
+  public static String entityToJsonString(Optional<Entity> electionEntity) {
     if (!electionEntity.isPresent()) {
       return (String) JsonNull.INSTANCE;
     } else {
-      return fromEntity(electionEntity.get()).toJsonString(datastore);
+      return fromEntity(electionEntity.get()).toJsonString();
     }
   }
 }

@@ -19,6 +19,7 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import com.google.gson.JsonNull;
+import com.google.gson.JsonParser;
 import java.util.Optional;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -125,7 +126,7 @@ public abstract class Candidate {
     if (!electionEntity.isPresent()) {
       return (String) JsonNull.INSTANCE;
     } else {
-      return JsonParser.parseString(fromEntity(electionEntity).toJsonString());
+      return JsonParser.parseString(fromEntity(electionEntity.get()).toJsonString());
     }
   }
 }
