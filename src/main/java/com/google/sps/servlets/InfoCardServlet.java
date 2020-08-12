@@ -70,7 +70,7 @@ public class InfoCardServlet extends HttpServlet {
     ServletUtils.deleteAllEntitiesOfKind(datastore, Contest.ENTITY_KIND);
     ServletUtils.deleteAllEntitiesOfKind(datastore, Candidate.ENTITY_KIND);
     ServletUtils.deleteAllEntitiesOfKind(datastore, Referendum.ENTITY_KIND);
-    ServletUtils.deleteAllEntitiesOfKind(datastore, "PollingStation");
+    ServletUtils.deleteAllEntitiesOfKind(datastore, PollingStation.ENTITY_KIND);
     logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "Successfully deleted Entities.");
 
     Optional<String> optionalAddress = ServletUtils.getRequestParam(request, response, "address");
