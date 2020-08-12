@@ -142,7 +142,7 @@ public abstract class PollingStation {
     try {
       endDate = obj.getString(END_DATE_JSON_KEYWORD);
     } catch (JSONException e) {
-      endDate = "on an unknown end date";
+      endDate = "an unknown end date";
     }
 
     String address =
