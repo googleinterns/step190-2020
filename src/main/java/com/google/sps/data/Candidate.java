@@ -59,7 +59,7 @@ public abstract class Candidate {
   }
 
   // Creates a new Candidate object by extracting the properties from "candidateData"
-  public static Candidate fromJSONObject(JSONObject candidateData) throws JSONException {
+  public static Candidate fromJSONObject(JSONObject candidateData) {
     String candidateName;
     String candidateParty;
     String candidateUrl;

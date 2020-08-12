@@ -134,7 +134,7 @@ public abstract class Election {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> referendumKeyList = this.getReferendums();
 
-    List<EmbeddedEntity> pollingStations = new ArrayList<EmbeddedEntity>(this.getPollingStations());
+    List<EmbeddedEntity> pollingStations = new ArrayList<>(this.getPollingStations());
     ImmutableSet<EmbeddedEntity> pollingStationSet;
 
     if (voterInfoQueryData.has(CONTESTS_JSON_KEYWORD)) {
@@ -180,11 +180,7 @@ public abstract class Election {
       }
     }
 
-    if (pollingStations.size() > 0) {
-      pollingStationSet = ImmutableSet.copyOf((Collection<EmbeddedEntity>) pollingStations);
-    } else {
-      pollingStationSet = ImmutableSet.of();
-    }
+    pollingStationSet = ImmutableSet.copyOf((Collection<EmbeddedEntity>) pollingStations);
 
     return this.withContests(contestKeyList)
         .withReferendums(referendumKeyList)
@@ -199,6 +195,8 @@ public abstract class Election {
    *     station
    * @param locationType a string signifying if this location is a polling station, drop-off
    *     location, or early vote site
+   * @param datastore an object representing our project's Datastore that can be used to store the
+   *     Entities we are creating
    */
   public EmbeddedEntity createPollingStation(
       JSONObject pollingStationJSON, String locationType, DatastoreService datastore) {
@@ -236,7 +234,7 @@ public abstract class Election {
   public static Election fromEntity(Entity entity) {
     Set<Long> contests = new HashSet<>();
     Set<Long> referendums = new HashSet<>();
-    ImmutableSet<EmbeddedEntity> pollingStationSet;
+    ImmutableSet<EmbeddedEntity> pollingStationSet = ImmutableSet.of();
 
     if (entity.getProperty("contests") != null) {
       contests = new HashSet<>((Collection<Long>) entity.getProperty("contests"));
@@ -249,8 +247,6 @@ public abstract class Election {
     if (entity.getProperty("pollingStations") != null) {
       pollingStationSet =
           ImmutableSet.copyOf((Collection<EmbeddedEntity>) entity.getProperty("pollingStations"));
-    } else {
-      pollingStationSet = ImmutableSet.of();
     }
 
     return Election.builder()
