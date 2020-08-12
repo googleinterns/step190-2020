@@ -233,7 +233,7 @@ body{
 
 .input-wrapper {
   margin-top: 4.5%;
-  margin-bottom: 8%;
+  margin-bottom: 3%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -440,8 +440,3 @@ body{
   width:100%;
 }
 
-#map-wrapper {
-  align-content: center;
-  justify-content: center;
-  width:100%;
-}
