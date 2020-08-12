@@ -18,7 +18,9 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
+import com.google.sps.data.Election;
 import com.google.sps.data.PollingStation;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,10 +68,9 @@ public class PollingStationServlet extends HttpServlet {
       return;
     }
 
-    Entity electionEntity = electionEntityOptional.get();
+    Election election = Election.fromEntity(electionEntityOptional.get());
 
-    List<EmbeddedEntity> pollingStationEntities =
-        (List<EmbeddedEntity>) electionEntity.getProperty("pollingStations");
+    ImmutableSet<EmbeddedEntity> pollingStationEntities = election.getPollingStations();
     List<PollingStation> pollingStations = new ArrayList<PollingStation>();
 
     for (EmbeddedEntity embeddedEntity : pollingStationEntities) {

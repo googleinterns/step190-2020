@@ -9,7 +9,6 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
-import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
@@ -33,12 +32,11 @@ public class ContestServletTest {
   @Mock HttpServletResponse httpServletResponse;
   @Mock PrintWriter printWriter;
 
-  private static final ImmutableSet<Long> CANDIDATE_ID_SET =
-      new ImmutableSet.Builder<Long>().add(1L).add(2L).add(3L).build();
-
   private Entity electionEntityOne;
   private Entity contestEntityOne;
   private Entity contestEntityTwo;
+  private Entity candidateEntityOne;
+  private Entity candidateEntityTwo;
   private Entity referendumEntityOne;
   private Entity referendumEntityTwo;
 
@@ -57,13 +55,25 @@ public class ContestServletTest {
 
     contestEntityOne = new Entity("Contest");
     contestEntityOne.setProperty("name", "myFirstContest");
-    contestEntityOne.setProperty("candidates", CANDIDATE_ID_SET);
+    contestEntityOne.setProperty("candidates", new HashSet<Long>());
     contestEntityOne.setProperty("description", "This contest is important.");
 
     contestEntityTwo = new Entity("Contest");
     contestEntityTwo.setProperty("name", "mySecondContest");
     contestEntityTwo.setProperty("candidates", new HashSet<Long>());
     contestEntityTwo.setProperty("description", "This contest is also important.");
+
+    candidateEntityOne = new Entity("Candidate");
+    candidateEntityOne.setProperty("name", "myFirstCandidate");
+    candidateEntityOne.setProperty("partyAffiliation", "myParty");
+    candidateEntityOne.setProperty("campaignSite", "myWebsite");
+    candidateEntityOne.setProperty("platformDescription", "This is a cool candidate.");
+
+    candidateEntityTwo = new Entity("Candidate");
+    candidateEntityTwo.setProperty("name", "mySecondCandidate");
+    candidateEntityTwo.setProperty("partyAffiliation", "myOtherParty");
+    candidateEntityTwo.setProperty("campaignSite", "myOtherWebsite");
+    candidateEntityTwo.setProperty("platformDescription", "But this is an even cooler candidate.");
 
     referendumEntityOne = new Entity("Referendum");
     referendumEntityOne.setProperty("title", "myFirstReferendum");
@@ -97,8 +107,83 @@ public class ContestServletTest {
 
     verify(printWriter)
         .println(
-            "{\"contests\": [{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"}],"
-                + "\"referendums\": []}");
+            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\"}],"
+                + "\"referendums\":[]}");
+  }
+
+  @Test
+  public void singleElection_singleContest_singleCandidate_testDoGet() throws Exception {
+    Entity electionEntity = new Entity("Election");
+    Entity contestEntity = new Entity("Contest");
+    Entity candidateEntity = new Entity("Candidate");
+
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    contestEntity.setPropertiesFrom(contestEntityOne);
+    candidateEntity.setPropertiesFrom(candidateEntityOne);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long contestId = ds.put(contestEntity).getId();
+    long candidateId = ds.put(candidateEntity).getId();
+
+    Collection<Long> candidateSet = (Collection<Long>) contestEntity.getProperty("candidates");
+    candidateSet.add(candidateId);
+    ds.put(contestEntity);
+    Collection<Long> contestSet = (Collection<Long>) electionEntity.getProperty("contests");
+    contestSet.add(contestId);
+    ds.put(electionEntity);
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[{\"name\":\"myFirstCandidate\","
+                + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
+                + "\"This is a cool candidate.\"}],\"description\":\"This contest is important.\"}],"
+                + "\"referendums\":[]}");
+  }
+
+  @Test
+  public void singleElection_singleContest_twoCandidate_testDoGet() throws Exception {
+    Entity electionEntity = new Entity("Election");
+    Entity contestEntity = new Entity("Contest");
+    Entity firstCandidateEntity = new Entity("Candidate");
+    Entity secondCandidateEntity = new Entity("Candidate");
+
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    contestEntity.setPropertiesFrom(contestEntityOne);
+    firstCandidateEntity.setPropertiesFrom(candidateEntityOne);
+    secondCandidateEntity.setPropertiesFrom(candidateEntityTwo);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long contestId = ds.put(contestEntity).getId();
+    long firstCandidateId = ds.put(firstCandidateEntity).getId();
+    long secondCandidateId = ds.put(secondCandidateEntity).getId();
+
+    Collection<Long> candidateSet = (Collection<Long>) contestEntity.getProperty("candidates");
+    candidateSet.add(firstCandidateId);
+    candidateSet.add(secondCandidateId);
+    ds.put(contestEntity);
+    Collection<Long> contestSet = (Collection<Long>) electionEntity.getProperty("contests");
+    contestSet.add(contestId);
+    ds.put(electionEntity);
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[{\"name\":\"myFirstCandidate\","
+                + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
+                + "\"This is a cool candidate.\"},{\"name\":\"mySecondCandidate\",\"partyAffiliation\":\"myOtherParty\","
+                + "\"campaignSite\":\"myOtherWebsite\",\"platformDescription\":\"But this is an even cooler candidate.\"}],"
+                + "\"description\":\"This contest is important.\"}],\"referendums\":[]}");
   }
 
   @Test
@@ -128,9 +213,9 @@ public class ContestServletTest {
 
     verify(printWriter)
         .println(
-            "{\"contests\": [{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"},"
+            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\"},"
                 + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\"}],"
-                + "\"referendums\": []}");
+                + "\"referendums\":[]}");
   }
 
   @Test
@@ -156,33 +241,24 @@ public class ContestServletTest {
 
     verify(printWriter)
         .println(
-            "{\"contests\": [],"
-                + "\"referendums\": [{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\"}]}");
+            "{\"contests\":[],"
+                + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\"}]}");
   }
 
   @Test
-  public void singleElection_twoContestsTwoReferendums_testDoGet() throws Exception {
+  public void singleElection_twoReferendum_testDoGet() throws Exception {
     Entity electionEntity = new Entity("Election");
-    Entity firstContestEntity = new Entity("Contest");
-    Entity secondContestEntity = new Entity("Contest");
     Entity firstReferendumEntity = new Entity("Referendum");
     Entity secondReferendumEntity = new Entity("Referendum");
 
     electionEntity.setPropertiesFrom(electionEntityOne);
-    firstContestEntity.setPropertiesFrom(contestEntityOne);
-    secondContestEntity.setPropertiesFrom(contestEntityTwo);
     firstReferendumEntity.setPropertiesFrom(referendumEntityOne);
     secondReferendumEntity.setPropertiesFrom(referendumEntityTwo);
 
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-    long contestOneId = ds.put(firstContestEntity).getId();
-    long contestTwoId = ds.put(secondContestEntity).getId();
     long referendumOneId = ds.put(firstReferendumEntity).getId();
     long referendumTwoId = ds.put(secondReferendumEntity).getId();
 
-    HashSet<Long> contestSet = (HashSet<Long>) electionEntityOne.getProperty("contests");
-    contestSet.add(contestOneId);
-    contestSet.add(contestTwoId);
     HashSet<Long> referendumSet = (HashSet<Long>) electionEntityOne.getProperty("referendums");
     referendumSet.add(referendumOneId);
     referendumSet.add(referendumTwoId);
@@ -196,9 +272,8 @@ public class ContestServletTest {
 
     verify(printWriter)
         .println(
-            "{\"contests\": [{\"name\":\"myFirstContest\",\"candidates\":[1,2,3],\"description\":\"This contest is important.\"},"
-                + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\"}],"
-                + "\"referendums\": [{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\"},"
+            "{\"contests\":[],"
+                + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\"},"
                 + "{\"title\":\"mySecondReferendum\",\"description\":\"This is another referendum.\"}]}");
   }
 
@@ -224,7 +299,7 @@ public class ContestServletTest {
     verify(printWriter).println("No electionId in the query URL.");
   }
 
-  @Test
+  @Test(expected = RuntimeException.class)
   public void oneElection_contestMissingInDatastore_testDoGet() throws IOException {
     Entity electionEntity = new Entity("Election");
     Entity firstContestEntity = new Entity("Contest");
@@ -244,12 +319,9 @@ public class ContestServletTest {
     ds.put(electionEntityOne);
 
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
-    when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     ContestsServlet contestServlet = new ContestsServlet();
     contestServlet.doGet(httpServletRequest, httpServletResponse);
-
-    verify(printWriter).println("Contest with Id " + contestTwoId + " was not found.");
   }
 
   @After

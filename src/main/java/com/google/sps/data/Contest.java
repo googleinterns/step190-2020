@@ -16,18 +16,25 @@ package com.google.sps.data;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.sps.servlets.ServletUtils;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /** A state or national public office position. */
 @AutoValue
 public abstract class Contest {
-  // TODO(caseyprice): Refactor Contest to a name that better fits public office position and 
+  // TODO(caseyprice): Refactor Contest to a name that better fits public office position and
   // doesn't get confusing with the API.
   public static final String ENTITY_KIND = "Contest";
   public static final String TYPE_JSON_KEYWORD = "type";
@@ -36,6 +43,7 @@ public abstract class Contest {
   public static final String NAME_ENTITY_KEYWORD = "name";
   public static final String CANDIDATES_ENTITY_KEYWORD = "candidates";
   public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
+  private static final Logger logger = Logger.getLogger(ServletUtils.class.getName());
 
   public abstract String getName();
 
@@ -81,6 +89,28 @@ public abstract class Contest {
         // TODO(gianelgado): get value for description
         .setDescription("")
         .build();
+  }
+
+  // Convert this Contest object to a String in JSON format. Serializes its list of Candiate Entity
+  // key names into JSON objects that correspond to each Candidate's attributes.
+  public String toJsonString(DatastoreService datastore) {
+    Gson gson = new Gson();
+    JsonObject contestJsonObject = gson.fromJson(gson.toJson(this), JsonObject.class);
+    JsonArray candidateJsonArray = new JsonArray();
+
+    // Since a Contest object's "candidates" collection consists only of their Datastore key IDs,
+    // iterate through each one to get the actual Candidate field data in JSON format.
+    ImmutableSet.copyOf(this.getCandidates())
+        .stream()
+        .map(id -> KeyFactory.createKey(Candidate.ENTITY_KIND, id.longValue()))
+        .map(key -> ServletUtils.getFromDatastore(datastore, key))
+        .map(entity -> JsonParser.parseString(Candidate.fromEntity(entity).toJsonString()))
+        // Have to use forEach to have void return. Can't use Collection to collect because
+        // JsonArray can't addAll() with String as parameter.
+        .forEach(jsonElement -> candidateJsonArray.add(jsonElement));
+
+    contestJsonObject.add("candidates", candidateJsonArray);
+    return gson.toJson(contestJsonObject);
   }
 
   // Creates a new Contest object by using the propperties of the provided Contest entity

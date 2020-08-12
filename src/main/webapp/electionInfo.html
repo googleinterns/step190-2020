@@ -15,12 +15,13 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
 
-	  <script type='text/javascript' src='config.js'></script>
-	  <link rel="stylesheet" href="style.css">
-    <script src="auto-complete.js"></script>
+	<script type='text/javascript' src='config.js'></script>
+	<link rel="stylesheet" href="style.css">
+      
     <script src="script.js"></script>
+    <script src="auto-complete.js"></script>
     <script src="election-info.js"></script>
-
+    
     </head>
 
     <body onload="onElectionInfoLoad();">
@@ -32,22 +33,27 @@
         </div>
 
         <div class="container" id="content">
-          <div id="election-info-page-title">
-            <p style="display: inline-block; text-align: left;">
-              <b>To show you polling locations, candidates, and ballot items from the&nbsp;</b> 
-            </p>
-            <div id="chosen-election" style="display: inline-block; text-align: left;"> </div>
-            <p style="display: inline-block; text-align: left;">
-              <b>, we'll need your registered voter address: </b>
-            </p>
-          </div>
 
-          <div class="input-wrapper">
-            <div class="panel panel-primary">
+          <div class="row page-title-text" id="election-info-page-title"></div>
+          <script id="election-name-template" type="text/x-handlebars-template">
+            <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
+              <b>
+              To show you polling locations and ballot items from the <span id="chosen-election">{{electionName}}</span>, we'll need your 
+              registered voter address:
+              </b>
+            </p>
+          </script>
+          
+          
+          <div class="row input-wrapper">
+            <div class="panel noborder panel-primary">
               <div class="container panel-body">
                 <div class="row location-field-wrapper">
                   <div class="col-lg-8 col-lg-offset-2" id="locationField">
-                      <input id="autocomplete" placeholder="Enter your address" onFocus="geolocate()" type="text"/>
+                      <input id="autocomplete" 
+                             placeholder="Enter your address" 
+                             onFocus="geolocate()" 
+                             type="text">
                   </div>
                 </div>
                 <div class="row address-row-wrapper">
@@ -81,15 +87,69 @@
                 </div>
 
                 <div class="row address-row-wrapper" id="address-button-container">
-                  <a href="#" onclick="logAddressInput();return false;" id="address-input-js">
-                    <div class="col-lg-2 col-lg-offset-5 col-md-2 col-md-offset-5 col-sm-2 col-sm-offset-5" 
-                          id="submit-address-button">
-                      Submit
-                    </div>
-                  </a>
+                  <input type="submit" 
+                        onclick="logAddressInput();return false;" 
+                        disabled="true"
+                        class="col-lg-2 col-lg-offset-5 col-md-2 col-md-offset-5 col-sm-2 col-sm-offset-5 noborder" 
+                        id="submit-address-button" 
+                        value="Submit"/>
                 </div>
               </div>
             </div>
+          </div>
+
+          <div class="row" id="map-container">
+            <div class="col-lg-8 col-lg-offset-2" id="map-wrapper">
+              <div id="polling-stations-map" style="height:600px"></div>
+            </div>
+          </div>
+
+          <div class="row info-cards-wrapper">
+            <div class="container-fluid" id="contests-referendums-content"></div>
+            <script id="contests-referendums-template" type="text/x-handlebars-template">
+              <h3 id="info-cards-title">What's on the ballot</h3>
+              <div class="col-md-4 col-lg-offset-2 contests-wrapper">
+                {{#each contests}}
+                <div class="info-card">
+                  <div class="info-card-title">
+                    {{this.name}}
+                  </div>
+                  <div class="candidates-wrapper">
+                    {{#each this.candidates}}
+                    <div class="candidate">
+                      <button type="button" class="candidate-name collapsible">
+                        <b>{{this.name}} </b>({{this.partyAffiliation}})
+                      </button>
+                      
+                      <div class="collapsible-content candidate-info">
+                        <p><b>Website: </b>{{this.campaignSite}}</p>
+                        <p>{{this.platformDescription}}</p>
+                      </div>
+                    </div>
+                    {{/each}}
+                  </div>
+                </div>
+                {{else}}
+                <p><em>No contests</em></p>
+                {{/each}}
+              </div>
+              <div class="col-md-4 referendums-wrapper">
+                {{#each referendums}}
+                <div class="info-card">
+                  <button type="button" class="info-card-title referendum-name collapsible">
+                    {{this.title}}
+                  </button>
+                  <div class="collapsible-content">
+                    <p class="referendum-description">
+                      {{this.description}}
+                    </p>
+                  </div>
+                </div>
+                {{else}}
+                <p><em>No referendums</em></p>
+                {{/each}}
+              </div>
+            </script>
           </div>
         </div>
 			</div>
