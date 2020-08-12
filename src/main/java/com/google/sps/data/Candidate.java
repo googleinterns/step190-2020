@@ -123,9 +123,9 @@ public abstract class Candidate {
   public static String entityToJsonString(
       Optional<Entity> electionEntity, DatastoreService datastore) {
     if (!electionEntity.isPresent()) {
-      return JsonNull.INSTANCE;
+      return (String) JsonNull.INSTANCE;
     } else {
-      return JsonParser.parseString(this.fromEntity(entity).toJsonString());
+      return JsonParser.parseString(fromEntity(electionEntity).toJsonString());
     }
   }
 }

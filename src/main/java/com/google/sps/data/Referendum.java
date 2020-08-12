@@ -83,9 +83,9 @@ public abstract class Referendum {
   public static String entityToJsonString(
       Optional<Entity> electionEntity, DatastoreService datastore) {
     if (!electionEntity.isPresent()) {
-      return JsonNull.INSTANCE;
+      return (String) JsonNull.INSTANCE;
     } else {
-      return this.fromEntity(electionEntity.get()).toJsonString(datastore);
+      return fromEntity(electionEntity.get()).toJsonString(datastore);
     }
   }
 }

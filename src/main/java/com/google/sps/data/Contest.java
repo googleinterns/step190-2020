@@ -143,7 +143,7 @@ public abstract class Contest {
   public static String entityToJsonString(
       Optional<Entity> electionEntity, DatastoreService datastore) {
     if (!electionEntity.isPresent()) {
-      return JsonNull.INSTANCE;
+      return (String) JsonNull.INSTANCE;
     } else {
       return fromEntity(electionEntity.get()).toJsonString(datastore);
     }
