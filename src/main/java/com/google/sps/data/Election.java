@@ -44,6 +44,13 @@ public abstract class Election {
   public static final String SCOPE_ENTITY_KEYWORD = "scope";
   public static final String CONTESTS_ENTITY_KEYWORD = "contests";
   public static final String REFERENDUMS_ENTITY_KEYWORD = "referendums";
+  public static final String POLLING_STATIONS_ENTITY_KEYWORD = "pollingStations";
+  public static final String EARLY_VOTE_JSON_KEYWORD = "earlyVoteSites";
+  public static final String EARLY_VOTE_LOCATION_TYPE = "earlyVoteSite";
+  public static final String DROP_OFF_JSON_KEYWORD = "dropOffLocations";
+  public static final String DROP_OFF_LOCATION_TYPE = "dropOffLocation";
+  public static final String POLLING_LOCATION_JSON_KEYWORD = "pollingLocations";
+  public static final String POLLING_LOCATION_TYPE = "pollingLocation";
 
   public abstract String getId();
 
@@ -155,28 +162,30 @@ public abstract class Election {
       }
     }
 
-    if (voterInfoQueryData.has("earlyVoteSites")) {
-      JSONArray earlyVoteSiteData = voterInfoQueryData.getJSONArray("earlyVoteSites");
+    if (voterInfoQueryData.has(EARLY_VOTE_JSON_KEYWORD)) {
+      JSONArray earlyVoteSiteData = voterInfoQueryData.getJSONArray(EARLY_VOTE_JSON_KEYWORD);
       for (Object earlyVoteSite : earlyVoteSiteData) {
         JSONObject earlyVoteSiteJSON = (JSONObject) earlyVoteSite;
-        pollingStations.add(createPollingStation(earlyVoteSiteJSON, "earlyVoteSite", datastore));
+        pollingStations.add(
+            createPollingStation(earlyVoteSiteJSON, EARLY_VOTE_LOCATION_TYPE, datastore));
       }
     }
 
-    if (voterInfoQueryData.has("dropOffLocations")) {
-      JSONArray dropOffData = voterInfoQueryData.getJSONArray("dropOffLocations");
+    if (voterInfoQueryData.has(DROP_OFF_JSON_KEYWORD)) {
+      JSONArray dropOffData = voterInfoQueryData.getJSONArray(DROP_OFF_JSON_KEYWORD);
       for (Object dropOff : dropOffData) {
         JSONObject dropOffJSON = (JSONObject) dropOff;
-        pollingStations.add(createPollingStation(dropOffJSON, "dropOffLocation", datastore));
+        pollingStations.add(createPollingStation(dropOffJSON, DROP_OFF_LOCATION_TYPE, datastore));
       }
     }
 
-    if (voterInfoQueryData.has("pollingLocations")) {
-      JSONArray pollingLocationData = voterInfoQueryData.getJSONArray("pollingLocations");
+    if (voterInfoQueryData.has(POLLING_LOCATION_JSON_KEYWORD)) {
+      JSONArray pollingLocationData =
+          voterInfoQueryData.getJSONArray(POLLING_LOCATION_JSON_KEYWORD);
       for (Object pollingLocation : pollingLocationData) {
         JSONObject pollingLocationJSON = (JSONObject) pollingLocation;
         pollingStations.add(
-            createPollingStation(pollingLocationJSON, "pollingLocation", datastore));
+            createPollingStation(pollingLocationJSON, POLLING_LOCATION_TYPE, datastore));
       }
     }
 
@@ -236,17 +245,19 @@ public abstract class Election {
     Set<Long> referendums = new HashSet<>();
     ImmutableSet<EmbeddedEntity> pollingStationSet = ImmutableSet.of();
 
-    if (entity.getProperty("contests") != null) {
-      contests = new HashSet<>((Collection<Long>) entity.getProperty("contests"));
+    if (entity.getProperty(CONTESTS_ENTITY_KEYWORD) != null) {
+      contests = new HashSet<>((Collection<Long>) entity.getProperty(CONTESTS_ENTITY_KEYWORD));
     }
 
-    if (entity.getProperty("referendums") != null) {
-      referendums = new HashSet<>((Collection<Long>) entity.getProperty("referendums"));
+    if (entity.getProperty(REFERENDUMS_ENTITY_KEYWORD) != null) {
+      referendums =
+          new HashSet<>((Collection<Long>) entity.getProperty(REFERENDUMS_ENTITY_KEYWORD));
     }
 
-    if (entity.getProperty("pollingStations") != null) {
+    if (entity.getProperty(POLLING_STATIONS_ENTITY_KEYWORD) != null) {
       pollingStationSet =
-          ImmutableSet.copyOf((Collection<EmbeddedEntity>) entity.getProperty("pollingStations"));
+          ImmutableSet.copyOf(
+              (Collection<EmbeddedEntity>) entity.getProperty(POLLING_STATIONS_ENTITY_KEYWORD));
     }
 
     return Election.builder()
@@ -289,7 +300,8 @@ public abstract class Election {
     entity.setProperty(SCOPE_ENTITY_KEYWORD, this.getScope());
     entity.setProperty(CONTESTS_ENTITY_KEYWORD, this.getContests());
     entity.setProperty(REFERENDUMS_ENTITY_KEYWORD, this.getReferendums());
-    entity.setProperty("pollingStations", new ArrayList<EmbeddedEntity>(this.getPollingStations()));
+    entity.setProperty(
+        POLLING_STATIONS_ENTITY_KEYWORD, new ArrayList<EmbeddedEntity>(this.getPollingStations()));
     datastore.put(entity);
     return entity.getKey().getId();
   }
