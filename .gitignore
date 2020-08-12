@@ -1,7 +1,7 @@
 # tmp integration_db.bin
 src/test/java/com/google/sps/integration/tmp/
 target/
-config.js
+src/main/webapp/config.js
 .DS_Store
 
 # API keys
