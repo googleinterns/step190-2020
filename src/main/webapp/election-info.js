@@ -224,18 +224,3 @@ function addPollingStationMarker(map, position, title, description) {
     infoWindow.open(map, marker);
   });
 }
-
-/**
- * Call GET on the Info Card Servlet to retrieve the information needed to populate
- * this page
- */
-function callInfoCardServlet() {
-  let response = await fetch('/info-cards');
-
-  if (response.ok) { // if HTTP-status is 200-299
-    console.log('Called Info Card servlet successfully');
-    // call servlets for individual types of data to populate site
-  } else {
-    alert("HTTP-Error: " + response.status);
-  }
-}
