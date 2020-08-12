@@ -295,6 +295,10 @@ body{
   text-decoration: none;
 }
 
+.panel.noborder {
+  border: none;
+}
+
 .form-control {
   background-color: #FFFFFF !important;
   border-radius: 20px;
