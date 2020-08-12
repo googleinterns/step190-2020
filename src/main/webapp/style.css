@@ -295,8 +295,9 @@ body{
   text-decoration: none;
 }
 
-.panel.noborder {
+.noborder {
   border: none;
+  box-shadow: none;
 }
 
 .form-control {
