@@ -4,12 +4,10 @@ function onElectionInfoLoad(){
 
   if (selectedElection != null) {
     let source = document.getElementById('election-name-template').innerHTML;
-    console.log("gud")
     let template = Handlebars.compile(source);
     let context = { electionName: selectedElection };
 
     let titleTextElement = document.getElementById('election-info-page-title');
-    console.log("double gud")
     titleTextElement.innerHTML = template(context);
   }
 }
