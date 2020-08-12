@@ -2,14 +2,23 @@ function onElectionInfoLoad(){
   let searchParams = new URLSearchParams(window.location.search);
   let selectedElection = searchParams.get("electionName"); 
 
-  if (selectedElection != null) {
-    let source = document.getElementById('election-name-template').innerHTML;
-    let template = Handlebars.compile(source);
-    let context = { electionName: selectedElection };
+  let source = document.getElementById('election-name-template').innerHTML;
+  let template = Handlebars.compile(source);
+  let context;
 
-    let titleTextElement = document.getElementById('election-info-page-title');
-    titleTextElement.innerHTML = template(context);
+  if (selectedElection != null) {
+    context = { 
+      electionIdInQuery: true,
+      electionName: selectedElection 
+    };
+  } else {
+    context = { 
+      electionIdInQuery: false,
+    };
   }
+
+  let titleTextElement = document.getElementById('election-info-page-title');
+  titleTextElement.innerHTML = template(context);
 }
 
 /**
