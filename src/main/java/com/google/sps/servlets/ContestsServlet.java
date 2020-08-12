@@ -84,8 +84,8 @@ public class ContestsServlet extends HttpServlet {
             .collect(ImmutableList.toImmutableList());
 
     Gson gson = new Gson();
-    String contestJson = gson.toJson(contestJsonList).replace("\"{", "{").replace("}\"", "}");
-    String referendumJson = gson.toJson(referendumJsonList).replace("\"{", "{").replace("}\"", "}");
+    String contestJson = gson.toJson(contestJsonList);
+    String referendumJson = gson.toJson(referendumJsonList);
 
     response.setContentType("application/json;");
     response

@@ -213,6 +213,10 @@ body{
   cursor: pointer;
 }
 
+.election-choice-js:hover {
+  text-decoration: none;
+}
+
 #address {
   margin: auto;
   display: flex;
@@ -254,30 +258,37 @@ body{
 }
 
 .address-row-wrapper{
-  margin-bottom: 4.5%;
+  margin-bottom: 3%;
 }
 
 #submit-address-button{
   background: #668EDB;
-  border: 1px solid #668EDB;
   font-weight: bold;
   padding: 10px;
   display: flex;
   height: 50%;
   align-content: center;
+  margin-top: 2.5%;
+  outline: none;
 }
 
-#submit-address-button:hover{
+#submit-address-button:disabled {
+  background-color: #B8D2EA;
+  color: #9A9A9A;
+}
+
+#submit-address-button:enabled:hover{
   background: #FFFFFF;
+  border: 1px solid #668EDB;
   color: #668EDB;
   cursor: pointer;
 }
 
-#address-button-container{
-  margin-top: 2.5%;
+#submit-address-button:disabled:hover {
+  cursor: not-allowed;
 }
 
-#address-button-container div{
+#address-button-container input {
   min-height: 5vmin;
   font-style: normal;
   font-weight: bold;
@@ -295,8 +306,9 @@ body{
   text-decoration: none;
 }
 
-.panel.noborder {
+.noborder {
   border: none;
+  box-shadow: none;
 }
 
 .form-control {
@@ -419,4 +431,17 @@ body{
 
 .active:after {
   content: "\2796"; /* Unicode character for "minus" sign (-) */
+}
+
+/* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+#polling-stations-map {
+  height:100%;
+  width:100%;
+}
+
+#map-wrapper {
+  align-content: center;
+  justify-content: center;
+  width:100%;
 }
