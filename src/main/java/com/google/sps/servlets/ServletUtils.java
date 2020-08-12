@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
@@ -138,6 +139,16 @@ public class ServletUtils {
     JSONObject obj = new JSONObject(results);
 
     return obj;
+  }
+
+  public static void deleteAllEntitiesOfKind(DatastoreService datastore, String entityKind) {
+    // Deleting the queries from yesterday in the case that they are outdated
+    PreparedQuery results = datastore.prepare(new Query(entityKind));
+
+    for (Entity entity : results.asIterable()) {
+      Key entityKey = KeyFactory.createKey(entityKind, entity.getKey().getId());
+      datastore.delete(entityKey);
+    }
   }
 
   /**
