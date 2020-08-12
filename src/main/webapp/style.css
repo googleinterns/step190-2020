@@ -20,7 +20,6 @@ body{
 #header-bar{
   position: fixed;
   width: 100%;
-  height: 6%;
   min-height: 40px;
   top: 0px;
   background: #668EDB;
@@ -159,6 +158,11 @@ body{
   font-weight: bold;
 }
 
+#election-info-page-title {
+  color: #668EDB;
+  font-weight: bold;
+}
+
 #state-dropdown {
   display: flex;
   justify-content: center;
@@ -214,6 +218,10 @@ body{
   cursor: pointer;
 }
 
+.election-choice-js:hover {
+  text-decoration: none;
+}
+
 #address {
   margin: auto;
   display: flex;
@@ -230,7 +238,7 @@ body{
 
 .input-wrapper {
   margin-top: 4.5%;
-  margin-bottom: 8%;
+  margin-bottom: 3%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -255,30 +263,37 @@ body{
 }
 
 .address-row-wrapper{
-  margin-bottom: 4.5%;
+  margin-bottom: 3%;
 }
 
 #submit-address-button{
   background: #668EDB;
-  border: 1px solid #668EDB;
   font-weight: bold;
   padding: 10px;
   display: flex;
   height: 50%;
   align-content: center;
+  margin-top: 2.5%;
+  outline: none;
 }
 
-#submit-address-button:hover{
+#submit-address-button:disabled {
+  background-color: #B8D2EA;
+  color: #9A9A9A;
+}
+
+#submit-address-button:enabled:hover{
   background: #FFFFFF;
+  border: 1px solid #668EDB;
   color: #668EDB;
   cursor: pointer;
 }
 
-#address-button-container{
-  margin-top: 2.5%;
+#submit-address-button:disabled:hover {
+  cursor: not-allowed;
 }
 
-#address-button-container div{
+#address-button-container input {
   min-height: 5vmin;
   font-style: normal;
   font-weight: bold;
@@ -296,6 +311,11 @@ body{
   text-decoration: none;
 }
 
+.noborder {
+  border: none;
+  box-shadow: none;
+}
+
 .form-control {
   background-color: #FFFFFF !important;
   border-radius: 20px;
@@ -307,20 +327,108 @@ body{
   color: red;
 }
 
-#election-info-page-title {
-  margin-top: 100px;
-  min-height: 10vmin;
-  font-style: normal;
-  font-weight: bold;
-  text-align: center;
-  color: #668EDB;
-  display: inline-block;
-  justify-content: center;
-  align-content: center;
-  flex-direction: column;
-  font-size: 1.75em;
+#chosen-election {
+  color: #000000;
 }
 
-#chosen-election {
-    color: #000000;
+#info-cards-title {
+  margin-left: 17%;
+  margin-bottom: 20px;
+  margin-top: 40px;
+  font-weight: bold;
 }
+
+.info-cards-wrapper {
+  width: 100%;
+}
+
+.info-card-title {
+  font-weight: bold;
+  font-size: 150% ;
+  padding: 2% 2% 0 2%;
+}
+
+.info-card {
+  background-color: white;
+  border: 1.5px solid #E5E5E5;
+  border-radius: 7px;
+  padding: 10px;
+  margin-bottom: 5%;
+}
+
+.candidate {
+  background-color: #E5E5E5;
+  margin: 3%;
+}
+
+.candidate-name {
+  padding: 3%;
+  background-color: #E5E5E5;
+  color: #444;
+  border: none;
+}
+
+.referendum-name {
+  background-color: white;
+  border: none;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  outline: none;
+}
+
+.referendum-description{
+  padding: 2%;
+  
+}
+
+/* Style the button that is used to open and close the collapsible content */
+.collapsible {
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  outline: none;
+}
+
+/* Add a background color to the candidate button if it is clicked on (add the .active class with JS), 
+   and when you move the mouse over it (hover) */
+.candidate-name.active, .candidate-name.collapsible:hover {
+  background-color: #ccc;
+}
+
+/* Style the collapsible content. Note: hidden by default */
+.collapsible-content {
+  padding: 0px 18px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.candidate-info {
+  background-color: #EFEFEF;
+}
+
+.collapsible:after {
+  content: '\02795'; /* Unicode character for "plus" sign (+) */
+  font-size: 13px;
+  color: black;
+  float: right;
+  margin-left: 5px;
+}
+
+.collapsible-content p {
+  margin: 18px 0;
+}
+
+.active:after {
+  content: "\2796"; /* Unicode character for "minus" sign (-) */
+}
+
+/* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+#polling-stations-map {
+  height:100%;
+  width:100%;
+}
+

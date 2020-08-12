@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -132,8 +133,9 @@ public abstract class Election {
       throws JSONException {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> referendumKeyList = this.getReferendums();
-    ArrayList<EmbeddedEntity> pollingStations =
-        new ArrayList<EmbeddedEntity>(this.getPollingStations());
+
+    List<EmbeddedEntity> pollingStations = new ArrayList<>(this.getPollingStations());
+    ImmutableSet<EmbeddedEntity> pollingStationSet;
 
     if (voterInfoQueryData.has(CONTESTS_JSON_KEYWORD)) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray(CONTESTS_JSON_KEYWORD);
@@ -157,7 +159,7 @@ public abstract class Election {
       JSONArray earlyVoteSiteData = voterInfoQueryData.getJSONArray("earlyVoteSites");
       for (Object earlyVoteSite : earlyVoteSiteData) {
         JSONObject earlyVoteSiteJSON = (JSONObject) earlyVoteSite;
-        pollingStations.add(createPollingStation(earlyVoteSiteJSON, "earlyVoteSite"));
+        pollingStations.add(createPollingStation(earlyVoteSiteJSON, "earlyVoteSite", datastore));
       }
     }
 
@@ -165,7 +167,7 @@ public abstract class Election {
       JSONArray dropOffData = voterInfoQueryData.getJSONArray("dropOffLocations");
       for (Object dropOff : dropOffData) {
         JSONObject dropOffJSON = (JSONObject) dropOff;
-        pollingStations.add(createPollingStation(dropOffJSON, "dropOffLocation"));
+        pollingStations.add(createPollingStation(dropOffJSON, "dropOffLocation", datastore));
       }
     }
 
@@ -173,13 +175,16 @@ public abstract class Election {
       JSONArray pollingLocationData = voterInfoQueryData.getJSONArray("pollingLocations");
       for (Object pollingLocation : pollingLocationData) {
         JSONObject pollingLocationJSON = (JSONObject) pollingLocation;
-        pollingStations.add(createPollingStation(pollingLocationJSON, "pollingLocation"));
+        pollingStations.add(
+            createPollingStation(pollingLocationJSON, "pollingLocation", datastore));
       }
     }
 
+    pollingStationSet = ImmutableSet.copyOf((Collection<EmbeddedEntity>) pollingStations);
+
     return this.withContests(contestKeyList)
         .withReferendums(referendumKeyList)
-        .withPollingStations(ImmutableSet.copyOf(pollingStations));
+        .withPollingStations(pollingStationSet);
   }
 
   /**
@@ -190,13 +195,20 @@ public abstract class Election {
    *     station
    * @param locationType a string signifying if this location is a polling station, drop-off
    *     location, or early vote site
+   * @param datastore an object representing our project's Datastore that can be used to store the
+   *     Entities we are creating
    */
-  public EmbeddedEntity createPollingStation(JSONObject pollingStationJSON, String locationType) {
+  public EmbeddedEntity createPollingStation(
+      JSONObject pollingStationJSON, String locationType, DatastoreService datastore) {
     PollingStation pollingStationObject =
         PollingStation.fromJSONObject(pollingStationJSON, locationType);
 
+    Entity pollingStationEntity = pollingStationObject.toEntity();
+    datastore.put(pollingStationEntity);
+
     EmbeddedEntity embeddedPollingStation = new EmbeddedEntity();
-    embeddedPollingStation.setPropertiesFrom(pollingStationObject.toEntity());
+    embeddedPollingStation.setPropertiesFrom(pollingStationEntity);
+    embeddedPollingStation.setKey(pollingStationEntity.getKey());
 
     return embeddedPollingStation;
   }

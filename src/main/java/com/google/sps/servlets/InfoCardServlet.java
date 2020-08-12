@@ -86,12 +86,13 @@ public class InfoCardServlet extends HttpServlet {
 
     String url =
         String.format(
-            BASE_URL,
-            optionalAddress.get(),
-            optionalElectionId.get(),
-            ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID));
-    JSONObject voterInfoData = ServletUtils.readFromApiUrl(url);
+                BASE_URL,
+                optionalAddress.get(),
+                optionalElectionId.get(),
+                ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID))
+            .replaceAll(" ", "%20");
 
+    JSONObject voterInfoData = ServletUtils.readFromApiUrl(url);
     election.fromVoterInfoQuery(datastore, voterInfoData).putInDatastore(datastore, electionEntity);
   }
 }
