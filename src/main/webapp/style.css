@@ -158,6 +158,11 @@ body{
   font-weight: bold;
 }
 
+#election-info-page-title {
+  color: #668EDB;
+  font-weight: bold;
+}
+
 #state-dropdown {
   display: flex;
   justify-content: center;
@@ -320,20 +325,6 @@ body{
 .required:after {
   content:" *";
   color: red;
-}
-
-#election-info-page-title {
-  margin-top: 100px;
-  min-height: 10vmin;
-  font-style: normal;
-  font-weight: bold;
-  text-align: center;
-  color: #668EDB;
-  display: inline-block;
-  justify-content: center;
-  align-content: center;
-  flex-direction: column;
-  font-size: 1.75em;
 }
 
 #chosen-election {
