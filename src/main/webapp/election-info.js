@@ -13,10 +13,26 @@ function onElectionInfoLoad(){
 }
 
 /**
+ * Enable the submit button if this element contains text.
+ */
+setInterval(function() {
+  if(document.getElementById('street_number').value == '' 
+      || document.getElementById('route').value == ''
+      || document.getElementById('locality').value == ''
+      || document.getElementById('administrative_area_level_1').value == ''
+      || document.getElementById('country').value == ''
+      || document.getElementById('postal_code').value == '') { 
+    document.getElementById('submit-address-button').disabled = true;
+  } else { 
+    document.getElementById('submit-address-button').disabled = false;
+  }
+}, 500);
+
+/**
  * Add the user's address (autocompleted by the Places API) to the 
  * query URL
  */
-function logAddressInput(){
+function logAddressInput() {
   let streetNumber = document.getElementById('street_number').value;
   let route = document.getElementById('route').value;
   let city = document.getElementById('locality').value;
