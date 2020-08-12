@@ -432,4 +432,5 @@ body{
 #map-wrapper {
   align-content: center;
   justify-content: center;
+  width:100%;
 }
