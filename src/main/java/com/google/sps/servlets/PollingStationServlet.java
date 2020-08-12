@@ -69,7 +69,7 @@ public class PollingStationServlet extends HttpServlet {
     Entity electionEntity = electionEntityOptional.get();
 
     List<EmbeddedEntity> pollingStationEntities =
-        (List<EmbeddedEntity>) electionEntity.getProperty("pollingStations");
+        (ArrayList<EmbeddedEntity>) electionEntity.getProperty("pollingStations");
     List<PollingStation> pollingStations = new ArrayList<PollingStation>();
 
     for (EmbeddedEntity embeddedEntity : pollingStationEntities) {

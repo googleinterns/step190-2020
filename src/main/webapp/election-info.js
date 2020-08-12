@@ -1,3 +1,6 @@
+var geocoder;
+var map;
+
 function onElectionInfoLoad(){
   let searchParams = new URLSearchParams(window.location.search);
   let selectedElection = searchParams.get("electionName"); 
@@ -46,6 +49,7 @@ function callInfoCardServlet(electionId, address){
       if (response.ok) { // if HTTP-status is 200-299
         console.log('Called Info Card servlet successfully');
         populateClassesForTemplate(electionId);
+        initializeMap();
       } else {
         alert("HTTP-Error: " + response.status);
       }
@@ -105,13 +109,6 @@ function populateClassesForTemplate(electionId){
   });
 }
 
-/*$(document).ready(function(){
-    $('#address-input-js').on('click', initializeMap)
-});
-
-var geocoder;
-var map;
-
 function initializeMap() {
   geocoder = new google.maps.Geocoder();
 
@@ -150,6 +147,7 @@ function initializeMap() {
           "</div>" +
           '<h1 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h1>' +
           '<div id="bodyContent">' +
+          "<p>" + pollingStation.address + "</p>" +
           "<p>Hours: Open " + pollingStation.pollingHours + " beginning " + pollingStation.startDate + 
           " and until " + pollingStation.endDate + ".</p>" +
           "<p>" + type + "</p>" +
@@ -159,13 +157,13 @@ function initializeMap() {
         addPollingStation(pollingStation.address, map, pollingStation.name, description);
       });
     });
-}*/
+}
 
 /**
  * Adds a polling station as a marker on the map, with an info card
  * that displays upon click to show more information about the station
  */
-/*function addPollingStation(address, map, title, description) {
+function addPollingStation(address, map, title, description) {
   geocoder.geocode({
     componentRestrictions: {country: 'US'},
     'address': address}, function(results, status) {
@@ -175,12 +173,12 @@ function initializeMap() {
         alert('Geocode was not successful for the following reason: ' + status);
       }
   });
-}*/
+}
 
 /** 
  * Adds a marker that shows an info window when clicked. 
  */
-/*function addPollingStationMarker(map, position, title, description) {
+function addPollingStationMarker(map, position, title, description) {
   const marker = new google.maps.Marker(
       {position: position, map: map, title: title});
 
@@ -188,4 +186,4 @@ function initializeMap() {
   marker.addListener('click', () => {
     infoWindow.open(map, marker);
   });
-}*/
+}
