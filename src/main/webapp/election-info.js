@@ -30,7 +30,7 @@ setInterval(function() {
 
 /**
  * Add the user's address (autocompleted by the Places API) to the 
- * query URL
+ * query URL and call functions to populate the info cards
  */
 function logAddressInput() {
   let streetNumber = document.getElementById('street_number').value;
@@ -51,6 +51,9 @@ function logAddressInput() {
 /**
  * Call PUT on the Info Card Servlet to retrieve the information needed to populate
  * this page
+ *
+ * @param {String} electionId the id of the user's chosen election
+ * @param {String} address the user's address
  */
 function callInfoCardServlet(electionId, address){
   let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
@@ -70,6 +73,8 @@ function callInfoCardServlet(electionId, address){
 /**
  * Make a GET request to the ContestsServlet and then update the values of the arrays
  * used by the Handlebars template.
+ *
+ * @param {String} electionId the id of the user's chosen election
  */
 function populateClassesForTemplate(electionId){
   let contests = [];
@@ -124,6 +129,11 @@ function populateClassesForTemplate(electionId){
 var geocoder;
 var map;
 
+/**
+ * Add a map to the page centered on the user's address and 
+ * containing markers for valid polling stations that display
+ * info markers when clicked.
+ */
 function initializeMap() {
   geocoder = new google.maps.Geocoder();
 
@@ -179,6 +189,11 @@ function initializeMap() {
 /**
  * Adds a polling station as a marker on the map, with an info card
  * that displays upon click to show more information about the station
+ *
+ * @param {String} address the user's address
+ * @param {google.maps.Map} map the map to add polling stations to
+ * @param {String} title the title of the polling station marker
+ * @param {String} description info window content for the marker
  */
 function addPollingStation(address, map, title, description) {
   geocoder.geocode({
@@ -194,6 +209,11 @@ function addPollingStation(address, map, title, description) {
 
 /** 
  * Adds a marker that shows an info window when clicked. 
+ *
+ * @param {google.maps.Map} map the map to add polling stations to
+ * @param {Position} position the latitude and longitude of the marker's location
+ * @param {String} title the title of the polling station marker
+ * @param {String} description info window content for the marker
  */
 function addPollingStationMarker(map, position, title, description) {
   const marker = new google.maps.Marker(
