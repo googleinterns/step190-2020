@@ -17,9 +17,13 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.common.collect.ImmutableSet;
 import com.google.sps.data.*;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +43,8 @@ public class InfoCardServlet extends HttpServlet {
   private static final String PROJECT_ID = "112408856470";
   private static final String SECRET_MANAGER_ID = "election-api-key";
   private static final String VERSION_ID = "1";
+  private static final String SOURCE_CLASS = InfoCardServlet.class.getName();
+  private static final Logger logger = Logger.getLogger(SOURCE_CLASS);
 
   /**
    * Makes an API call to voterInfoQuery in the Google Civic Information API using the user-chosen
@@ -52,10 +58,20 @@ public class InfoCardServlet extends HttpServlet {
   @Override
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+
+    // Temporary solution to repeated information in the Datastore.
+    // TODO(gianelgado): Remove these deletes and handle only putting
+    //   data that is new
+    logger.logp(
+        Level.INFO,
+        SOURCE_CLASS,
+        "doPut",
+        "Deleting all Entities of Contest, Candidate, Referendum, and PollingStation.");
     ServletUtils.deleteAllEntitiesOfKind(datastore, Contest.ENTITY_KIND);
     ServletUtils.deleteAllEntitiesOfKind(datastore, Candidate.ENTITY_KIND);
     ServletUtils.deleteAllEntitiesOfKind(datastore, Referendum.ENTITY_KIND);
     ServletUtils.deleteAllEntitiesOfKind(datastore, "PollingStation");
+    logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "Successfully deleted Entities.");
 
     Optional<String> optionalAddress = ServletUtils.getRequestParam(request, response, "address");
     Optional<String> optionalElectionId =
@@ -81,13 +97,16 @@ public class InfoCardServlet extends HttpServlet {
       response.setStatus(400);
     }
 
-    Entity electionEntity = optionalEntity.get();
-    Election election = Election.fromEntity(electionEntity);
+    logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "Got election ID and user address.");
 
-    // Don't need to make the API call if this Election object has already been populated.
-    if (election.isPopulatedByVoterInfoQuery()) {
-      return;
-    }
+    Entity electionEntity = optionalEntity.get();
+
+    // Temporary solution to repeated information in the Datastore.
+    electionEntity.setProperty("contests", new HashSet<Long>());
+    electionEntity.setProperty("referendums", new HashSet<Long>());
+    electionEntity.setProperty("pollingStations", ImmutableSet.of());
+
+    Election election = Election.fromEntity(electionEntity);
 
     String url =
         String.format(
@@ -98,6 +117,8 @@ public class InfoCardServlet extends HttpServlet {
             .replaceAll(" ", "%20");
 
     JSONObject voterInfoData = ServletUtils.readFromApiUrl(url);
+
+    logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "Performing PUT on election from API response.");
     election.fromVoterInfoQuery(datastore, voterInfoData).putInDatastore(datastore, electionEntity);
   }
 }
