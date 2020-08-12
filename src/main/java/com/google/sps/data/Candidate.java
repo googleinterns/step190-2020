@@ -18,6 +18,8 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
+import com.google.gson.JsonNull;
+import java.util.Optional;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -116,5 +118,14 @@ public abstract class Candidate {
     entity.setProperty(PLATFORM_ENTITY_KEYWORD, this.getPlatformDescription());
     datastore.put(entity);
     return entity.getKey().getId();
+  }
+
+  public static String entityToJsonString(
+      Optional<Entity> electionEntity, DatastoreService datastore) {
+    if (!electionEntity.isPresent()) {
+      return JsonNull.INSTANCE;
+    } else {
+      return JsonParser.parseString(this.fromEntity(entity).toJsonString());
+    }
   }
 }

@@ -173,18 +173,18 @@ public class ServletUtils {
   }
 
   /**
-   * Gets an Entity from the Datastore using the given key. Throws a RuntimeException if the Entity
-   * is not found.
+   * Queries Datastore for a given Entity key and instantiates an Optional container if it's present
+   * in Datastore
    *
    * @param datastore the Datastore containing all election data
    * @param key the key corresponding to the Entity being queried
-   * @return the found Entity
+   * @return the Optional<Entity>
    */
-  public static Entity getFromDatastore(DatastoreService datastore, Key key) {
+  public static Optional<Entity> getFromDatastore(DatastoreService datastore, Key key) {
     try {
-      return datastore.get(key);
+      return Optional.of(datastore.get(key));
     } catch (EntityNotFoundException e) {
-      throw new RuntimeException(e);
+      return Optional.empty();
     }
   }
 }
