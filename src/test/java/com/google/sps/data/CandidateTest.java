@@ -35,7 +35,7 @@ public class CandidateTest {
   }
 
   @Test
-  public void testFromJsonObject() {
+  public void allFieldsPresent_testFromJsonObject() {
     JSONObject candidateJSON =
         new JSONObject(
             "{\""
@@ -49,6 +49,38 @@ public class CandidateTest {
     Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
     Assert.assertEquals(newCandidate.getName(), "Jane Doe");
     Assert.assertEquals(newCandidate.getPartyAffiliation(), "Green Party");
+    Assert.assertEquals(newCandidate.getCampaignSite(), "www.janedoe.org");
+  }
+
+  @Test
+  public void urlFieldMissing_testFromJsonObject() {
+    JSONObject candidateJSON =
+        new JSONObject(
+            "{\""
+                + Candidate.NAME_JSON_KEYWORD
+                + "\":\"Jane Doe\",\""
+                + Candidate.PARTY_JSON_KEYWORD
+                + "\":\"Green Party\"}");
+
+    Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
+    Assert.assertEquals(newCandidate.getName(), "Jane Doe");
+    Assert.assertEquals(newCandidate.getPartyAffiliation(), "Green Party");
+    Assert.assertEquals(newCandidate.getCampaignSite(), "");
+  }
+
+  @Test
+  public void partyFieldMissing_testFromJsonObject() {
+    JSONObject candidateJSON =
+        new JSONObject(
+            "{\""
+                + Candidate.NAME_JSON_KEYWORD
+                + "\":\"Jane Doe\",\""
+                + Candidate.CAMPAIGN_URL_JSON_KEYWORD
+                + "\":\"www.janedoe.org\"}");
+
+    Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
+    Assert.assertEquals(newCandidate.getName(), "Jane Doe");
+    Assert.assertEquals(newCandidate.getPartyAffiliation(), "");
     Assert.assertEquals(newCandidate.getCampaignSite(), "www.janedoe.org");
   }
 
