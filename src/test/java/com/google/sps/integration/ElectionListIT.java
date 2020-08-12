@@ -66,15 +66,14 @@ public class ElectionListIT {
     WebElement learnMoreButton = driver.findElement(By.id("state-learn-more-button"));
     learnMoreButton.click();
 
-    String targetElectionName = "Georgia+General+Primary+Runoff+Election";
     String targetElectionID = "4979";
 
     Thread.sleep(2000);
 
     Assert.assertEquals(
         String.format(
-            "http://localhost:9876/electionInfo.html?state=ga&electionId=%s&electionName=%s",
-            targetElectionID, targetElectionName),
+            "http://localhost:9876/electionInfo.html?state=ga&electionId=%s",
+            targetElectionID),
         driver.getCurrentUrl());
   }
 
