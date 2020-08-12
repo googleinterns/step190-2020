@@ -425,7 +425,11 @@ body{
 /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
 #polling-stations-map {
-    height: 100%;
-    width:100%;
-    border: thin solid black;
+  height:100%;
+  width:100%;
+}
+
+#map-wrapper {
+  align-content: center;
+  justify-content: center;
 }

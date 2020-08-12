@@ -1,6 +1,3 @@
-var geocoder;
-var map;
-
 function onElectionInfoLoad(){
   let searchParams = new URLSearchParams(window.location.search);
   let selectedElection = searchParams.get("electionName"); 
@@ -109,6 +106,10 @@ function populateClassesForTemplate(electionId){
   });
 }
 
+
+var geocoder;
+var map;
+
 function initializeMap() {
   geocoder = new google.maps.Geocoder();
 
@@ -121,6 +122,7 @@ function initializeMap() {
         center: results[0].geometry.location,
         zoom: 8
       });
+      console.log("Created map");
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
     }
@@ -145,7 +147,7 @@ function initializeMap() {
           '<div id="content">' +
           '<div id="siteNotice">' +
           "</div>" +
-          '<h1 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h1>' +
+          '<h2 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h2>' +
           '<div id="bodyContent">' +
           "<p>" + pollingStation.address + "</p>" +
           "<p>Hours: Open " + pollingStation.pollingHours + " beginning " + pollingStation.startDate + 
@@ -155,6 +157,7 @@ function initializeMap() {
           "</div>";
 
         addPollingStation(pollingStation.address, map, pollingStation.name, description);
+        console.log("Added polling station marker");
       });
     });
 }
