@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -133,8 +134,7 @@ public abstract class Election {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> referendumKeyList = this.getReferendums();
 
-    List<EmbeddedEntity> pollingStations =
-        new ArrayList<EmbeddedEntity>(this.getPollingStations());
+    List<EmbeddedEntity> pollingStations = new ArrayList<EmbeddedEntity>(this.getPollingStations());
     ImmutableSet<EmbeddedEntity> pollingStationSet;
 
     if (voterInfoQueryData.has(CONTESTS_JSON_KEYWORD)) {
@@ -210,6 +210,8 @@ public abstract class Election {
 
     EmbeddedEntity embeddedPollingStation = new EmbeddedEntity();
     embeddedPollingStation.setPropertiesFrom(pollingStationEntity);
+    embeddedPollingStation.setKey(pollingStationEntity.getKey());
+
     return embeddedPollingStation;
   }
 
