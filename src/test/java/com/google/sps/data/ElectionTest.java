@@ -164,6 +164,7 @@ public class ElectionTest {
     Election updatedElection = election.fromVoterInfoQuery(ds, voterInfoQueryJson);
 
     Assert.assertEquals(updatedElection.getContests().size(), 2);
+    Assert.assertEquals(updatedElection.getPollingStations().size(), 1);
   }
 
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading

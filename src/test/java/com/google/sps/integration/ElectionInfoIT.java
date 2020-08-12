@@ -25,9 +25,24 @@ public class ElectionInfoIT {
   }
 
   /**
-   * TODO(anooshree): Resolve issue of being unable to test address input box locally due to API
-   * restrictions
+   * Tests if the submit button allows submission when the site is first loaded, but the user has
+   * not entered an address
    */
+  // @Test
+  // public void addressSubmission_onClick_blocksSubmissionWithoutAddress() {}
+
+  // TODO(anooshree): Check that Query URL updates after address submission
+  /**
+   * Tests if the query URL updates with the user address following address submission using the
+   * autocomplete feature
+   */
+  // @Test
+  // public void addressSubmission_onClick_createAndUpdateQueryParams() {}
+
+  // TODO(anooshree): Check that content loads for a valid URL
+  // @Test
+  // public void addressSubmission_afterSubmission_contentLoads() {}
+
   @After
   public void tearDown() {
     driver.quit();

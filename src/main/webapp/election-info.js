@@ -1,34 +1,21 @@
 function onElectionInfoLoad(){
   let searchParams = new URLSearchParams(window.location.search);
-  let selectedElection = findElectionNameById(searchParams.get("electionId")); 
+  let electionId = searchParams.get("electionId");
 
-  if (selectedElection != null) {
-    let source = document.getElementById('election-name-template').innerHTML;
-    let template = Handlebars.compile(source);
-    let context = { electionName: selectedElection };
-
-    let titleTextElement = document.getElementById('election-info-page-title');
-    titleTextElement.innerHTML = template(context);
-  }
-}
-
-/**
- * Find the name of the election with the given ID.
- *
- * @param {String} electionId ID of user's selected election
- * @return {String} name of the user's selected election
- */
-function findElectionNameById(electionId) {
   fetch('/election')
-    .then(response => response.json())
-    .then((electionList) => {
-      electionList.forEach((election) => {
-        if(electionId == election.id) {
-          return election.name;
-        }
-      });
+  .then(response => response.json())
+  .then((electionList) => {
+    electionList.forEach((election) => {
+      if(electionId == election.id) {
+        let source = document.getElementById('election-name-template').innerHTML;
+        let template = Handlebars.compile(source);
+        let context = { electionName: election.name };
+
+        let titleTextElement = document.getElementById('election-info-page-title');
+        titleTextElement.innerHTML = template(context);
+      }
     });
-  return "";
+  });
 }
 
 /**
