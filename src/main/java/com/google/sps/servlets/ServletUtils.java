@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse;
@@ -140,6 +141,16 @@ public class ServletUtils {
     return obj;
   }
 
+  public static void deleteAllEntitiesOfKind(DatastoreService datastore, String entityKind) {
+    // Deleting the queries from yesterday in the case that they are outdated
+    PreparedQuery results = datastore.prepare(new Query(entityKind));
+
+    for (Entity entity : results.asIterable()) {
+      Key entityKey = KeyFactory.createKey(entityKind, entity.getKey().getId());
+      datastore.delete(entityKey);
+    }
+  }
+
   /**
    * Find an Election Entity in the Datastore based off its electionId property.
    *
@@ -162,18 +173,19 @@ public class ServletUtils {
   }
 
   /**
-   * Gets an Entity from the Datastore using the given key. Throws a RuntimeException if the Entity
-   * is not found.
+   * Queries Datastore for a given Entity key and instantiates an Optional container if it's present
+   * in Datastore
    *
    * @param datastore the Datastore containing all election data
    * @param key the key corresponding to the Entity being queried
-   * @return the found Entity
+   * @return the Optional<Entity>
    */
-  public static Entity getFromDatastore(DatastoreService datastore, Key key) {
+  public static Optional<Entity> getFromDatastore(DatastoreService datastore, Key key) {
     try {
-      return datastore.get(key);
+      return Optional.of(datastore.get(key));
     } catch (EntityNotFoundException e) {
-      throw new RuntimeException(e);
+      logger.log(Level.WARNING, "No Entity with key " + key + " in Datastore.");
+      return Optional.empty();
     }
   }
 }

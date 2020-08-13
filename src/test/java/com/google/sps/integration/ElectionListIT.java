@@ -73,8 +73,9 @@ public class ElectionListIT {
 
     Assert.assertEquals(
         String.format(
-            "http://localhost:9876/electionInfo.html?state=wy&electionId=%s&electionName=%s",
-            targetElectionID, targetElectionName),
+            // "http://localhost:9876/electionInfo.html?state=wy&electionId=%s&electionName=%s",
+            // targetElectionID, targetElectionName),
+            "http://localhost:9876/electionInfo.html?state=ga&electionId=%s", targetElectionID),
         driver.getCurrentUrl());
   }
 

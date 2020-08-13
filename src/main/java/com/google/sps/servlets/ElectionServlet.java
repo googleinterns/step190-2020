@@ -17,8 +17,6 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
@@ -53,16 +51,8 @@ public class ElectionServlet extends HttpServlet {
    */
   @Override
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-    // Deleting the queries from yesterday in the case that they are outdated
-    Query query = new Query(Election.ENTITY_KIND);
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
-
-    for (Entity entity : results.asIterable()) {
-      Key electionEntityKey = KeyFactory.createKey(Election.ENTITY_KIND, entity.getKey().getId());
-      datastore.delete(electionEntityKey);
-    }
+    ServletUtils.deleteAllEntitiesOfKind(datastore, Election.ENTITY_KIND);
 
     String electionApiKey = ServletUtils.getApiKey("112408856470", "election-api-key", "1");
 

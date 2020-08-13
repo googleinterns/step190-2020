@@ -57,6 +57,174 @@ public class PollingStationTest {
     Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
   }
 
+  @Test
+  public void line1FieldMissing_testFromJsonObject() {
+    JSONObject pollingStationJsonObject =
+        new JSONObject(
+            "{\"id\": \"pollingId\","
+                + "\"address\": {\"locationName\": \"name\","
+                + "\"line2\": \"2\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\","
+                + "\"zip\": \"zip\"},\"pollingHours\": \"-\",\"name\": \"pollingStation\","
+                + "\"startDate\": \"start\",\"endDate\": \"end\"}");
+
+    PollingStation pollingStation =
+        PollingStation.fromJSONObject(pollingStationJsonObject, "pollingLocation");
+
+    Assert.assertEquals(pollingStation.getName(), "pollingStation");
+    Assert.assertEquals(pollingStation.getAddress(), "2 3, city, state zip");
+    Assert.assertEquals(pollingStation.getPollingHours(), "-");
+    Assert.assertEquals(pollingStation.getStartDate(), "start");
+    Assert.assertEquals(pollingStation.getEndDate(), "end");
+    Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
+  }
+
+  @Test
+  public void line2FieldMissing_testFromJsonObject() {
+    JSONObject pollingStationJsonObject =
+        new JSONObject(
+            "{\"id\": \"pollingId\","
+                + "\"address\": {\"locationName\": \"name\","
+                + "\"line1\": \"1\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\","
+                + "\"zip\": \"zip\"},\"pollingHours\": \"-\",\"name\": \"pollingStation\","
+                + "\"startDate\": \"start\",\"endDate\": \"end\"}");
+
+    PollingStation pollingStation =
+        PollingStation.fromJSONObject(pollingStationJsonObject, "pollingLocation");
+
+    Assert.assertEquals(pollingStation.getName(), "pollingStation");
+    Assert.assertEquals(pollingStation.getAddress(), "1 3, city, state zip");
+    Assert.assertEquals(pollingStation.getPollingHours(), "-");
+    Assert.assertEquals(pollingStation.getStartDate(), "start");
+    Assert.assertEquals(pollingStation.getEndDate(), "end");
+    Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
+  }
+
+  @Test
+  public void line3FieldMissing_testFromJsonObject() {
+    JSONObject pollingStationJsonObject =
+        new JSONObject(
+            "{\"id\": \"pollingId\","
+                + "\"address\": {\"locationName\": \"name\","
+                + "\"line1\": \"1\",\"line2\": \"2\",\"city\": \"city\",\"state\": \"state\","
+                + "\"zip\": \"zip\"},\"pollingHours\": \"-\",\"name\": \"pollingStation\","
+                + "\"startDate\": \"start\",\"endDate\": \"end\"}");
+
+    PollingStation pollingStation =
+        PollingStation.fromJSONObject(pollingStationJsonObject, "pollingLocation");
+
+    Assert.assertEquals(pollingStation.getName(), "pollingStation");
+    Assert.assertEquals(pollingStation.getAddress(), "1 2, city, state zip");
+    Assert.assertEquals(pollingStation.getPollingHours(), "-");
+    Assert.assertEquals(pollingStation.getStartDate(), "start");
+    Assert.assertEquals(pollingStation.getEndDate(), "end");
+    Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
+  }
+
+  @Test
+  public void zipCodeFieldMissing_testFromJsonObject() {
+    JSONObject pollingStationJsonObject =
+        new JSONObject(
+            "{\"id\": \"pollingId\","
+                + "\"address\": {\"locationName\": \"name\",\"line1\": \"1\","
+                + "\"line2\": \"2\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\"},"
+                + "\"pollingHours\": \"-\",\"name\": \"pollingStation\","
+                + "\"startDate\": \"start\",\"endDate\": \"end\"}");
+
+    PollingStation pollingStation =
+        PollingStation.fromJSONObject(pollingStationJsonObject, "pollingLocation");
+
+    Assert.assertEquals(pollingStation.getName(), "pollingStation");
+    Assert.assertEquals(pollingStation.getAddress(), "1 2 3, city, state ");
+    Assert.assertEquals(pollingStation.getPollingHours(), "-");
+    Assert.assertEquals(pollingStation.getStartDate(), "start");
+    Assert.assertEquals(pollingStation.getEndDate(), "end");
+    Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
+  }
+
+  @Test
+  public void nameFieldMissing_testFromJsonObject() {
+    JSONObject pollingStationJsonObject =
+        new JSONObject(
+            "{\"id\": \"pollingId\","
+                + "\"address\": {\"locationName\": \"name\",\"line1\": \"1\","
+                + "\"line2\": \"2\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\","
+                + "\"zip\": \"zip\"},\"pollingHours\": \"-\","
+                + "\"startDate\": \"start\",\"endDate\": \"end\"}");
+
+    PollingStation pollingStation =
+        PollingStation.fromJSONObject(pollingStationJsonObject, "pollingLocation");
+
+    Assert.assertEquals(pollingStation.getName(), "Polling Station");
+    Assert.assertEquals(pollingStation.getAddress(), "1 2 3, city, state zip");
+    Assert.assertEquals(pollingStation.getPollingHours(), "-");
+    Assert.assertEquals(pollingStation.getStartDate(), "start");
+    Assert.assertEquals(pollingStation.getEndDate(), "end");
+    Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
+  }
+
+  @Test
+  public void pollingHoursFieldMissing_testFromJsonObject() {
+    JSONObject pollingStationJsonObject =
+        new JSONObject(
+            "{\"id\": \"pollingId\","
+                + "\"address\": {\"locationName\": \"name\",\"line1\": \"1\","
+                + "\"line2\": \"2\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\","
+                + "\"zip\": \"zip\"},\"name\": \"pollingStation\","
+                + "\"startDate\": \"start\",\"endDate\": \"end\"}");
+
+    PollingStation pollingStation =
+        PollingStation.fromJSONObject(pollingStationJsonObject, "pollingLocation");
+
+    Assert.assertEquals(pollingStation.getName(), "pollingStation");
+    Assert.assertEquals(pollingStation.getAddress(), "1 2 3, city, state zip");
+    Assert.assertEquals(pollingStation.getPollingHours(), "daily");
+    Assert.assertEquals(pollingStation.getStartDate(), "start");
+    Assert.assertEquals(pollingStation.getEndDate(), "end");
+    Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
+  }
+
+  @Test
+  public void startDateFieldMissing_testFromJsonObject() {
+    JSONObject pollingStationJsonObject =
+        new JSONObject(
+            "{\"id\": \"pollingId\","
+                + "\"address\": {\"locationName\": \"name\",\"line1\": \"1\","
+                + "\"line2\": \"2\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\","
+                + "\"zip\": \"zip\"},\"pollingHours\": \"-\",\"name\": \"pollingStation\","
+                + "\"endDate\": \"end\"}");
+
+    PollingStation pollingStation =
+        PollingStation.fromJSONObject(pollingStationJsonObject, "pollingLocation");
+
+    Assert.assertEquals(pollingStation.getName(), "pollingStation");
+    Assert.assertEquals(pollingStation.getAddress(), "1 2 3, city, state zip");
+    Assert.assertEquals(pollingStation.getPollingHours(), "-");
+    Assert.assertEquals(pollingStation.getStartDate(), "on an unknown start date");
+    Assert.assertEquals(pollingStation.getEndDate(), "end");
+    Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
+  }
+
+  @Test
+  public void endDateFieldMissing_testFromJsonObject() {
+    JSONObject pollingStationJsonObject =
+        new JSONObject(
+            "{\"id\": \"pollingId\","
+                + "\"address\": {\"locationName\": \"name\",\"line1\": \"1\","
+                + "\"line2\": \"2\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\","
+                + "\"zip\": \"zip\"},\"pollingHours\": \"-\",\"name\": \"pollingStation\","
+                + "\"startDate\": \"start\"}");
+
+    PollingStation pollingStation =
+        PollingStation.fromJSONObject(pollingStationJsonObject, "pollingLocation");
+
+    Assert.assertEquals(pollingStation.getName(), "pollingStation");
+    Assert.assertEquals(pollingStation.getAddress(), "1 2 3, city, state zip");
+    Assert.assertEquals(pollingStation.getPollingHours(), "-");
+    Assert.assertEquals(pollingStation.getStartDate(), "start");
+    Assert.assertEquals(pollingStation.getEndDate(), "an unknown end date");
+    Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
+  }
+
   // Test creating a new PollingStation object from an Entity in Datastore
   @Test
   public void testFromEntity() throws Exception {
