@@ -49,9 +49,24 @@ public abstract class Referendum {
 
   // creates a new Referendum object by extracting the properties from "obj"
   public static Referendum fromJSONObject(JSONObject obj) throws JSONException {
+    String referendumDescription;
+    String referendumTitle;
+
+    try {
+      referendumTitle = obj.getString(TITLE_JSON_KEYWORD);
+    } catch (JSONException e) {
+      throw new JSONException("Referendum title not found in JSON response.");
+    }
+
+    try {
+      referendumDescription = obj.getString(DESCRIPTION_JSON_KEYWORD);
+    } catch (JSONException e) {
+      referendumDescription = "";
+    }
+
     return Referendum.builder()
-        .setTitle(obj.getString(TITLE_JSON_KEYWORD))
-        .setDescription(obj.getString(DESCRIPTION_JSON_KEYWORD))
+        .setTitle(referendumTitle)
+        .setDescription(referendumDescription)
         .build();
   }
 
