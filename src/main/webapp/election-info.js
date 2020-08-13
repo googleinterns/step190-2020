@@ -1,26 +1,35 @@
 function onElectionInfoLoad(){
   let searchParams = new URLSearchParams(window.location.search);
-  let selectedElection = searchParams.get("electionName"); 
-
-  let source = document.getElementById('election-name-template').innerHTML;
-  let template = Handlebars.compile(source);
-  let context;
-
-  if (selectedElection != null) {
-    context = { 
-      electionIdInQuery: true,
-      electionName: selectedElection 
-    };
-    document.getElementById('election-info-wrapper').style.removeProperty('display');
-  } else {
-    context = { 
-      electionIdInQuery: false,
-    };
-    document.getElementById('election-info-wrapper').style.display = 'none';
-  }
+  let electionId = searchParams.get("electionId");
 
   let titleTextElement = document.getElementById('election-info-page-title');
-  titleTextElement.innerHTML = template(context);
+  let source = document.getElementById('election-name-template').innerHTML;
+  let template = Handlebars.compile(source);
+  let context = null;
+
+  fetch('/election')
+  .then(response => response.json())
+  .then((electionList) => {
+    electionList.forEach((election) => {
+      if (electionId == election.id) {
+        context = { 
+          electionIdInQuery: true,
+          electionName: election.name 
+        };
+        document.getElementById('election-info-wrapper').style.removeProperty('display');
+        titleTextElement.innerHTML = template(context);
+        return;
+      }
+    });
+
+    if (context == null) {
+      context = { 
+        electionIdInQuery: false,
+      };
+      document.getElementById('election-info-wrapper').style.display = 'none';
+      titleTextElement.innerHTML = template(context);
+    }
+  });
 }
 
 /**
