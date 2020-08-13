@@ -46,34 +46,6 @@ public class ElectionInfoIT {
   }
 
   // TODO(anooshree): Check that Query URL updates after address submission
-  /**
-   * Tests if the query URL updates with the user address following address submission using the
-   * autocomplete feature
-   */
-  @Test
-  public void addressSubmission_onClick_createAndUpdateQueryParams() throws InterruptedException {
-
-    driver.get("http://localhost:9876/electionInfo.html?state=ca&electionId=2000");
-    WebDriverWait wait = new WebDriverWait(driver, 20);
-
-    WebElement autocompleteBox = driver.findElement(By.id("autocomplete"));
-    autocompleteBox.sendKeys("121 Bernal Road, San Jose");
-    Thread.sleep(5000);
-
-    wait.until(ExpectedConditions.visibilityOfElementLocated((By.id("autocomplete"))))
-        .sendKeys(Keys.DOWN, Keys.ENTER);
-
-    Thread.sleep(1000);
-
-    WebElement submitButton = driver.findElement(By.id("submit-address-button"));
-    submitButton.click();
-
-    String targetAddressValue = "121+Bernal+Road+San+Jose+CA+95119+United+States";
-    Assert.assertEquals(
-        "http://localhost:9876/electionInfo.html?state=ca&electionId=2000&address="
-            + targetAddressValue,
-        driver.getCurrentUrl());
-  }
 
   // TODO(anooshree): Check that content loads for a valid URL
   // @Test
