@@ -30,6 +30,7 @@ public class ElectionInfoIT {
 
   /**
    * Tests if the error screen shows when the URL does not contain an election ID query parameter.
+   * Tests that address form is not displayed.
    */
   @Test
   public void noElectionIdInQueryUrl_displayErrorText() {
@@ -43,7 +44,8 @@ public class ElectionInfoIT {
   }
 
   /**
-   * Tests if the error screen shows when the URL does not contain an election ID query parameter.
+   * Tests if the regular election info screen shows when the URL does contain an election ID query parameter.
+   * Tests that address form does display.
    */
   @Test
   public void electionIdInQueryUrl_displayRegularInfoCardScreen() {
