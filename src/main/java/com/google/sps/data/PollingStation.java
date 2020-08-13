@@ -22,6 +22,14 @@ import org.json.JSONObject;
 /** A polling station open for voters to vote or drop ballots off at */
 @AutoValue
 public abstract class PollingStation {
+  public static final String ENTITY_KIND = "PollingStation";
+  public static final String NAME_JSON_KEYWORD = "name";
+  public static final String ADDRESS_JSON_KEYWORD = "address";
+  public static final String START_DATE_JSON_KEYWORD = "startDate";
+  public static final String END_DATE_JSON_KEYWORD = "endDate";
+  public static final String LOCATION_TYPE_JSON_KEYWORD = "locationType";
+  public static final String POLLING_HOURS_JSON_KEYWORD = "pollingHours";
+
   public abstract String getName();
 
   public abstract String getAddress();
@@ -81,14 +89,14 @@ public abstract class PollingStation {
     String endDate;
 
     try {
-      line1 = obj.getJSONObject("address").getString("line1");
+      line1 = obj.getJSONObject(ADDRESS_JSON_KEYWORD).getString("line1");
       streetName += line1;
     } catch (JSONException e) {
       line1 = "";
     }
 
     try {
-      line2 = obj.getJSONObject("address").getString("line2");
+      line2 = obj.getJSONObject(ADDRESS_JSON_KEYWORD).getString("line2");
       if (!streetName.isEmpty()) {
         streetName += " ";
       }
@@ -98,7 +106,7 @@ public abstract class PollingStation {
     }
 
     try {
-      line3 = obj.getJSONObject("address").getString("line3");
+      line3 = obj.getJSONObject(ADDRESS_JSON_KEYWORD).getString("line3");
       if (!streetName.isEmpty()) {
         streetName += " ";
       }
@@ -108,41 +116,41 @@ public abstract class PollingStation {
     }
 
     try {
-      zipCode = obj.getJSONObject("address").getString("zip");
+      zipCode = obj.getJSONObject(ADDRESS_JSON_KEYWORD).getString("zip");
     } catch (JSONException e) {
       zipCode = "";
     }
 
     try {
-      name = obj.getString("name");
+      name = obj.getString(NAME_JSON_KEYWORD);
     } catch (JSONException e) {
       name = "Polling Station";
     }
 
     try {
-      pollingHours = obj.getString("pollingHours");
+      pollingHours = obj.getString(POLLING_HOURS_JSON_KEYWORD);
     } catch (JSONException e) {
       pollingHours = "daily";
     }
 
     try {
-      startDate = obj.getString("startDate");
+      startDate = obj.getString(START_DATE_JSON_KEYWORD);
     } catch (JSONException e) {
       startDate = "on an unknown start date";
     }
 
     try {
-      endDate = obj.getString("endDate");
+      endDate = obj.getString(END_DATE_JSON_KEYWORD);
     } catch (JSONException e) {
-      endDate = "on an unknown end date";
+      endDate = "an unknown end date";
     }
 
     String address =
         streetName
             + ", "
-            + obj.getJSONObject("address").getString("city")
+            + obj.getJSONObject(ADDRESS_JSON_KEYWORD).getString("city")
             + ", "
-            + obj.getJSONObject("address").getString("state")
+            + obj.getJSONObject(ADDRESS_JSON_KEYWORD).getString("state")
             + " "
             + zipCode;
 
@@ -163,12 +171,12 @@ public abstract class PollingStation {
    */
   public static PollingStation fromEntity(Entity entity) {
     return PollingStation.builder()
-        .setName((String) entity.getProperty("name"))
-        .setAddress((String) entity.getProperty("address"))
-        .setPollingHours((String) entity.getProperty("pollingHours"))
-        .setStartDate((String) entity.getProperty("startDate"))
-        .setEndDate((String) entity.getProperty("endDate"))
-        .setLocationType((String) entity.getProperty("locationType"))
+        .setName((String) entity.getProperty(NAME_JSON_KEYWORD))
+        .setAddress((String) entity.getProperty(ADDRESS_JSON_KEYWORD))
+        .setPollingHours((String) entity.getProperty(POLLING_HOURS_JSON_KEYWORD))
+        .setStartDate((String) entity.getProperty(START_DATE_JSON_KEYWORD))
+        .setEndDate((String) entity.getProperty(END_DATE_JSON_KEYWORD))
+        .setLocationType((String) entity.getProperty(LOCATION_TYPE_JSON_KEYWORD))
         .build();
   }
 
@@ -178,13 +186,13 @@ public abstract class PollingStation {
    * @return an Entity that can be stored in Datastore
    */
   public Entity toEntity() {
-    Entity entity = new Entity("PollingStation");
-    entity.setProperty("name", this.getName());
-    entity.setProperty("address", this.getAddress());
-    entity.setProperty("pollingHours", this.getPollingHours());
-    entity.setProperty("startDate", this.getStartDate());
-    entity.setProperty("endDate", this.getEndDate());
-    entity.setProperty("locationType", this.getLocationType());
+    Entity entity = new Entity(ENTITY_KIND);
+    entity.setProperty(NAME_JSON_KEYWORD, this.getName());
+    entity.setProperty(ADDRESS_JSON_KEYWORD, this.getAddress());
+    entity.setProperty(POLLING_HOURS_JSON_KEYWORD, this.getPollingHours());
+    entity.setProperty(START_DATE_JSON_KEYWORD, this.getStartDate());
+    entity.setProperty(END_DATE_JSON_KEYWORD, this.getEndDate());
+    entity.setProperty(LOCATION_TYPE_JSON_KEYWORD, this.getLocationType());
     return entity;
   }
 }

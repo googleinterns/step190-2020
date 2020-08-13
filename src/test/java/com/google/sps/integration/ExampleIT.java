@@ -44,7 +44,7 @@ public class ExampleIT {
     // worth right now.
     String response = getUrlResponse("http://localhost:9876/election");
     System.out.println(response);
-    Assert.assertTrue(response.contains("Wisconsin State Primary Election"));
+    Assert.assertTrue(response.contains("Wyoming State Primary Election"));
   }
 
   private String getUrlResponse(String urlAddress) throws Exception {

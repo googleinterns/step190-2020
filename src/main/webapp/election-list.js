@@ -64,26 +64,12 @@ function listElections() {
   updateLinksWithQueryParams(document.links);
 }
 
-function findElectionNameById(electionId) {
-  addQueryParameter("electionId", electionId);
-  fetch('/election')
-    .then(response => response.json())
-    .then((electionList) => {
-      electionList.forEach((election) => {
-        if(electionId == election.id) {
-          goToElectionPage(election.name, electionId);
-        }
-      });
-    });
-}
-
 /**
  * Redirect to third page and update the query string with election info.
+ *
+ * @param {String} electionId the ID of the user's selected election
  */
-function goToElectionPage(electionName, electionId){
-  // TODO(anooshree): handle electionName server-side instead of passing to
-  //                  query URL, as seen here: https://happycoding.io/tutorials/java-server/jsp
-  addQueryParameter("electionName", electionName);
+function goToElectionPage(electionId){
   addQueryParameter("electionId", electionId);
   
   var query = window.location.search;
