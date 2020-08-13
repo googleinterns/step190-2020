@@ -20,19 +20,20 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParser;
 import com.google.sps.data.Contest;
 import com.google.sps.data.Election;
 import com.google.sps.data.Referendum;
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONObject;
 
 /**
  * This servlet is used to retrieve the information of all the contests present on the election
@@ -65,29 +66,42 @@ public class ContestsServlet extends HttpServlet {
 
     Election election = Election.fromEntity(electionEntityOptional.get());
 
-    Collection<JsonElement> contestJsonList =
+    List<JsonElement> contestJsonList =
         election
             .getContests()
             .stream()
             .map(id -> KeyFactory.createKey(Contest.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
-            .map(entity -> Contest.entityToJsonString(entity, datastore))
-            .map(jsonString -> JsonParser.parseString(jsonString))
+            .map(
+                entity -> {
+                  if (entity.isPresent()) {
+                    return JsonParser.parseString(
+                        Contest.fromEntity(entity.get()).toJsonString(datastore));
+                  } else {
+                    return JsonNull.INSTANCE;
+                  }
+                })
             .collect(Collectors.toList());
 
-    contestJsonList.removeAll(JSONObject.NULL);
-
-    Collection<JsonElement> referendumJsonList =
+    List<JsonElement> referendumJsonList =
         election
             .getReferendums()
             .stream()
             .map(id -> KeyFactory.createKey(Referendum.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
-            .map(entity -> Referendum.entityToJsonString(entity))
-            .map(jsonString -> JsonParser.parseString(jsonString))
+            .map(
+                entity -> {
+                  if (entity.isPresent()) {
+                    return JsonParser.parseString(
+                        Referendum.fromEntity(entity.get()).toJsonString());
+                  } else {
+                    return JsonNull.INSTANCE;
+                  }
+                })
             .collect(Collectors.toList());
 
-    referendumJsonList.removeAll(JSONObject.NULL);
+    contestJsonList.removeAll(Collections.singleton(JsonNull.INSTANCE));
+    referendumJsonList.removeAll(Collections.singleton(JsonNull.INSTANCE));
 
     Gson gson = new Gson();
     String contestJson = gson.toJson(contestJsonList);

@@ -95,6 +95,7 @@ public class InfoCardServlet extends HttpServlet {
           .println(
               "Could not find election with ID " + optionalElectionId.get() + " in Datastore.");
       response.setStatus(400);
+      return;
     }
 
     logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "Got election ID and user address.");

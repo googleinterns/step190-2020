@@ -23,10 +23,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.sps.servlets.ServletUtils;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.json.JSONException;
@@ -105,7 +105,14 @@ public abstract class Contest {
         .stream()
         .map(id -> KeyFactory.createKey(Candidate.ENTITY_KIND, id.longValue()))
         .map(key -> ServletUtils.getFromDatastore(datastore, key))
-        .map(entity -> Candidate.entityToJsonString(entity, datastore))
+        .map(
+            entity -> {
+              if (entity.isPresent()) {
+                return JsonParser.parseString(Candidate.fromEntity(entity.get()).toJsonString());
+              } else {
+                return JsonNull.INSTANCE;
+              }
+            })
         // Have to use forEach to have void return. Can't use Collection to collect because
         // JsonArray can't addAll() with String as parameter.
         .forEach(jsonElement -> candidateJsonArray.add(jsonElement));
@@ -138,14 +145,5 @@ public abstract class Contest {
     entity.setProperty(DESCRIPTION_ENTITY_KEYWORD, this.getDescription());
     datastore.put(entity);
     return entity.getKey().getId();
-  }
-
-  public static String entityToJsonString(
-      Optional<Entity> electionEntity, DatastoreService datastore) {
-    if (!electionEntity.isPresent()) {
-      return (String) JsonNull.INSTANCE;
-    } else {
-      return fromEntity(electionEntity.get()).toJsonString(datastore);
-    }
   }
 }

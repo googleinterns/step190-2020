@@ -18,8 +18,6 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
-import com.google.gson.JsonNull;
-import java.util.Optional;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -78,13 +76,5 @@ public abstract class Referendum {
     entity.setProperty(DESCRIPTION_ENTITY_KEYWORD, this.getDescription());
     datastore.put(entity);
     return entity.getKey().getId();
-  }
-
-  public static String entityToJsonString(Optional<Entity> electionEntity) {
-    if (!electionEntity.isPresent()) {
-      return (String) JsonNull.INSTANCE;
-    } else {
-      return fromEntity(electionEntity.get()).toJsonString();
-    }
   }
 }
