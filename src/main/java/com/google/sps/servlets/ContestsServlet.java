@@ -74,12 +74,10 @@ public class ContestsServlet extends HttpServlet {
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
             .map(
                 entity -> {
-                  if (entity.isPresent()) {
-                    return JsonParser.parseString(
-                        Contest.fromEntity(entity.get()).toJsonString(datastore));
-                  } else {
-                    return JsonNull.INSTANCE;
-                  }
+                  return entity.isPresent()
+                      ? JsonParser.parseString(
+                          Contest.fromEntity(entity.get()).toJsonString(datastore))
+                      : JsonNull.INSTANCE;
                 })
             .collect(Collectors.toList());
 
@@ -91,12 +89,9 @@ public class ContestsServlet extends HttpServlet {
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
             .map(
                 entity -> {
-                  if (entity.isPresent()) {
-                    return JsonParser.parseString(
-                        Referendum.fromEntity(entity.get()).toJsonString());
-                  } else {
-                    return JsonNull.INSTANCE;
-                  }
+                  return entity.isPresent()
+                      ? JsonParser.parseString(Referendum.fromEntity(entity.get()).toJsonString())
+                      : JsonNull.INSTANCE;
                 })
             .collect(Collectors.toList());
 

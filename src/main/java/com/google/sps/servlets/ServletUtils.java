@@ -184,6 +184,7 @@ public class ServletUtils {
     try {
       return Optional.of(datastore.get(key));
     } catch (EntityNotFoundException e) {
+      logger.log(Level.WARNING, "No Entity with key " + key + " in Datastore.");
       return Optional.empty();
     }
   }
