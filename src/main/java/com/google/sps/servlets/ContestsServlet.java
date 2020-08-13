@@ -18,17 +18,18 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonParser;
 import com.google.sps.data.Contest;
 import com.google.sps.data.Election;
 import com.google.sps.data.Referendum;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -66,22 +67,34 @@ public class ContestsServlet extends HttpServlet {
     Election election = Election.fromEntity(electionEntityOptional.get());
 
     List<JsonElement> contestJsonList =
-        ImmutableSet.copyOf(election.getContests())
+        election
+            .getContests()
             .stream()
             .map(id -> KeyFactory.createKey(Contest.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
-            .map(entity -> Contest.fromEntity(entity).toJsonString(datastore))
-            .map(jsonString -> JsonParser.parseString(jsonString))
-            .collect(ImmutableList.toImmutableList());
+            .map(
+                entity ->
+                    entity.isPresent()
+                        ? JsonParser.parseString(
+                            Contest.fromEntity(entity.get()).toJsonString(datastore))
+                        : JsonNull.INSTANCE)
+            .collect(Collectors.toList());
 
     List<JsonElement> referendumJsonList =
-        ImmutableSet.copyOf(election.getReferendums())
+        election
+            .getReferendums()
             .stream()
             .map(id -> KeyFactory.createKey(Referendum.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
-            .map(entity -> Referendum.fromEntity(entity).toJsonString())
-            .map(jsonString -> JsonParser.parseString(jsonString))
-            .collect(ImmutableList.toImmutableList());
+            .map(
+                entity ->
+                    entity.isPresent()
+                        ? JsonParser.parseString(Referendum.fromEntity(entity.get()).toJsonString())
+                        : JsonNull.INSTANCE)
+            .collect(Collectors.toList());
+
+    contestJsonList.removeAll(Collections.singleton(JsonNull.INSTANCE));
+    referendumJsonList.removeAll(Collections.singleton(JsonNull.INSTANCE));
 
     Gson gson = new Gson();
     String contestJson = gson.toJson(contestJsonList);

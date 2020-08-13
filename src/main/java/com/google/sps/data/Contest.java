@@ -21,6 +21,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.sps.servlets.ServletUtils;
@@ -104,7 +105,11 @@ public abstract class Contest {
         .stream()
         .map(id -> KeyFactory.createKey(Candidate.ENTITY_KIND, id.longValue()))
         .map(key -> ServletUtils.getFromDatastore(datastore, key))
-        .map(entity -> JsonParser.parseString(Candidate.fromEntity(entity).toJsonString()))
+        .map(
+            entity ->
+                entity.isPresent()
+                    ? JsonParser.parseString(Candidate.fromEntity(entity.get()).toJsonString())
+                    : JsonNull.INSTANCE)
         // Have to use forEach to have void return. Can't use Collection to collect because
         // JsonArray can't addAll() with String as parameter.
         .forEach(jsonElement -> candidateJsonArray.add(jsonElement));
