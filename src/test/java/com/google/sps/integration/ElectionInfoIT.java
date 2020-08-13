@@ -44,8 +44,8 @@ public class ElectionInfoIT {
   }
 
   /**
-   * Tests if the regular election info screen shows when the URL does contain an election ID query parameter.
-   * Tests that address form does display.
+   * Tests if the regular election info screen shows when the URL does contain an election ID query
+   * parameter. Tests that address form does display.
    */
   @Test
   public void electionIdInQueryUrl_displayRegularInfoCardScreen() {
@@ -63,9 +63,8 @@ public class ElectionInfoIT {
 
   /**
    * TODO(anooshree): Resolve issue of being unable to test address input box locally due to API
-   * restrictions
-   * Tests if the submit button allows submission when the site is first loaded, but the user has
-   * not entered an address
+   * restrictions Tests if the submit button allows submission when the site is first loaded, but
+   * the user has not entered an address
    */
   @Test
   public void addressSubmission_onClick_blocksSubmissionWithoutAddress() {
