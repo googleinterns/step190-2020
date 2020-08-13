@@ -5,16 +5,18 @@ function onElectionInfoLoad(){
   fetch('/election')
   .then(response => response.json())
   .then((electionList) => {
-    electionList.forEach((election) => {
-      if(electionId == election.id) {
+    for(var i = 0; i < electionList.length; i++) {
+      if(electionId == electionList[i].id) {
         let source = document.getElementById('election-name-template').innerHTML;
         let template = Handlebars.compile(source);
-        let context = { electionName: election.name };
+        let context = { electionName: electionList[i].name };
 
         let titleTextElement = document.getElementById('election-info-page-title');
         titleTextElement.innerHTML = template(context);
+
+        break;
       }
-    });
+    }
   });
 }
 

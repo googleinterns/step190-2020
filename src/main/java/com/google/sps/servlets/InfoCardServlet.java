@@ -102,7 +102,9 @@ public class InfoCardServlet extends HttpServlet {
 
     Entity electionEntity = optionalEntity.get();
 
-    // Temporary solution to repeated information in the Datastore.
+    // TODO(gianelgado): Find solution to avoid repeated information in Datastore
+    //                   that ideally doesn't require deletion of all entities on each
+    //                   call to doPut().
     electionEntity.setProperty("contests", new HashSet<Long>());
     electionEntity.setProperty("referendums", new HashSet<Long>());
     electionEntity.setProperty("pollingStations", ImmutableSet.of());

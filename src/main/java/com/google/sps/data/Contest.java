@@ -106,13 +106,10 @@ public abstract class Contest {
         .map(id -> KeyFactory.createKey(Candidate.ENTITY_KIND, id.longValue()))
         .map(key -> ServletUtils.getFromDatastore(datastore, key))
         .map(
-            entity -> {
-              if (entity.isPresent()) {
-                return JsonParser.parseString(Candidate.fromEntity(entity.get()).toJsonString());
-              } else {
-                return JsonNull.INSTANCE;
-              }
-            })
+            entity ->
+                entity.isPresent()
+                    ? JsonParser.parseString(Candidate.fromEntity(entity.get()).toJsonString())
+                    : JsonNull.INSTANCE)
         // Have to use forEach to have void return. Can't use Collection to collect because
         // JsonArray can't addAll() with String as parameter.
         .forEach(jsonElement -> candidateJsonArray.add(jsonElement));

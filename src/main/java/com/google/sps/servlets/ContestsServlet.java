@@ -73,12 +73,11 @@ public class ContestsServlet extends HttpServlet {
             .map(id -> KeyFactory.createKey(Contest.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
             .map(
-                entity -> {
-                  return entity.isPresent()
-                      ? JsonParser.parseString(
-                          Contest.fromEntity(entity.get()).toJsonString(datastore))
-                      : JsonNull.INSTANCE;
-                })
+                entity ->
+                    entity.isPresent()
+                        ? JsonParser.parseString(
+                            Contest.fromEntity(entity.get()).toJsonString(datastore))
+                        : JsonNull.INSTANCE)
             .collect(Collectors.toList());
 
     List<JsonElement> referendumJsonList =
@@ -88,11 +87,10 @@ public class ContestsServlet extends HttpServlet {
             .map(id -> KeyFactory.createKey(Referendum.ENTITY_KIND, id.longValue()))
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
             .map(
-                entity -> {
-                  return entity.isPresent()
-                      ? JsonParser.parseString(Referendum.fromEntity(entity.get()).toJsonString())
-                      : JsonNull.INSTANCE;
-                })
+                entity ->
+                    entity.isPresent()
+                        ? JsonParser.parseString(Referendum.fromEntity(entity.get()).toJsonString())
+                        : JsonNull.INSTANCE)
             .collect(Collectors.toList());
 
     contestJsonList.removeAll(Collections.singleton(JsonNull.INSTANCE));
