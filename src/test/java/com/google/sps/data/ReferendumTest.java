@@ -15,9 +15,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+@RunWith(JUnit4.class)
 public class ReferendumTest {
   private final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(
@@ -70,7 +73,7 @@ public class ReferendumTest {
             "{\"type\": \"Referendum\", \"referendumSubtitle\": \"Water Bond. Funding for Water Quality, Supply, Treatment, and Storage Projects.\"}");
 
     exceptionRule.expect(JSONException.class);
-    exceptionRule.expectMessage("Referendum title not found in JSON response.");
+    exceptionRule.expectMessage("Malformed referendum JSONObject: referendumTitle does not exist.");
     Referendum referendum = Referendum.fromJSONObject(referendumJsonObject);
   }
 

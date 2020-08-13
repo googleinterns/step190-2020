@@ -18,6 +18,8 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +31,8 @@ public abstract class Referendum {
   public static final String DESCRIPTION_JSON_KEYWORD = "referendumSubtitle";
   public static final String TITLE_ENTITY_KEYWORD = "title";
   public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
+  public static final String SOURCE_CLASS = Referendum.class.getName();
+  public static final Logger LOGGER = Logger.getLogger(SOURCE_CLASS);
 
   public abstract String getTitle();
 
@@ -55,7 +59,8 @@ public abstract class Referendum {
     try {
       referendumTitle = obj.getString(TITLE_JSON_KEYWORD);
     } catch (JSONException e) {
-      throw new JSONException("Referendum title not found in JSON response.");
+      LOGGER.logp(Level.WARNING, SOURCE_CLASS, "fromJSONObject", "referendumTitle does not exist");
+      throw new JSONException("Malformed referendum JSONObject: referendumTitle does not exist.");
     }
 
     try {
