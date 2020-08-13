@@ -45,8 +45,6 @@ public class ElectionInfoIT {
   // TODO(anooshree): Check that Query URL updates after address submission
 
   // TODO(anooshree): Check that content loads for a valid URL
-  // @Test
-  // public void addressSubmission_afterSubmission_contentLoads() {}
 
   @After
   public void tearDown() {
