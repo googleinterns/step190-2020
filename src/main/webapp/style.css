@@ -266,38 +266,16 @@ body{
   margin-bottom: 3%;
 }
 
-#submit-address-button{
+.generic-button {
   background: #668EDB;
-  font-weight: bold;
   padding: 10px;
-  display: flex;
   height: 50%;
-  align-content: center;
   margin-top: 2.5%;
   outline: none;
-}
-
-#submit-address-button:disabled {
-  background-color: #B8D2EA;
-  color: #9A9A9A;
-}
-
-#submit-address-button:enabled:hover{
-  background: #FFFFFF;
-  border: 1px solid #668EDB;
-  color: #668EDB;
-  cursor: pointer;
-}
-
-#submit-address-button:disabled:hover {
-  cursor: not-allowed;
-}
-
-#address-button-container input {
   min-height: 5vmin;
   font-style: normal;
   font-weight: bold;
-  font-size: 2vmin;
+  font-size: 2.5vmin;
   text-align: center;
   color: #FFFFFF;
   border-radius: 10px;
@@ -305,6 +283,22 @@ body{
   justify-content: center;
   align-content: center;
   flex-direction: row;
+}
+
+.generic-button:disabled {
+  background-color: #B8D2EA;
+  color: #9A9A9A;
+}
+
+.generic-button:enabled:hover, div.generic-button:hover{
+  background: #FFFFFF;
+  border: 1px solid #668EDB;
+  color: #668EDB;
+  cursor: pointer;
+}
+
+.generic-button:disabled:hover {
+  cursor: not-allowed;
 }
 
 #address-button-container div a{

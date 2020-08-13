@@ -11,10 +11,12 @@ function onElectionInfoLoad(){
       electionIdInQuery: true,
       electionName: selectedElection 
     };
+    document.getElementById('election-info-wrapper').style.removeProperty('display');
   } else {
     context = { 
       electionIdInQuery: false,
     };
+    document.getElementById('election-info-wrapper').style.display = 'none';
   }
 
   let titleTextElement = document.getElementById('election-info-page-title');
@@ -115,7 +117,7 @@ function populateClassesForTemplate(electionId){
                       candidates: candidates, 
                       referendums: referendums };
 
-      let infoCardContainerElement = document.getElementById('contests-referendums-content');
+      let infoCardContainerElement = document.getElementById('election-info-results');
       infoCardContainerElement.innerHTML = template(context);
 
       let collapsibles = document.getElementsByClassName("collapsible");
