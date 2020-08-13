@@ -1,23 +1,23 @@
 function onElectionInfoLoad(){
-  let searchParams = new URLSearchParams(window.location.search);
-  let electionId = searchParams.get("electionId");
-
-  let titleTextElement = document.getElementById('election-info-page-title');
-  let source = document.getElementById('election-name-template').innerHTML;
-  let template = Handlebars.compile(source);
-  let context = null;
-
   fetch('/election')
   .then(response => response.json())
   .then((electionList) => {
+    let searchParams = new URLSearchParams(window.location.search);
+    let electionId = searchParams.get("electionId");
+
+    let titleTextElement = document.getElementById('election-info-page-title');
+    let electionInfoWrapperElement = document.getElementById('election-info-wrapper');
+    let source = document.getElementById('election-name-template').innerHTML;
+    let template = Handlebars.compile(source);
+    let context = null;
+
     electionList.forEach((election) => {
       if (electionId == election.id) {
         context = { 
           electionIdInQuery: true,
           electionName: election.name 
         };
-        document.getElementById('election-info-wrapper').style.removeProperty('display');
-        titleTextElement.innerHTML = template(context);
+        electionInfoWrapperElement.style.removeProperty('display');
         return;
       }
     });
@@ -26,9 +26,10 @@ function onElectionInfoLoad(){
       context = { 
         electionIdInQuery: false,
       };
-      document.getElementById('election-info-wrapper').style.display = 'none';
-      titleTextElement.innerHTML = template(context);
+      electionInfoWrapperElement.style.display = 'none';
     }
+
+    titleTextElement.innerHTML = template(context);
   });
 }
 
