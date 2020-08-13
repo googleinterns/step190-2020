@@ -1,5 +1,4 @@
 function onElectionInfoLoad(){
-  $("#loading").hide();
   let searchParams = new URLSearchParams(window.location.search);
   let electionId = searchParams.get("electionId");
 
@@ -57,6 +56,16 @@ function logAddressInput() {
   callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"));
 }
 
+function showSpinner() {
+  let spinner = document.getElementById("spinner");
+  spinner.className = "show";
+}
+
+function hideSpinner() {
+  let spinner = document.getElementById("spinner");
+  spinner.className = spinner.className.replace("show", "");
+}
+
 /**
  * Call PUT on the Info Card Servlet to retrieve the information needed to populate
  * this page
@@ -65,7 +74,7 @@ function logAddressInput() {
  * @param {String} address the user's address
  */
 function callInfoCardServlet(electionId, address){
-  $("#loading").show();
+  showSpinner();
   let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
   fetch(servletUrl, {
     method: 'PUT'
@@ -74,11 +83,11 @@ function callInfoCardServlet(electionId, address){
         console.log('Called Info Card servlet successfully');
         populateClassesForTemplate(electionId);
         initializeMap();
+        hideSpinner();
       } else {
         alert("HTTP-Error: " + response.status);
       }
   });
-  $("#loading").hide();
 }
 
 /**
