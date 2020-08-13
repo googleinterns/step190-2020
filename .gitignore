@@ -13,3 +13,6 @@ portfolio.iml
 
 # vim swap files
 **/*.swp
+
+#jasmine installation
+jasmine-3.6.0
