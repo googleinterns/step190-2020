@@ -33,7 +33,6 @@
         </div>
 
         <div class="container" id="content">
-
           <div class="row page-title-text" id="election-info-page-title"></div>
           <script id="election-name-template" type="text/x-handlebars-template">
             {{#if electionIdInQuery}}
@@ -106,7 +105,9 @@
                 </div>
               </div>
             </div>
-  
+
+            <div id="spinner"></div>
+
             <div id="election-info-results"></div>
             <script id="contests-referendums-template" type="text/x-handlebars-template">
               <div class="row" id="map-container">
@@ -114,7 +115,7 @@
                   <div id="polling-stations-map" style="height:600px"></div>
                 </div>
               </div>
-    
+      
               <div class="row info-cards-wrapper">
                 <div class="container-fluid">
                   <h3 id="info-cards-title">What's on the ballot</h3>
