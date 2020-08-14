@@ -244,3 +244,8 @@ function addPollingStationMarker(map, position, title, description) {
     infoWindow.open(map, marker);
   });
 }
+
+Handlebars.registerHelper('stripUrl', function(urlString){
+  urlString = urlString.replace(/(^\w+:|^)\/\//, '');
+  return urlString.slice(0, -1);
+})

@@ -124,8 +124,12 @@
                       </button>
                       
                       <div class="collapsible-content candidate-info">
-                        <p><b>Website: </b>{{this.campaignSite}}</p>
+                        {{#if this.campaignSite}}
+                        <p><b>Website: </b><a href={{this.campaignSite}}>{{stripUrl this.campaignSite}}</a></p>
+                        {{/if}}
+                        {{#if this.platformDescription}}
                         <p>{{this.platformDescription}}</p>
+                        {{/if}}
                       </div>
                     </div>
                     {{/each}}
