@@ -104,10 +104,11 @@ function callInfoCardServlet(electionId, address){
         errorTextElement.style.display = "none";
         populateClassesForTemplate(electionId);
         initializeMap();
-        hideSpinner();
       } else {
         errorTextElement.style.display = "block";
       }
+
+      hideSpinner();
   });
 }
 
