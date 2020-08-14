@@ -33,96 +33,123 @@
         </div>
 
         <div class="container" id="content">
-
           <div class="row page-title-text" id="election-info-page-title"></div>
           <script id="election-name-template" type="text/x-handlebars-template">
-            <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2">
-              <b>
-              To show you polling locations and ballot items from the <span id="chosen-election">{{electionName}}</span>, we'll need your 
-              registered voter address:
-              </b>
+            {{#if electionIdInQuery}}
+            <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2" id="title-text">
+              <b>To show you polling locations and ballot items from the <span id="chosen-election">{{electionName}}</span>, 
+                we&apos;ll need your registered voter address:</b>
             </p>
+            {{else}}
+            <p class="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2" id="title-text" style="padding:0">
+              <b>Error! No election selected.</b>
+            </p>
+            <a href="electionlist.html">
+              <div class="col-lg-2 col-lg-offset-2 col-md-2 col-md-offset-2 col-sm-2 col-sm-offset-2 generic-button">
+                Choose an election here
+              </div>
+            </a>
+            {{/if}}
           </script>
           
-          
-          <div class="row input-wrapper">
-            <div class="panel noborder panel-primary">
-              <div class="container panel-body">
-                <div class="row location-field-wrapper">
-                  <div class="col-lg-8 col-lg-offset-2" id="locationField">
-                      <input id="autocomplete" 
-                             placeholder="Enter your address" 
-                             onFocus="geolocate()" 
-                             type="text">
+          <div style="display:none" id="election-info-wrapper">
+            <div class="row input-wrapper">
+              <div class="panel noborder panel-primary">
+                <div class="container panel-body">
+                  <div class="row location-field-wrapper">
+                    <div class="col-lg-8 col-lg-offset-2" id="locationField">
+                        <input id="autocomplete" 
+                               placeholder="Enter your address" 
+                               onFocus="geolocate()" 
+                               type="text">
+                    </div>
                   </div>
-                </div>
-                <div class="row address-row-wrapper">
-                  <div class="col-md-2 col-md-offset-1">
-                    <input class="form-control" id="street_number" disabled="true">
-                    <label class="control-label required">Street Number</label>
+                  <div class="row address-row-wrapper">
+                    <div class="col-md-2 col-md-offset-1">
+                      <input class="form-control" id="street_number" disabled="true">
+                      <label class="control-label required">Street Number</label>
+                    </div>
+                    <div class="col-md-5">
+                      <input class="form-control" id="route" disabled="true">
+                      <label class="control-label required">Street Name</label>
+                    </div>
+                    <div class="col-md-3">
+                      <input class="form-control field" id="locality" disabled="true">
+                      <label class="control-label required">City</label>
+                    </div>
                   </div>
-                  <div class="col-md-5">
-                    <input class="form-control" id="route" disabled="true">
-                    <label class="control-label required">Street Name</label>
+  
+                  <div class="row address-row-wrapper">
+                    <div class="col-md-2 col-md-offset-2"> 
+                      <input class="form-control" id="administrative_area_level_1" disabled="true">
+                      <label class="control-label required">State</label>
+                    </div>
+                    <div class="col-md-4">
+                      <input class="form-control" id="country" disabled="true">
+                      <label class="control-label required">Country</label>
+                    </div>
+                    <div class="col-md-2">
+                      <input class="form-control" id="postal_code" disabled="true">
+                      <label class="control-label required">Zip Code</label>
+                    </div>
                   </div>
-                  <div class="col-md-3">
-                    <input class="form-control field" id="locality" disabled="true">
-                    <label class="control-label required">City</label>
+  
+                  <div class="row address-row-wrapper" id="address-button-container">
+                    <input type="submit" 
+                          onclick="logAddressInput();return false;" 
+                          disabled="true"
+                          class="col-lg-2 col-lg-offset-5 col-md-2 col-md-offset-5 col-sm-2 col-sm-offset-5 generic-button noborder" 
+                          id="submit-address-button" 
+                          value="Submit"/>
                   </div>
-                </div>
-
-                <div class="row address-row-wrapper">
-                  <div class="col-md-2 col-md-offset-2"> 
-                    <input class="form-control" id="administrative_area_level_1" disabled="true">
-                    <label class="control-label required">State</label>
-                  </div>
-                  <div class="col-md-4">
-                    <input class="form-control" id="country" disabled="true">
-                    <label class="control-label required">Country</label>
-                  </div>
-                  <div class="col-md-2">
-                    <input class="form-control" id="postal_code" disabled="true">
-                    <label class="control-label required">Zip Code</label>
-                  </div>
-                </div>
-
-                <div class="row address-row-wrapper" id="address-button-container">
-                  <input type="submit" 
-                        onclick="logAddressInput();return false;" 
-                        disabled="true"
-                        class="col-lg-2 col-lg-offset-5 col-md-2 col-md-offset-5 col-sm-2 col-sm-offset-5 noborder" 
-                        id="submit-address-button" 
-                        value="Submit"/>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div id="spinner"></div> 
+            <div id="spinner"></div>
 
-          <div class="row" id="map-container">
-            <div class="col-lg-8 col-lg-offset-2" id="map-wrapper">
-              <div id="polling-stations-map" style="height:600px"></div>
-            </div>
-          </div>
-
-          <div class="row info-cards-wrapper">
-            <div class="container-fluid" id="contests-referendums-content"></div>
+            <div id="election-info-results"></div>
             <script id="contests-referendums-template" type="text/x-handlebars-template">
-              <h3 id="info-cards-title">What's on the ballot</h3>
-              <div class="col-md-4 col-lg-offset-2 contests-wrapper">
-                {{#each contests}}
-                <div class="info-card">
-                  <div class="info-card-title">
-                    {{this.name}}
+              <div class="row" id="map-container">
+                <div class="col-lg-8 col-lg-offset-2" id="map-wrapper">
+                  <div id="polling-stations-map" style="height:600px"></div>
+                </div>
+              </div>
+      
+              <div class="row info-cards-wrapper">
+                <div class="container-fluid">
+                  <h3 id="info-cards-title">What's on the ballot</h3>
+                  <div class="col-md-4 col-lg-offset-2 contests-wrapper">
+                    {{#each contests}}
+                    <div class="info-card">
+                      <div class="info-card-title">
+                        {{this.name}}
+                      </div>
+                      <div class="candidates-wrapper">
+                        {{#each this.candidates}}
+                        <div class="candidate">
+                          <button type="button" class="candidate-name collapsible">
+                            <b>{{this.name}} </b>({{this.partyAffiliation}})
+                          </button>
+                          
+                          <div class="collapsible-content candidate-info">
+                            <p><b>Website: </b>{{this.campaignSite}}</p>
+                            <p>{{this.platformDescription}}</p>
+                          </div>
+                        </div>
+                        {{/each}}
+                      </div>
+                    </div>
+                    {{else}}
+                    <p><em>No contests</em></p>
+                    {{/each}}
                   </div>
-                  <div class="candidates-wrapper">
-                    {{#each this.candidates}}
-                    <div class="candidate">
-                      <button type="button" class="candidate-name collapsible">
-                        <b>{{this.name}} </b>({{this.partyAffiliation}})
+                  <div class="col-md-4 referendums-wrapper">
+                    {{#each referendums}}
+                    <div class="info-card">
+                      <button type="button" class="info-card-title referendum-name collapsible">
+                        {{this.title}}
                       </button>
-                      
                       <div class="collapsible-content candidate-info">
                         {{#if this.campaignSite}}
                         <p><b>Website: </b><a href={{this.campaignSite}} target="_blank">{{stripUrl this.campaignSite}}</a></p>
@@ -132,28 +159,11 @@
                         {{/if}}
                       </div>
                     </div>
+                    {{else}}
+                    <p><em>No referendums</em></p>
                     {{/each}}
                   </div>
                 </div>
-                {{else}}
-                <p><em>No contests</em></p>
-                {{/each}}
-              </div>
-              <div class="col-md-4 referendums-wrapper">
-                {{#each referendums}}
-                <div class="info-card">
-                  <button type="button" class="info-card-title referendum-name collapsible">
-                    {{this.title}}
-                  </button>
-                  <div class="collapsible-content">
-                    <p class="referendum-description">
-                      {{this.description}}
-                    </p>
-                  </div>
-                </div>
-                {{else}}
-                <p><em>No referendums</em></p>
-                {{/each}}
               </div>
             </script>
           </div>
