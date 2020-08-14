@@ -258,6 +258,12 @@ function addPollingStationMarker(map, position, title, description) {
   });
 }
 
+/**
+ * Handlebars helper that removes the beginning "http://" and the trailing "/"
+ * from the supplied URL string.
+ * 
+ * @param {String} URL to be stripped.
+ */
 Handlebars.registerHelper('stripUrl', function(urlString){
   urlString = urlString.replace(/(^\w+:|^)\/\//, '');
   return urlString.slice(0, -1);
