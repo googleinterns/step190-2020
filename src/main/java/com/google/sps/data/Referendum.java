@@ -18,6 +18,8 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +31,8 @@ public abstract class Referendum {
   public static final String DESCRIPTION_JSON_KEYWORD = "referendumSubtitle";
   public static final String TITLE_ENTITY_KEYWORD = "title";
   public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
+  public static final String SOURCE_CLASS = Referendum.class.getName();
+  public static final Logger LOGGER = Logger.getLogger(SOURCE_CLASS);
 
   public abstract String getTitle();
 
@@ -49,9 +53,25 @@ public abstract class Referendum {
 
   // creates a new Referendum object by extracting the properties from "obj"
   public static Referendum fromJSONObject(JSONObject obj) throws JSONException {
+    String referendumDescription;
+    String referendumTitle;
+
+    try {
+      referendumTitle = obj.getString(TITLE_JSON_KEYWORD);
+    } catch (JSONException e) {
+      LOGGER.logp(Level.WARNING, SOURCE_CLASS, "fromJSONObject", "referendumTitle does not exist");
+      throw new JSONException("Malformed referendum JSONObject: referendumTitle does not exist.");
+    }
+
+    try {
+      referendumDescription = obj.getString(DESCRIPTION_JSON_KEYWORD);
+    } catch (JSONException e) {
+      referendumDescription = "";
+    }
+
     return Referendum.builder()
-        .setTitle(obj.getString(TITLE_JSON_KEYWORD))
-        .setDescription(obj.getString(DESCRIPTION_JSON_KEYWORD))
+        .setTitle(referendumTitle)
+        .setDescription(referendumDescription)
         .build();
   }
 
