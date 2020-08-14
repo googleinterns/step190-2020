@@ -37,7 +37,7 @@ function onElectionInfoLoad(){
 
     titleTextElement.innerHTML = template(context);
   })
-  .catch(error => alert(error));
+  .catch(() => alert('There has been an error.'));
 }
 
 /**
