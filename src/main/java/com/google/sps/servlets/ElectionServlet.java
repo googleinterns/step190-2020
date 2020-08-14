@@ -24,6 +24,7 @@ import com.google.sps.data.Election;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -56,8 +57,17 @@ public class ElectionServlet extends HttpServlet {
 
     String electionApiKey = ServletUtils.getApiKey("112408856470", "election-api-key", "1");
 
-    JSONObject obj = ServletUtils.readFromApiUrl(String.format(BASE_URL, electionApiKey));
-    JSONArray electionQueryArray = obj.getJSONArray(Election.ELECTIONS_JSON_KEYWORD);
+    Optional<JSONObject> electionQueryData =
+        ServletUtils.readFromApiUrl(String.format(BASE_URL, electionApiKey));
+    if (!electionQueryData.isPresent()) {
+      response.setContentType("text/html");
+      response.getWriter().println("Could not query electionQuery.");
+      response.setStatus(404);
+      return;
+    }
+
+    JSONArray electionQueryArray =
+        electionQueryData.get().getJSONArray(Election.ELECTIONS_JSON_KEYWORD);
 
     for (Object o : electionQueryArray) {
       JSONObject election = (JSONObject) o;

@@ -85,15 +85,16 @@ public class InfoCardServlet extends HttpServlet {
       response.setStatus(400);
     }
 
-    Optional<Entity> optionalEntity =
-        ServletUtils.findElectionInDatastore(datastore, optionalElectionId.get());
+    String address = optionalAddress.get();
+    String electionId = optionalElectionId.get();
+
+    Optional<Entity> optionalEntity = ServletUtils.findElectionInDatastore(datastore, electionId);
 
     if (!optionalEntity.isPresent()) {
       response.setContentType("text/html");
       response
           .getWriter()
-          .println(
-              "Could not find election with ID " + optionalElectionId.get() + " in Datastore.");
+          .println("Could not find election with ID " + electionId + " in Datastore.");
       response.setStatus(400);
       return;
     }
@@ -114,14 +115,25 @@ public class InfoCardServlet extends HttpServlet {
     String url =
         String.format(
                 BASE_URL,
-                optionalAddress.get(),
-                optionalElectionId.get(),
+                address,
+                electionId,
                 ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID))
             .replaceAll(" ", "%20");
 
-    JSONObject voterInfoData = ServletUtils.readFromApiUrl(url);
+    Optional<JSONObject> voterInfoData = ServletUtils.readFromApiUrl(url);
+    if (!voterInfoData.isPresent()) {
+      response.setContentType("text/html");
+      response
+          .getWriter()
+          .println(
+              "Could not query with electionId " + electionId + " and address " + address + ".");
+      response.setStatus(400);
+      return;
+    }
 
     logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "Performing PUT on election from API response.");
-    election.fromVoterInfoQuery(datastore, voterInfoData).putInDatastore(datastore, electionEntity);
+    election
+        .fromVoterInfoQuery(datastore, voterInfoData.get())
+        .putInDatastore(datastore, electionEntity);
   }
 }
