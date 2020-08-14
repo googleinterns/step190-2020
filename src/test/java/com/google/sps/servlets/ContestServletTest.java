@@ -142,7 +142,7 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[{\"name\":\"myFirstCandidate\","
                 + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
-                + "\"This is a cool candidate.\"}],\"description\":\"This contest is important.\"}],"
+                + "\"This is a cool candidate.\",\"channels\":{}}],\"description\":\"This contest is important.\"}],"
                 + "\"referendums\":[]}");
   }
 
@@ -181,8 +181,8 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[{\"name\":\"myFirstCandidate\","
                 + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
-                + "\"This is a cool candidate.\"},{\"name\":\"mySecondCandidate\",\"partyAffiliation\":\"myOtherParty\","
-                + "\"campaignSite\":\"myOtherWebsite\",\"platformDescription\":\"But this is an even cooler candidate.\"}],"
+                + "\"This is a cool candidate.\",\"channels\":{}},{\"name\":\"mySecondCandidate\",\"partyAffiliation\":\"myOtherParty\","
+                + "\"campaignSite\":\"myOtherWebsite\",\"platformDescription\":\"But this is an even cooler candidate.\",\"channels\":{}}],"
                 + "\"description\":\"This contest is important.\"}],\"referendums\":[]}");
   }
 

@@ -15,12 +15,13 @@
 package com.google.sps.data;
 
 import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.EmbeddedEntity;
+import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -46,7 +47,7 @@ public abstract class Candidate {
 
   public abstract String getPlatformDescription();
 
-  public abstract Map<String, String> getChannels();
+  public abstract ImmutableMap<String, String> getChannels();
 
   public static Builder builder() {
     return new AutoValue_Candidate.Builder();
@@ -72,7 +73,7 @@ public abstract class Candidate {
     String candidateName;
     String candidateParty;
     String candidateUrl;
-    Map<String, String> channelsMap = new HashMap<String, String>;
+    Map<String, String> channelsMap = new HashMap<>();
 
     try {
       candidateName = candidateData.getString(NAME_JSON_KEYWORD);
@@ -92,11 +93,11 @@ public abstract class Candidate {
       candidateUrl = "";
     }
 
-    if(candidateData.has(CHANNELS_JSON_KEYWORD)) {
-      for(Object channel : candidateData.getJSONArray(CHANNELS_JSON_KEYWORD)){
+    if (candidateData.has(CHANNELS_JSON_KEYWORD)) {
+      for (Object channel : candidateData.getJSONArray(CHANNELS_JSON_KEYWORD)) {
         JSONObject currentChannel = (JSONObject) channel;
         channelsMap.put(currentChannel.getString("type"), currentChannel.getString("id"));
-      } 
+      }
     }
 
     return Candidate.builder()
@@ -105,7 +106,7 @@ public abstract class Candidate {
         .setCampaignSite(candidateUrl)
         // TODO(gianelgado): get value for platformDescription
         .setPlatformDescription("")
-        .setChannels(channelsMap);
+        .setChannels(channelsMap)
         .build();
   }
 
@@ -116,12 +117,21 @@ public abstract class Candidate {
 
   // Creates a new Candidate object by using the properties of the provided Candidate entity
   public static Candidate fromEntity(Entity entity) {
+    Map<String, String> channelsMap = new HashMap<>();
+    EmbeddedEntity channelsEntity = (EmbeddedEntity) entity.getProperty(CHANNELS_ENTITY_KEYWORD);
+
+    if (channelsEntity != null) {
+      for (String channelType : channelsEntity.getProperties().keySet()) {
+        channelsMap.put(channelType, (String) channelsEntity.getProperty(channelType));
+      }
+    }
 
     return Candidate.builder()
         .setName((String) entity.getProperty(NAME_ENTITY_KEYWORD))
         .setPartyAffiliation((String) entity.getProperty(PARTY_ENTITY_KEYWORD))
         .setCampaignSite((String) entity.getProperty(CAMPAIGN_URL_ENTITY_KEYWORD))
         .setPlatformDescription((String) entity.getProperty(PLATFORM_ENTITY_KEYWORD))
+        .setChannels(channelsMap)
         .build();
   }
 
@@ -133,6 +143,13 @@ public abstract class Candidate {
     entity.setProperty(PARTY_ENTITY_KEYWORD, this.getPartyAffiliation());
     entity.setProperty(CAMPAIGN_URL_ENTITY_KEYWORD, this.getCampaignSite());
     entity.setProperty(PLATFORM_ENTITY_KEYWORD, this.getPlatformDescription());
+
+    EmbeddedEntity channelsEntity = new EmbeddedEntity();
+    for (String channelType : this.getChannels().keySet()) {
+      channelsEntity.setProperty(channelType, this.getChannels().get(channelType));
+    }
+    entity.setProperty(CHANNELS_ENTITY_KEYWORD, channelsEntity);
+
     datastore.put(entity);
     return entity.getKey().getId();
   }
