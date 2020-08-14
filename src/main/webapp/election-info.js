@@ -1,22 +1,35 @@
 function onElectionInfoLoad(){
-  let searchParams = new URLSearchParams(window.location.search);
-  let electionId = searchParams.get("electionId");
-
   fetch('/election')
   .then(response => response.json())
   .then((electionList) => {
-    for(var i = 0; i < electionList.length; i++) {
-      if(electionId == electionList[i].id) {
-        let source = document.getElementById('election-name-template').innerHTML;
-        let template = Handlebars.compile(source);
-        let context = { electionName: electionList[i].name };
+    let searchParams = new URLSearchParams(window.location.search);
+    let electionId = searchParams.get("electionId");
 
-        let titleTextElement = document.getElementById('election-info-page-title');
-        titleTextElement.innerHTML = template(context);
+    let titleTextElement = document.getElementById('election-info-page-title');
+    let electionInfoWrapperElement = document.getElementById('election-info-wrapper');
+    let source = document.getElementById('election-name-template').innerHTML;
+    let template = Handlebars.compile(source);
+    let context = null;
 
-        break;
+    electionList.forEach((election) => {
+      if (electionId == election.id) {
+        context = { 
+          electionIdInQuery: true,
+          electionName: election.name 
+        };
+        electionInfoWrapperElement.style.removeProperty('display');
+        return;
       }
+    });
+
+    if (context == null) {
+      context = { 
+        electionIdInQuery: false,
+      };
+      electionInfoWrapperElement.style.display = 'none';
     }
+
+    titleTextElement.innerHTML = template(context);
   });
 }
 
@@ -126,7 +139,7 @@ function populateClassesForTemplate(electionId){
                       candidates: candidates, 
                       referendums: referendums };
 
-      let infoCardContainerElement = document.getElementById('contests-referendums-content');
+      let infoCardContainerElement = document.getElementById('election-info-results');
       infoCardContainerElement.innerHTML = template(context);
 
       let collapsibles = document.getElementsByClassName("collapsible");
