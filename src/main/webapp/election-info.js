@@ -266,5 +266,8 @@ function addPollingStationMarker(map, position, title, description) {
  */
 Handlebars.registerHelper('stripUrl', function(urlString){
   urlString = urlString.replace(/(^\w+:|^)\/\//, '');
-  return urlString.slice(0, -1);
+  if(urlString[urlString.length - 1] == '/'){
+    urlString = urlString.slice(0, -1);
+  }
+  return urlString;
 })
