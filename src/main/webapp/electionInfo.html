@@ -126,6 +126,9 @@
                       <div class="collapsible-content candidate-info">
                         <p><b>Website: </b>{{this.campaignSite}}</p>
                         <p>{{this.platformDescription}}</p>
+                        {{#each this.channels}}
+                        <p><b>{{@key}}: </b>{{this}}</p>
+                        {{/each}}
                       </div>
                     </div>
                     {{/each}}

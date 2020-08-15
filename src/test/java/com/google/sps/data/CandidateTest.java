@@ -2,6 +2,7 @@ package com.google.sps.data;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
@@ -138,7 +139,7 @@ public class CandidateTest {
   }
 
   @Test
-  public void testAddToDatastore() throws Exception {
+  public void noChannels_testAddToDatastore() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Candidate newCandidate =
         Candidate.builder()
@@ -162,5 +163,43 @@ public class CandidateTest {
     Assert.assertEquals(
         candidateEntity.getProperty(Candidate.PLATFORM_ENTITY_KEYWORD),
         newCandidate.getPlatformDescription());
+  }
+
+  @Test
+  public void withChannels_testAddtoDatastore() throws Exception {
+    ImmutableMap<String, String> expectedChannelsMap =
+        ImmutableMap.<String, String>builder()
+            .put("Twitter", "twitterHandle")
+            .put("Facebook", "facebookPage")
+            .build();
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Candidate newCandidate =
+        Candidate.builder()
+            .setName("Jane Doe")
+            .setPartyAffiliation("Green")
+            .setPlatformDescription("")
+            .setCampaignSite("www.janedoe.org")
+            .setChannels(expectedChannelsMap)
+            .build();
+    long candidateId = newCandidate.addToDatastore(ds);
+    Key candidateKey = KeyFactory.createKey(Candidate.ENTITY_KIND, candidateId);
+    Entity candidateEntity = ds.get(candidateKey);
+
+    EmbeddedEntity channelsEntity =
+        (EmbeddedEntity) candidateEntity.getProperty(Candidate.CHANNELS_ENTITY_KEYWORD);
+
+    Assert.assertEquals(newCandidate.getChannels(), channelsEntity.getProperties());
+    Assert.assertEquals(
+        newCandidate.getName(), candidateEntity.getProperty(Candidate.NAME_ENTITY_KEYWORD));
+    Assert.assertEquals(
+        newCandidate.getPartyAffiliation(),
+        candidateEntity.getProperty(Candidate.PARTY_ENTITY_KEYWORD));
+    Assert.assertEquals(
+        newCandidate.getCampaignSite(),
+        candidateEntity.getProperty(Candidate.CAMPAIGN_URL_ENTITY_KEYWORD));
+    Assert.assertEquals(
+        newCandidate.getPlatformDescription(),
+        candidateEntity.getProperty(Candidate.PLATFORM_ENTITY_KEYWORD));
   }
 }
