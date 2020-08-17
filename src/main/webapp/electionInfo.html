@@ -139,6 +139,9 @@
                             {{#if this.platformDescription}}
                             <p>{{this.platformDescription}}</p>
                             {{/if}}
+                            {{#each this.channels}}
+                            <p><b>{{@key}}: </b><a href={{this}}>{{stripUrl this}}</a></p>
+                            {{/each}}
                           </div>
                         </div>
                         {{/each}}

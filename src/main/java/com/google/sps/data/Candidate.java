@@ -15,9 +15,13 @@
 package com.google.sps.data;
 
 import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import java.util.HashMap;
+import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,10 +31,12 @@ public abstract class Candidate {
   public static final String ENTITY_KIND = "Candidate";
   public static final String NAME_JSON_KEYWORD = "name";
   public static final String PARTY_JSON_KEYWORD = "party";
+  public static final String CHANNELS_JSON_KEYWORD = "channels";
   public static final String CAMPAIGN_URL_JSON_KEYWORD = "candidateUrl";
   public static final String NAME_ENTITY_KEYWORD = "name";
   public static final String PARTY_ENTITY_KEYWORD = "partyAffiliation";
   public static final String CAMPAIGN_URL_ENTITY_KEYWORD = "campaignSite";
+  public static final String CHANNELS_ENTITY_KEYWORD = "channels";
   public static final String PLATFORM_ENTITY_KEYWORD = "platformDescription";
 
   public abstract String getName();
@@ -40,6 +46,8 @@ public abstract class Candidate {
   public abstract String getCampaignSite();
 
   public abstract String getPlatformDescription();
+
+  public abstract ImmutableMap<String, String> getChannels();
 
   public static Builder builder() {
     return new AutoValue_Candidate.Builder();
@@ -55,6 +63,8 @@ public abstract class Candidate {
 
     public abstract Builder setPlatformDescription(String platformDescription);
 
+    public abstract Builder setChannels(Map<String, String> channels);
+
     public abstract Candidate build();
   }
 
@@ -63,6 +73,7 @@ public abstract class Candidate {
     String candidateName;
     String candidateParty;
     String candidateUrl;
+    Map<String, String> channelsMap = new HashMap<>();
 
     try {
       candidateName = candidateData.getString(NAME_JSON_KEYWORD);
@@ -82,12 +93,20 @@ public abstract class Candidate {
       candidateUrl = "";
     }
 
+    if (candidateData.has(CHANNELS_JSON_KEYWORD)) {
+      for (Object channel : candidateData.getJSONArray(CHANNELS_JSON_KEYWORD)) {
+        JSONObject currentChannel = (JSONObject) channel;
+        channelsMap.put(currentChannel.getString("type"), currentChannel.getString("id"));
+      }
+    }
+
     return Candidate.builder()
         .setName(candidateName)
         .setPartyAffiliation(candidateParty)
         .setCampaignSite(candidateUrl)
         // TODO(gianelgado): get value for platformDescription
         .setPlatformDescription("")
+        .setChannels(channelsMap)
         .build();
   }
 
@@ -98,11 +117,21 @@ public abstract class Candidate {
 
   // Creates a new Candidate object by using the properties of the provided Candidate entity
   public static Candidate fromEntity(Entity entity) {
+    Map<String, String> channelsMap = new HashMap<>();
+    EmbeddedEntity channelsEntity = (EmbeddedEntity) entity.getProperty(CHANNELS_ENTITY_KEYWORD);
+
+    if (channelsEntity != null) {
+      for (String channelType : channelsEntity.getProperties().keySet()) {
+        channelsMap.put(channelType, (String) channelsEntity.getProperty(channelType));
+      }
+    }
+
     return Candidate.builder()
         .setName((String) entity.getProperty(NAME_ENTITY_KEYWORD))
         .setPartyAffiliation((String) entity.getProperty(PARTY_ENTITY_KEYWORD))
         .setCampaignSite((String) entity.getProperty(CAMPAIGN_URL_ENTITY_KEYWORD))
         .setPlatformDescription((String) entity.getProperty(PLATFORM_ENTITY_KEYWORD))
+        .setChannels(channelsMap)
         .build();
   }
 
@@ -114,6 +143,13 @@ public abstract class Candidate {
     entity.setProperty(PARTY_ENTITY_KEYWORD, this.getPartyAffiliation());
     entity.setProperty(CAMPAIGN_URL_ENTITY_KEYWORD, this.getCampaignSite());
     entity.setProperty(PLATFORM_ENTITY_KEYWORD, this.getPlatformDescription());
+
+    EmbeddedEntity channelsEntity = new EmbeddedEntity();
+    for (String channelType : this.getChannels().keySet()) {
+      channelsEntity.setProperty(channelType, this.getChannels().get(channelType));
+    }
+    entity.setProperty(CHANNELS_ENTITY_KEYWORD, channelsEntity);
+
     datastore.put(entity);
     return entity.getKey().getId();
   }
