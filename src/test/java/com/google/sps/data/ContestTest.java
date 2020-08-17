@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Set;
 import org.json.JSONObject;
 import org.junit.After;
@@ -73,6 +74,7 @@ public class ContestTest {
             .setPartyAffiliation("Green")
             .setPlatformDescription("")
             .setCampaignSite("www.janedoe.org")
+            .setChannels(new HashMap<String, String>())
             .build();
 
     Candidate candidateTwo =
@@ -81,6 +83,7 @@ public class ContestTest {
             .setPartyAffiliation("Tea")
             .setPlatformDescription("")
             .setCampaignSite("www.jamesdoe.org")
+            .setChannels(new HashMap<String, String>())
             .build();
 
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
