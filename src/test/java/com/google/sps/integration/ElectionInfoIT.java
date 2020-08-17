@@ -111,10 +111,10 @@ public class ElectionInfoIT {
     driver.findElement(By.id("postal_code")).sendKeys("90044");
 
     WebElement submitButton = driver.findElement(By.id("submit-address-button"));
-    Thread.sleep(1000);
+    Thread.sleep(2000);
     submitButton.click();
 
-    Thread.sleep(10000);
+    Thread.sleep(12000);
 
     WebElement errorTextElement = driver.findElement(By.id("address-error-text"));
     Assert.assertEquals("none", errorTextElement.getCssValue("display"));
