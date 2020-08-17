@@ -177,7 +177,7 @@ function initializeMap() {
     if (status == 'OK') {
       map = new google.maps.Map(document.getElementById("polling-stations-map"), {
         center: results[0].geometry.location,
-        zoom: 8
+        zoom: 13
       });
       console.log("Created map");
     } else {
@@ -257,3 +257,17 @@ function addPollingStationMarker(map, position, title, description) {
     infoWindow.open(map, marker);
   });
 }
+
+/**
+ * Handlebars helper that removes the beginning "http://", "https://" and the trailing "/"
+ * from the supplied URL string.
+ * 
+ * @param {String} URL to be stripped.
+ */
+Handlebars.registerHelper('stripUrl', function(urlString){
+  urlString = urlString.replace(/(^\w+:|^)\/\//, '');
+  if(urlString[urlString.length - 1] == '/'){
+    urlString = urlString.slice(0, -1);
+  }
+  return urlString;
+})
