@@ -259,7 +259,7 @@ function addPollingStationMarker(map, position, title, description) {
 }
 
 /**
- * Handlebars helper that removes the beginning "http://" and the trailing "/"
+ * Handlebars helper that removes the beginning "http://", "https://" and the trailing "/"
  * from the supplied URL string.
  * 
  * @param {String} URL to be stripped.
