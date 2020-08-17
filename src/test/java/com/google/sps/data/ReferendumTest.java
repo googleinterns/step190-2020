@@ -45,7 +45,8 @@ public class ReferendumTest {
     JSONObject referendumJsonObject =
         new JSONObject(
             "{\"type\": \"Referendum\",\"referendumTitle\": \"Proposition 1\","
-                + "\"referendumSubtitle\": \"Water Bond. Funding for Water Quality, Supply, Treatment, and Storage Projects.\"}");
+                + "\"referendumSubtitle\": \"Water Bond. Funding for Water Quality, Supply, Treatment, and Storage Projects.\","
+                + "\"sources\": [{\"name\": \"Voter Information Project\"},{\"name\": \"Ballot Information Project\"}]}");
 
     Referendum referendum = Referendum.fromJSONObject(referendumJsonObject);
 
@@ -53,6 +54,8 @@ public class ReferendumTest {
     Assert.assertEquals(
         referendum.getDescription(),
         "Water Bond. Funding for Water Quality, Supply, Treatment, and Storage Projects.");
+    Assert.assertEquals(
+        referendum.getSource(), "Voter Information Project, Ballot Information Project");
   }
 
   @Test

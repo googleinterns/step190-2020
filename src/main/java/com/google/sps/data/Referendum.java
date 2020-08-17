@@ -20,6 +20,9 @@ import com.google.auto.value.AutoValue;
 import com.google.gson.Gson;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -62,7 +65,7 @@ public abstract class Referendum {
   public static Referendum fromJSONObject(JSONObject obj) throws JSONException {
     String referendumDescription;
     String referendumTitle;
-    String sourceString = "";
+    String source = "";
 
     try {
       referendumTitle = obj.getString(TITLE_JSON_KEYWORD);
@@ -78,19 +81,18 @@ public abstract class Referendum {
     }
 
     if (obj.has(SOURCE_JSON_KEYWORD)) {
-      StringBuilder strBuf = new StringBuilder();
-      for (Object sourceObject : obj.getJSONArray(SOURCE_JSON_KEYWORD)) {
-        JSONObject source = (JSONObject) sourceObject;
-        strBuf.append(source.getString(SOURCE_NAME_JSON_KEYWORD));
-        strBuf.append(", ");
-      }
-      sourceString = strBuf.toString().substring(0, strBuf.length() - 2);
+      // "source" field is given as a list of Strings, so put them into a list as one String
+      JSONArray sourceList = obj.getJSONArray(SOURCE_JSON_KEYWORD);
+      source =
+          StreamSupport.stream(sourceList.spliterator(), false)
+              .map(sourceObject -> ((JSONObject) sourceObject).getString(SOURCE_NAME_JSON_KEYWORD))
+              .collect(Collectors.joining(", "));
     }
 
     return Referendum.builder()
         .setTitle(referendumTitle)
         .setDescription(referendumDescription)
-        .setSource(sourceString)
+        .setSource(source)
         .build();
   }
 
