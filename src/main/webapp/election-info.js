@@ -177,7 +177,7 @@ function initializeMap() {
     if (status == 'OK') {
       map = new google.maps.Map(document.getElementById("polling-stations-map"), {
         center: results[0].geometry.location,
-        zoom: 8
+        zoom: 13
       });
       console.log("Created map");
     } else {
