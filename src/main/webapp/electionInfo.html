@@ -112,14 +112,14 @@
 
             <div id="spinner"></div>
 
+            <div class="row" id="map-container">
+              <div class="col-lg-8 col-lg-offset-2" id="map-wrapper">
+                <div id="polling-stations-map" style="height:600px"></div>
+              </div>
+            </div>
+
             <div id="election-info-results"></div>
             <script id="contests-referendums-template" type="text/x-handlebars-template">
-              <div class="row" id="map-container">
-                <div class="col-lg-8 col-lg-offset-2" id="map-wrapper">
-                  <div id="polling-stations-map" style="height:600px"></div>
-                </div>
-              </div>
-      
               <div class="row info-cards-wrapper">
                 <div class="container-fluid">
                   <h3 id="info-cards-title">What's on the ballot</h3>
@@ -144,6 +144,9 @@
                             {{#if this.platformDescription}}
                             <p>{{this.platformDescription}}</p>
                             {{/if}}
+                            {{#each this.channels}}
+                            <p><b>{{@key}}: </b><a href={{this}}>{{stripUrl this}}</a></p>
+                            {{/each}}
                           </div>
                         </div>
                         {{/each}}

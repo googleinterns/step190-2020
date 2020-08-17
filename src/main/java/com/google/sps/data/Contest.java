@@ -29,6 +29,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -82,7 +85,7 @@ public abstract class Contest {
   public static Contest fromJSONObject(DatastoreService datastore, JSONObject contestData)
       throws JSONException {
     Set<Long> candidateKeyIds = new HashSet<>();
-    String sourceString = "";
+    String source = "";
 
     if (contestData.has(CANDIDATES_JSON_KEYWORD)) {
       for (Object candidateObject : contestData.getJSONArray(CANDIDATES_JSON_KEYWORD)) {
@@ -93,13 +96,12 @@ public abstract class Contest {
     }
 
     if (contestData.has(SOURCE_JSON_KEYWORD)) {
-      StringBuilder strBuf = new StringBuilder();
-      for (Object sourceObject : contestData.getJSONArray(SOURCE_JSON_KEYWORD)) {
-        JSONObject source = (JSONObject) sourceObject;
-        strBuf.append(source.getString(SOURCE_NAME_JSON_KEYWORD));
-        strBuf.append(", ");
-      }
-      sourceString = strBuf.toString().substring(0, strBuf.length() - 2);
+      // "source" field is given as a list of Strings, so put them into a list as one String
+      JSONArray sourceList = contestData.getJSONArray(SOURCE_JSON_KEYWORD);
+      source =
+          StreamSupport.stream(sourceList.spliterator(), false)
+              .map(sourceObject -> ((JSONObject) sourceObject).getString(SOURCE_NAME_JSON_KEYWORD))
+              .collect(Collectors.joining(", "));
     }
 
     return Contest.builder()
@@ -107,7 +109,7 @@ public abstract class Contest {
         .setCandidates(candidateKeyIds)
         // TODO(gianelgado): get value for description
         .setDescription("")
-        .setSource(sourceString)
+        .setSource(source)
         .build();
   }
 

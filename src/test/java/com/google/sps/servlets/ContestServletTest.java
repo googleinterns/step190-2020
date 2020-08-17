@@ -146,7 +146,7 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[{\"name\":\"myFirstCandidate\","
                 + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
-                + "\"This is a cool candidate.\"}],\"description\":\"This contest is important.\","
+                + "\"This is a cool candidate.\",\"channels\":{}}],\"description\":\"This contest is important.\","
                 + "\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
   }
 
