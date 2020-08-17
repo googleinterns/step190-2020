@@ -29,6 +29,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,10 +44,14 @@ public abstract class Contest {
   public static final String TYPE_JSON_KEYWORD = "type";
   public static final String NAME_JSON_KEYWORD = "office";
   public static final String CANDIDATES_JSON_KEYWORD = "candidates";
+  public static final String SOURCE_JSON_KEYWORD = "sources";
+  public static final String SOURCE_NAME_JSON_KEYWORD = "name";
   public static final String NAME_ENTITY_KEYWORD = "name";
   public static final String CANDIDATES_ENTITY_KEYWORD = "candidates";
   public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
-  private static final Logger logger = Logger.getLogger(ServletUtils.class.getName());
+  public static final String SOURCE_ENTITY_KEYWORD = "source";
+
+  private static final Logger logger = Logger.getLogger(Contest.class.getName());
 
   public abstract String getName();
 
@@ -53,6 +60,8 @@ public abstract class Contest {
   public abstract ImmutableSet<Long> getCandidates();
 
   public abstract String getDescription();
+
+  public abstract String getSource();
 
   public static Builder builder() {
     return new AutoValue_Contest.Builder();
@@ -66,6 +75,8 @@ public abstract class Contest {
 
     public abstract Builder setDescription(String description);
 
+    public abstract Builder setSource(String source);
+
     public abstract Contest build();
   }
 
@@ -75,6 +86,7 @@ public abstract class Contest {
   public static Contest fromJSONObject(DatastoreService datastore, JSONObject contestData)
       throws JSONException {
     Set<Long> candidateKeyIds = new HashSet<>();
+    String source = "";
 
     if (contestData.has(CANDIDATES_JSON_KEYWORD)) {
       for (Object candidateObject : contestData.getJSONArray(CANDIDATES_JSON_KEYWORD)) {
@@ -84,11 +96,21 @@ public abstract class Contest {
       }
     }
 
+    if (contestData.has(SOURCE_JSON_KEYWORD)) {
+      // "source" field is given as a list of Strings, so put them into a list as one String
+      JSONArray sourceList = contestData.getJSONArray(SOURCE_JSON_KEYWORD);
+      source =
+          StreamSupport.stream(sourceList.spliterator(), false)
+              .map(sourceObject -> ((JSONObject) sourceObject).getString(SOURCE_NAME_JSON_KEYWORD))
+              .collect(Collectors.joining(", "));
+    }
+
     return Contest.builder()
         .setName(contestData.getString(NAME_JSON_KEYWORD))
         .setCandidates(candidateKeyIds)
         // TODO(gianelgado): get value for description
         .setDescription("")
+        .setSource(source)
         .build();
   }
 
@@ -130,6 +152,7 @@ public abstract class Contest {
         .setName((String) entity.getProperty(NAME_ENTITY_KEYWORD))
         .setDescription((String) entity.getProperty(DESCRIPTION_ENTITY_KEYWORD))
         .setCandidates(candidates)
+        .setSource((String) entity.getProperty(SOURCE_ENTITY_KEYWORD))
         .build();
   }
 
@@ -140,6 +163,7 @@ public abstract class Contest {
     entity.setProperty(NAME_ENTITY_KEYWORD, this.getName());
     entity.setProperty(CANDIDATES_ENTITY_KEYWORD, this.getCandidates());
     entity.setProperty(DESCRIPTION_ENTITY_KEYWORD, this.getDescription());
+    entity.setProperty(SOURCE_ENTITY_KEYWORD, this.getSource());
     datastore.put(entity);
     return entity.getKey().getId();
   }
