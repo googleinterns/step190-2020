@@ -76,7 +76,7 @@ public class ElectionInfoIT {
         "http://localhost:9876/electionInfo.html?state=ca&electionId=2000", driver.getCurrentUrl());
   }
 
-  /** TODO */
+  /** Test sending an invalid address to the API and getting the response. */
   @Test
   public void invalidAddressSubmission_onClick_displayErrorMessage() throws InterruptedException {
     driver.get("http://localhost:9876/electionInfo.html?state=ca&electionId=2000");
@@ -88,6 +88,7 @@ public class ElectionInfoIT {
     driver.findElement(By.id("postal_code")).sendKeys("x");
 
     WebElement submitButton = driver.findElement(By.id("submit-address-button"));
+    Thread.sleep(1000);
     submitButton.click();
 
     Thread.sleep(10000);
@@ -96,6 +97,27 @@ public class ElectionInfoIT {
     Assert.assertEquals("", wrapperElement.getAttribute("innerHTML"));
     WebElement errorTextElement = driver.findElement(By.id("address-error-text"));
     Assert.assertEquals("block", errorTextElement.getCssValue("display"));
+  }
+
+  /** Test sending an invalid address to the API and getting the response. */
+  @Test
+  public void validAddressSubmission_onClick_hideErrorMessage() throws InterruptedException {
+    driver.get("http://localhost:9876/electionInfo.html?state=ca&electionId=2000");
+    driver.findElement(By.id("street_number")).sendKeys("1261");
+    driver.findElement(By.id("route")).sendKeys("West 79th Street");
+    driver.findElement(By.id("locality")).sendKeys("Los Angeles");
+    driver.findElement(By.id("administrative_area_level_1")).sendKeys("CA");
+    driver.findElement(By.id("country")).sendKeys("United States");
+    driver.findElement(By.id("postal_code")).sendKeys("90044");
+
+    WebElement submitButton = driver.findElement(By.id("submit-address-button"));
+    Thread.sleep(1000);
+    submitButton.click();
+
+    Thread.sleep(10000);
+
+    WebElement errorTextElement = driver.findElement(By.id("address-error-text"));
+    Assert.assertEquals("none", errorTextElement.getCssValue("display"));
   }
 
   // TODO(anooshree): Check that Query URL updates after address submission
