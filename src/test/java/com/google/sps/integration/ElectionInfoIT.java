@@ -76,6 +76,28 @@ public class ElectionInfoIT {
         "http://localhost:9876/electionInfo.html?state=ca&electionId=2000", driver.getCurrentUrl());
   }
 
+  /** TODO */
+  @Test
+  public void invalidAddressSubmission_onClick_displayErrorMessage() throws InterruptedException {
+    driver.get("http://localhost:9876/electionInfo.html?state=ca&electionId=2000");
+    driver.findElement(By.id("street_number")).sendKeys("x");
+    driver.findElement(By.id("route")).sendKeys("x");
+    driver.findElement(By.id("locality")).sendKeys("x");
+    driver.findElement(By.id("administrative_area_level_1")).sendKeys("x");
+    driver.findElement(By.id("country")).sendKeys("x");
+    driver.findElement(By.id("postal_code")).sendKeys("x");
+
+    WebElement submitButton = driver.findElement(By.id("submit-address-button"));
+    submitButton.click();
+
+    Thread.sleep(10000);
+
+    WebElement wrapperElement = driver.findElement(By.id("election-info-results"));
+    Assert.assertEquals("", wrapperElement.getAttribute("innerHTML"));
+    WebElement errorTextElement = driver.findElement(By.id("address-error-text"));
+    Assert.assertEquals("block", errorTextElement.getCssValue("display"));
+  }
+
   // TODO(anooshree): Check that Query URL updates after address submission
 
   // TODO(anooshree): Check that content loads for a valid URL
