@@ -121,7 +121,6 @@ function populateClassesForTemplate(electionId){
     .then((JSONobject) => {
       JSONobject.contests.forEach((contest) => {
         contests.push(contest);
-        console.log(contest)
 
         contest.candidates.forEach((candidate) => {
           candidates.push(candidate);
