@@ -1,22 +1,35 @@
 function onElectionInfoLoad(){
-  let searchParams = new URLSearchParams(window.location.search);
-  let electionId = searchParams.get("electionId");
-
   fetch('/election')
   .then(response => response.json())
   .then((electionList) => {
-    for(var i = 0; i < electionList.length; i++) {
-      if(electionId == electionList[i].id) {
-        let source = document.getElementById('election-name-template').innerHTML;
-        let template = Handlebars.compile(source);
-        let context = { electionName: electionList[i].name };
+    let searchParams = new URLSearchParams(window.location.search);
+    let electionId = searchParams.get("electionId");
 
-        let titleTextElement = document.getElementById('election-info-page-title');
-        titleTextElement.innerHTML = template(context);
+    let titleTextElement = document.getElementById('election-info-page-title');
+    let electionInfoWrapperElement = document.getElementById('election-info-wrapper');
+    let source = document.getElementById('election-name-template').innerHTML;
+    let template = Handlebars.compile(source);
+    let context = null;
 
-        break;
+    electionList.forEach((election) => {
+      if (electionId == election.id) {
+        context = { 
+          electionIdInQuery: true,
+          electionName: election.name 
+        };
+        electionInfoWrapperElement.style.removeProperty('display');
+        return;
       }
+    });
+
+    if (context == null) {
+      context = { 
+        electionIdInQuery: false,
+      };
+      electionInfoWrapperElement.style.display = 'none';
     }
+
+    titleTextElement.innerHTML = template(context);
   });
 }
 
@@ -126,7 +139,7 @@ function populateClassesForTemplate(electionId){
                       candidates: candidates, 
                       referendums: referendums };
 
-      let infoCardContainerElement = document.getElementById('contests-referendums-content');
+      let infoCardContainerElement = document.getElementById('election-info-results');
       infoCardContainerElement.innerHTML = template(context);
 
       let collapsibles = document.getElementsByClassName("collapsible");
@@ -244,3 +257,17 @@ function addPollingStationMarker(map, position, title, description) {
     infoWindow.open(map, marker);
   });
 }
+
+/**
+ * Handlebars helper that removes the beginning "http://", "https://" and the trailing "/"
+ * from the supplied URL string.
+ * 
+ * @param {String} URL to be stripped.
+ */
+Handlebars.registerHelper('stripUrl', function(urlString){
+  urlString = urlString.replace(/(^\w+:|^)\/\//, '');
+  if(urlString[urlString.length - 1] == '/'){
+    urlString = urlString.slice(0, -1);
+  }
+  return urlString;
+})
