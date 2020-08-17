@@ -125,6 +125,7 @@
                       <div class="info-card-title">
                         {{this.name}}
                       </div>
+
                       <div class="candidates-wrapper">
                         {{#each this.candidates}}
                         <div class="candidate">
@@ -138,6 +139,9 @@
                           </div>
                         </div>
                         {{/each}}
+                        {{#if this.source}}
+                        <p class="source-text"><em>Source: {{this.source}}</em></p>
+                        {{/if}}
                       </div>
                     </div>
                     {{else}}
@@ -154,6 +158,9 @@
                         <p class="referendum-description">
                           {{this.description}}
                         </p>
+                        {{#if this.source}}
+                        <p class="source-text"><em>Source: {{this.source}}</em></p>
+                        {{/if}}
                       </div>
                     </div>
                     {{else}}

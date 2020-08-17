@@ -57,11 +57,13 @@ public class ContestServletTest {
     contestEntityOne.setProperty("name", "myFirstContest");
     contestEntityOne.setProperty("candidates", new HashSet<Long>());
     contestEntityOne.setProperty("description", "This contest is important.");
+    contestEntityOne.setProperty("source", "Voter Information Project");
 
     contestEntityTwo = new Entity("Contest");
     contestEntityTwo.setProperty("name", "mySecondContest");
     contestEntityTwo.setProperty("candidates", new HashSet<Long>());
     contestEntityTwo.setProperty("description", "This contest is also important.");
+    contestEntityTwo.setProperty("source", "Voter Information Project");
 
     candidateEntityOne = new Entity("Candidate");
     candidateEntityOne.setProperty("name", "myFirstCandidate");
@@ -78,10 +80,12 @@ public class ContestServletTest {
     referendumEntityOne = new Entity("Referendum");
     referendumEntityOne.setProperty("title", "myFirstReferendum");
     referendumEntityOne.setProperty("description", "This is a referendum.");
+    referendumEntityOne.setProperty("source", "Voter Information Project");
 
     referendumEntityTwo = new Entity("Referendum");
     referendumEntityTwo.setProperty("title", "mySecondReferendum");
     referendumEntityTwo.setProperty("description", "This is another referendum.");
+    referendumEntityTwo.setProperty("source", "Voter Information Project");
   }
 
   @Test
@@ -107,8 +111,8 @@ public class ContestServletTest {
 
     verify(printWriter)
         .println(
-            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\"}],"
-                + "\"referendums\":[]}");
+            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\","
+                + "\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
   }
 
   @Test
@@ -142,8 +146,8 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[{\"name\":\"myFirstCandidate\","
                 + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
-                + "\"This is a cool candidate.\"}],\"description\":\"This contest is important.\"}],"
-                + "\"referendums\":[]}");
+                + "\"This is a cool candidate.\"}],\"description\":\"This contest is important.\","
+                + "\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
   }
 
   @Test
@@ -183,7 +187,7 @@ public class ContestServletTest {
                 + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
                 + "\"This is a cool candidate.\"},{\"name\":\"mySecondCandidate\",\"partyAffiliation\":\"myOtherParty\","
                 + "\"campaignSite\":\"myOtherWebsite\",\"platformDescription\":\"But this is an even cooler candidate.\"}],"
-                + "\"description\":\"This contest is important.\"}],\"referendums\":[]}");
+                + "\"description\":\"This contest is important.\",\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
   }
 
   @Test
@@ -213,9 +217,10 @@ public class ContestServletTest {
 
     verify(printWriter)
         .println(
-            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\"},"
-                + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\"}],"
-                + "\"referendums\":[]}");
+            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\","
+                + "\"source\":\"Voter Information Project\"},"
+                + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\","
+                + "\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
   }
 
   @Test
@@ -242,7 +247,8 @@ public class ContestServletTest {
     verify(printWriter)
         .println(
             "{\"contests\":[],"
-                + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\"}]}");
+                + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
+                + "\"source\":\"Voter Information Project\"}]}");
   }
 
   @Test
@@ -273,8 +279,10 @@ public class ContestServletTest {
     verify(printWriter)
         .println(
             "{\"contests\":[],"
-                + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\"},"
-                + "{\"title\":\"mySecondReferendum\",\"description\":\"This is another referendum.\"}]}");
+                + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
+                + "\"source\":\"Voter Information Project\"},"
+                + "{\"title\":\"mySecondReferendum\",\"description\":\"This is another referendum.\","
+                + "\"source\":\"Voter Information Project\"}]}");
   }
 
   @Test

@@ -52,7 +52,9 @@ public class ContestTest {
                 + "\":["
                 + "{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
                 + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteTwo.com\"}"
-                + "]}");
+                + "],\""
+                + Contest.SOURCE_JSON_KEYWORD
+                + "\":[{\"name\":\"Voter Information Project\"}]}");
 
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Contest newContest = Contest.fromJSONObject(ds, contestJSON);
@@ -60,6 +62,7 @@ public class ContestTest {
     Assert.assertEquals(candidateIds.size(), 2);
     Assert.assertEquals(newContest.getName(), "Governer");
     Assert.assertEquals(newContest.getDescription(), "");
+    Assert.assertEquals(newContest.getSource(), "Voter Information Project");
   }
 
   @Test
@@ -92,6 +95,7 @@ public class ContestTest {
             .setName("Governer")
             .setCandidates(candidateIdSet)
             .setDescription("Race for California Governer")
+            .setSource("Voter Information Project")
             .build();
 
     JsonElement returnedContestJSON = JsonParser.parseString(newContest.toJsonString(ds));
@@ -108,7 +112,10 @@ public class ContestTest {
                 + candidateTwo.toJsonString()
                 + "],\""
                 + Contest.DESCRIPTION_ENTITY_KEYWORD
-                + "\":\"Race for California Governer\"}");
+                + "\":\"Race for California Governer\""
+                + ",\""
+                + Contest.SOURCE_ENTITY_KEYWORD
+                + "\":\"Voter Information Project\"}");
 
     Assert.assertEquals(expectedContestJSON, returnedContestJSON);
   }
@@ -121,12 +128,14 @@ public class ContestTest {
     newContestEntity.setProperty(Contest.CANDIDATES_ENTITY_KEYWORD, idSet);
     newContestEntity.setProperty(
         Contest.DESCRIPTION_ENTITY_KEYWORD, "Race for California Governer");
+    newContestEntity.setProperty(Contest.SOURCE_ENTITY_KEYWORD, "Voter Information Project");
 
     Contest newContest = Contest.fromEntity(newContestEntity);
 
     Assert.assertEquals("Governer", newContest.getName());
     Assert.assertEquals(idSet, newContest.getCandidates());
     Assert.assertEquals("Race for California Governer", newContest.getDescription());
+    Assert.assertEquals("Voter Information Project", newContest.getSource());
   }
 
   @Test
@@ -139,6 +148,7 @@ public class ContestTest {
             .setName("Governer")
             .setCandidates(idSet)
             .setDescription("Race for California Governer")
+            .setSource("Voter Information Project")
             .build();
 
     long contestId = newContest.addToDatastore(ds);

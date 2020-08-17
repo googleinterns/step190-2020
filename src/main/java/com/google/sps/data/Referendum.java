@@ -29,14 +29,19 @@ public abstract class Referendum {
   public static final String ENTITY_KIND = "Referendum";
   public static final String TITLE_JSON_KEYWORD = "referendumTitle";
   public static final String DESCRIPTION_JSON_KEYWORD = "referendumSubtitle";
+  public static final String SOURCE_JSON_KEYWORD = "sources";
+  public static final String SOURCE_NAME_JSON_KEYWORD = "name";
   public static final String TITLE_ENTITY_KEYWORD = "title";
   public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
+  public static final String SOURCE_ENTITY_KEYWORD = "source";
   public static final String SOURCE_CLASS = Referendum.class.getName();
   public static final Logger LOGGER = Logger.getLogger(SOURCE_CLASS);
 
   public abstract String getTitle();
 
   public abstract String getDescription();
+
+  public abstract String getSource();
 
   public static Builder builder() {
     return new AutoValue_Referendum.Builder();
@@ -48,6 +53,8 @@ public abstract class Referendum {
 
     public abstract Builder setDescription(String description);
 
+    public abstract Builder setSource(String source);
+
     public abstract Referendum build();
   }
 
@@ -55,6 +62,7 @@ public abstract class Referendum {
   public static Referendum fromJSONObject(JSONObject obj) throws JSONException {
     String referendumDescription;
     String referendumTitle;
+    String sourceString = "";
 
     try {
       referendumTitle = obj.getString(TITLE_JSON_KEYWORD);
@@ -69,9 +77,20 @@ public abstract class Referendum {
       referendumDescription = "";
     }
 
+    if (obj.has(SOURCE_JSON_KEYWORD)) {
+      StringBuilder strBuf = new StringBuilder();
+      for (Object sourceObject : obj.getJSONArray(SOURCE_JSON_KEYWORD)) {
+        JSONObject source = (JSONObject) sourceObject;
+        strBuf.append(source.getString(SOURCE_NAME_JSON_KEYWORD));
+        strBuf.append(", ");
+      }
+      sourceString = strBuf.toString().substring(0, strBuf.length() - 2);
+    }
+
     return Referendum.builder()
         .setTitle(referendumTitle)
         .setDescription(referendumDescription)
+        .setSource(sourceString)
         .build();
   }
 
@@ -85,6 +104,7 @@ public abstract class Referendum {
     return Referendum.builder()
         .setTitle((String) entity.getProperty(TITLE_ENTITY_KEYWORD))
         .setDescription((String) entity.getProperty(DESCRIPTION_ENTITY_KEYWORD))
+        .setSource((String) entity.getProperty(SOURCE_ENTITY_KEYWORD))
         .build();
   }
 
@@ -94,6 +114,7 @@ public abstract class Referendum {
     Entity entity = new Entity(ENTITY_KIND);
     entity.setProperty(TITLE_ENTITY_KEYWORD, this.getTitle());
     entity.setProperty(DESCRIPTION_ENTITY_KEYWORD, this.getDescription());
+    entity.setProperty(SOURCE_ENTITY_KEYWORD, this.getSource());
     datastore.put(entity);
     return entity.getKey().getId();
   }

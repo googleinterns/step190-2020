@@ -339,7 +339,7 @@ body{
 .info-card-title {
   font-weight: bold;
   font-size: 150% ;
-  padding: 2% 2% 0 2%;
+  padding: 18px;
 }
 
 .info-card {
@@ -350,9 +350,15 @@ body{
   margin-bottom: 5%;
 }
 
+.candidates-wrapper {
+  padding-left: 18px;
+  padding-right: 18px;
+}
+
 .candidate {
   background-color: #E5E5E5;
-  margin: 3%;
+  margin-top: 3%;
+  margin-bottom: 3%;
 }
 
 .candidate-name {
@@ -373,7 +379,6 @@ body{
 
 .referendum-description{
   padding: 2%;
-  
 }
 
 /* Style the button that is used to open and close the collapsible content */
@@ -413,6 +418,10 @@ body{
 
 .collapsible-content p {
   margin: 18px 0;
+}
+
+.source-text {
+  font-size: 11pt;
 }
 
 .active:after {

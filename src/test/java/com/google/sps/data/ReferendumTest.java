@@ -82,7 +82,11 @@ public class ReferendumTest {
   public void testAddToDatastore() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Referendum referendum =
-        Referendum.builder().setTitle("myTitle").setDescription("myDescription").build();
+        Referendum.builder()
+            .setTitle("myTitle")
+            .setDescription("myDescription")
+            .setSource("mySource")
+            .build();
 
     long entityKeyId = referendum.addToDatastore(ds);
     Entity entity = ds.get(KeyFactory.createKey("Referendum", entityKeyId));
@@ -97,6 +101,7 @@ public class ReferendumTest {
     Entity entity = new Entity("Referendum");
     entity.setProperty("title", "myTitle");
     entity.setProperty("description", "myDescription");
+    entity.setProperty("source", "mySource");
 
     Referendum referendum = Referendum.fromEntity(entity);
 
