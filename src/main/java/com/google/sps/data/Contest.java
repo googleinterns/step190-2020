@@ -50,6 +50,7 @@ public abstract class Contest {
   public static final String CANDIDATES_ENTITY_KEYWORD = "candidates";
   public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
   public static final String SOURCE_ENTITY_KEYWORD = "source";
+  
   private static final Logger logger = Logger.getLogger(Contest.class.getName());
 
   public abstract String getName();
