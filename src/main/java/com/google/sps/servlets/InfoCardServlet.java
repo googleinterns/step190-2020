@@ -83,6 +83,7 @@ public class InfoCardServlet extends HttpServlet {
           .getWriter()
           .println("Insufficient parameters to /info-cards. Needs address and electionId.");
       response.setStatus(400);
+      return;
     }
 
     String address = optionalAddress.get();
@@ -135,5 +136,6 @@ public class InfoCardServlet extends HttpServlet {
     election
         .fromVoterInfoQuery(datastore, voterInfoData.get())
         .putInDatastore(datastore, electionEntity);
+    logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "PUT /info-cards is complete.");
   }
 }
