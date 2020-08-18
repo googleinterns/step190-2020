@@ -60,6 +60,7 @@ public class PollingStationServletTest {
     pollingStationOne.setProperty("startDate", "today");
     pollingStationOne.setProperty("endDate", "never");
     pollingStationOne.setProperty("locationType", "pollingLocation");
+    pollingStationOne.setProperty("sources", new ArrayList<String>());
   }
 
   @Test
@@ -89,7 +90,7 @@ public class PollingStationServletTest {
         .println(
             "[{\"name\":\"pollingStationOne\",\"address\":\"addressOne\","
                 + "\"pollingHours\":\"-\",\"startDate\":\"today\",\"endDate\":\"never\","
-                + "\"locationType\":\"pollingLocation\"}]");
+                + "\"locationType\":\"pollingLocation\",\"sources\":[]}]");
   }
 
   @Test

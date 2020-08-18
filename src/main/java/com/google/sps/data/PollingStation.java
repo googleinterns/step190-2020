@@ -16,6 +16,7 @@ package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -29,6 +30,7 @@ public abstract class PollingStation {
   public static final String END_DATE_JSON_KEYWORD = "endDate";
   public static final String LOCATION_TYPE_JSON_KEYWORD = "locationType";
   public static final String POLLING_HOURS_JSON_KEYWORD = "pollingHours";
+  public static final String SOURCES_JSON_KEYWORD = "sources";
 
   public abstract String getName();
 
@@ -41,6 +43,8 @@ public abstract class PollingStation {
   public abstract String getEndDate();
 
   public abstract String getLocationType();
+
+  public abstract ArrayList<String> getSources();
 
   public static Builder builder() {
     return new AutoValue_PollingStation.Builder();
@@ -60,10 +64,10 @@ public abstract class PollingStation {
 
     public abstract Builder setLocationType(String type);
 
+    public abstract Builder setSources(ArrayList<String> sources);
+
     public abstract PollingStation build();
   }
-
-  // TODO(anooshree): create enum with constants for types of polling locations
 
   /**
    * Creates a new PollingStation object using the information stored in a JSON object as well as
@@ -82,6 +86,7 @@ public abstract class PollingStation {
     String line3;
     String streetName = "";
     String zipCode;
+    ArrayList<String> sources = new ArrayList<String>();
 
     String name;
     String pollingHours;
@@ -145,6 +150,15 @@ public abstract class PollingStation {
       endDate = "an unknown end date";
     }
 
+    if (obj.has(SOURCES_JSON_KEYWORD)) {
+      for (Object sourceObject : obj.getJSONArray(SOURCES_JSON_KEYWORD)) {
+        JSONObject source = (JSONObject) sourceObject;
+        if (source.getBoolean("official")) {
+          sources.add(source.getString("name"));
+        }
+      }
+    }
+
     String address =
         streetName
             + ", "
@@ -161,6 +175,7 @@ public abstract class PollingStation {
         .setStartDate(startDate)
         .setEndDate(endDate)
         .setLocationType(locationType)
+        .setSources(sources)
         .build();
   }
 
@@ -170,6 +185,12 @@ public abstract class PollingStation {
    * @param entity the Entity in Datastore that represents a PollingStation
    */
   public static PollingStation fromEntity(Entity entity) {
+    ArrayList<String> sources;
+    if (entity.getProperty(SOURCES_JSON_KEYWORD) == null) {
+      sources = new ArrayList<String>();
+    } else {
+      sources = (ArrayList<String>) entity.getProperty(SOURCES_JSON_KEYWORD);
+    }
     return PollingStation.builder()
         .setName((String) entity.getProperty(NAME_JSON_KEYWORD))
         .setAddress((String) entity.getProperty(ADDRESS_JSON_KEYWORD))
@@ -177,6 +198,7 @@ public abstract class PollingStation {
         .setStartDate((String) entity.getProperty(START_DATE_JSON_KEYWORD))
         .setEndDate((String) entity.getProperty(END_DATE_JSON_KEYWORD))
         .setLocationType((String) entity.getProperty(LOCATION_TYPE_JSON_KEYWORD))
+        .setSources(sources)
         .build();
   }
 
@@ -193,6 +215,7 @@ public abstract class PollingStation {
     entity.setProperty(START_DATE_JSON_KEYWORD, this.getStartDate());
     entity.setProperty(END_DATE_JSON_KEYWORD, this.getEndDate());
     entity.setProperty(LOCATION_TYPE_JSON_KEYWORD, this.getLocationType());
+    entity.setProperty(SOURCES_JSON_KEYWORD, this.getSources());
     return entity;
   }
 }

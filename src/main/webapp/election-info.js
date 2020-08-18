@@ -180,6 +180,15 @@ function initializeMap() {
         zoom: 13
       });
       console.log("Created map");
+      
+      const homeMarker = new google.maps.Marker({
+        position:results[0].geometry.location, 
+        map:map,
+        icon: "https://img.icons8.com/ios-filled/50/000000/home.png",
+        draggarble: false
+     });
+     
+      console.log("Created user address marker");
     } else {
       alert('Geocode was not successful for the following reason: ' + status);
     }
@@ -190,6 +199,17 @@ function initializeMap() {
   fetch(servletUrl)
     .then(response => response.json())
     .then((pollingStationList) => {
+      if (pollingStationList === undefined || pollingStationList.length == 0) {
+        document.getElementById("polling-stations-map").style.display = "none";
+        document.getElementById("no-polling-stations").innerText = 
+          "Sorry, we can't find any polling stations for this election near your address.";
+        console.log("displayed polling station message");
+        return;
+      }
+
+      document.getElementById("no-polling-stations").innerText = "";
+      document.getElementById("polling-stations-map").style.display = "block";
+
       pollingStationList.forEach((pollingStation) => {
         var type;
         if (pollingStation.locationType == "dropOffLocation") {
@@ -200,18 +220,25 @@ function initializeMap() {
           type = "Standard polling location.";
         }
 
-        const description =
+        var description =
           '<div id="content">' +
           '<div id="siteNotice">' +
           "</div>" +
-          '<h2 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h2>' +
+          '<h3 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h3>' +
           '<div id="bodyContent">' +
           "<p>" + pollingStation.address + "</p>" +
-          "<p>Hours: Open " + pollingStation.pollingHours + " beginning " + pollingStation.startDate + 
+          "<p>Open " + pollingStation.pollingHours + " beginning " + pollingStation.startDate + 
           " and until " + pollingStation.endDate + ".</p>" +
-          "<p>" + type + "</p>" +
-          "</div>" +
-          "</div>";
+          "<p>" + type + "</p>";
+          
+          if (pollingStation.sources !== undefined && pollingStation.sources.length != 0) {
+            description += "<p><i>" + "Source(s): ";
+            description += pollingStation.sources.join(" ,");
+            description += "</i><p>";
+            console.log("Added sources");
+          }
+          
+          description += "</div>" + "</div>";
 
         addPollingStation(pollingStation.address, map, pollingStation.name, description);
         console.log("Added polling station marker");
