@@ -324,7 +324,7 @@ public class ContestServletTest {
     contestServlet.doGet(httpServletRequest, httpServletResponse);
   }
 
-  // TODO(anooshree): Test retrieval/deletion of Entities no longer in 
+  // TODO(anooshree): Test retrieval/deletion of Entities no longer in
   //                  Datastore
 
   @After
