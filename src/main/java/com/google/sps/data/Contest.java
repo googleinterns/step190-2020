@@ -134,7 +134,12 @@ public abstract class Contest {
                     : JsonNull.INSTANCE)
         // Have to use forEach to have void return. Can't use Collection to collect because
         // JsonArray can't addAll() with String as parameter.
-        .forEach(jsonElement -> candidateJsonArray.add(jsonElement));
+        .forEach(
+            jsonElement -> {
+              if (!jsonElement.isJsonNull()) {
+                candidateJsonArray.add(jsonElement);
+              }
+            });
 
     contestJsonObject.add("candidates", candidateJsonArray);
     return gson.toJson(contestJsonObject);
