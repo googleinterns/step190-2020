@@ -185,7 +185,7 @@ function initializeMap() {
         position:results[0].geometry.location, 
         map:map,
         icon: "https://img.icons8.com/ios-filled/50/000000/home.png",
-        draggarble: false
+        draggable: false
      });
      
       console.log("Created user address marker");
