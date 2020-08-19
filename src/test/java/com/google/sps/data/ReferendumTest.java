@@ -61,7 +61,7 @@ public class ReferendumTest {
 
   // Test putting API JSON response for one election in an Election object and reading from it.
   @Test
-  public void missingUrll_testFromJSONObject() throws Exception {
+  public void missingUrl_testFromJSONObject() throws Exception {
     JSONObject referendumJsonObject =
         new JSONObject(
             "{\"type\": \"Referendum\",\"referendumTitle\": \"Proposition 1\","
