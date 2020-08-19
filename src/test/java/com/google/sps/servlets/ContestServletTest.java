@@ -83,11 +83,13 @@ public class ContestServletTest {
     referendumEntityOne.setProperty("title", "myFirstReferendum");
     referendumEntityOne.setProperty("description", "This is a referendum.");
     referendumEntityOne.setProperty("source", "Voter Information Project");
+    referendumEntityOne.setProperty("url", "testUrl");
 
     referendumEntityTwo = new Entity("Referendum");
     referendumEntityTwo.setProperty("title", "mySecondReferendum");
     referendumEntityTwo.setProperty("description", "This is another referendum.");
     referendumEntityTwo.setProperty("source", "Voter Information Project");
+    referendumEntityTwo.setProperty("url", "testUrl");
   }
 
   @Test
@@ -250,7 +252,7 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[],"
                 + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
-                + "\"source\":\"Voter Information Project\"}]}");
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"}]}");
   }
 
   @Test
@@ -282,9 +284,9 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[],"
                 + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
-                + "\"source\":\"Voter Information Project\"},"
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"},"
                 + "{\"title\":\"mySecondReferendum\",\"description\":\"This is another referendum.\","
-                + "\"source\":\"Voter Information Project\"}]}");
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"}]}");
   }
 
   @Test

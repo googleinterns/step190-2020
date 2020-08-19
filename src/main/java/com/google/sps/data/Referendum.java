@@ -32,11 +32,13 @@ public abstract class Referendum {
   public static final String ENTITY_KIND = "Referendum";
   public static final String TITLE_JSON_KEYWORD = "referendumTitle";
   public static final String DESCRIPTION_JSON_KEYWORD = "referendumSubtitle";
+  public static final String URL_JSON_KEYWORD = "referendumUrl";
   public static final String SOURCE_JSON_KEYWORD = "sources";
   public static final String SOURCE_NAME_JSON_KEYWORD = "name";
   public static final String TITLE_ENTITY_KEYWORD = "title";
   public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
   public static final String SOURCE_ENTITY_KEYWORD = "source";
+  public static final String URL_ENTITY_KEYWORD = "url";
   public static final String SOURCE_CLASS = Referendum.class.getName();
   public static final Logger LOGGER = Logger.getLogger(SOURCE_CLASS);
 
@@ -45,6 +47,8 @@ public abstract class Referendum {
   public abstract String getDescription();
 
   public abstract String getSource();
+
+  public abstract String getUrl();
 
   public static Builder builder() {
     return new AutoValue_Referendum.Builder();
@@ -58,6 +62,8 @@ public abstract class Referendum {
 
     public abstract Builder setSource(String source);
 
+    public abstract Builder setUrl(String url);
+
     public abstract Referendum build();
   }
 
@@ -66,12 +72,19 @@ public abstract class Referendum {
     String referendumDescription;
     String referendumTitle;
     String source = "";
+    String referendumUrl;
 
     try {
       referendumTitle = obj.getString(TITLE_JSON_KEYWORD);
     } catch (JSONException e) {
       LOGGER.logp(Level.WARNING, SOURCE_CLASS, "fromJSONObject", "referendumTitle does not exist");
       throw new JSONException("Malformed referendum JSONObject: referendumTitle does not exist.");
+    }
+
+    try {
+      referendumUrl = obj.getString(URL_JSON_KEYWORD);
+    } catch (JSONException e) {
+      referendumUrl = "";
     }
 
     try {
@@ -93,6 +106,7 @@ public abstract class Referendum {
         .setTitle(referendumTitle)
         .setDescription(referendumDescription)
         .setSource(source)
+        .setUrl(referendumUrl)
         .build();
   }
 
@@ -107,6 +121,7 @@ public abstract class Referendum {
         .setTitle((String) entity.getProperty(TITLE_ENTITY_KEYWORD))
         .setDescription((String) entity.getProperty(DESCRIPTION_ENTITY_KEYWORD))
         .setSource((String) entity.getProperty(SOURCE_ENTITY_KEYWORD))
+        .setUrl((String) entity.getProperty(URL_ENTITY_KEYWORD))
         .build();
   }
 
@@ -117,6 +132,7 @@ public abstract class Referendum {
     entity.setProperty(TITLE_ENTITY_KEYWORD, this.getTitle());
     entity.setProperty(DESCRIPTION_ENTITY_KEYWORD, this.getDescription());
     entity.setProperty(SOURCE_ENTITY_KEYWORD, this.getSource());
+    entity.setProperty(URL_ENTITY_KEYWORD, this.getUrl());
     datastore.put(entity);
     return entity.getKey().getId();
   }

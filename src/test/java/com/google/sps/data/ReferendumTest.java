@@ -89,6 +89,7 @@ public class ReferendumTest {
             .setTitle("myTitle")
             .setDescription("myDescription")
             .setSource("mySource")
+            .setUrl("myUrl")
             .build();
 
     long entityKeyId = referendum.addToDatastore(ds);
@@ -105,6 +106,7 @@ public class ReferendumTest {
     entity.setProperty("title", "myTitle");
     entity.setProperty("description", "myDescription");
     entity.setProperty("source", "mySource");
+    entity.setProperty("url", "myUrl");
 
     Referendum referendum = Referendum.fromEntity(entity);
 
