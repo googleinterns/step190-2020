@@ -125,8 +125,8 @@ public abstract class Candidate {
   }
 
   /**
-   * Use the WeVote API to search for the name of a candidate, and use the we_vote_id associated
-   * with that candidate to find their Ballotpedia
+   * Use the WeVote API to search for the name of a candidate and get its we_vote_id, then use the we_vote_id with the WeVote API to get 
+   * the candidate description from Ballotpedia. 
    */
   public static String getPlatformDescriptionFromWeVoteApi(String candidateName) {
     if (candidateName.equals("")) {
@@ -135,6 +135,7 @@ public abstract class Candidate {
 
     String candidateDescription;
     try {
+      // We need to search for the candidate's name to get their we_vote_id first.
       JSONObject searchObject =
           ServletUtils.readFromApiUrl(
               String.format(
