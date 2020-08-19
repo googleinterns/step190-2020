@@ -16,7 +16,9 @@ package com.google.sps.data;
 
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,7 +46,7 @@ public abstract class PollingStation {
 
   public abstract String getLocationType();
 
-  public abstract ArrayList<String> getSources();
+  public abstract ImmutableList<String> getSources();
 
   public static Builder builder() {
     return new AutoValue_PollingStation.Builder();
@@ -64,7 +66,7 @@ public abstract class PollingStation {
 
     public abstract Builder setLocationType(String type);
 
-    public abstract Builder setSources(ArrayList<String> sources);
+    public abstract Builder setSources(ImmutableList<String> sources);
 
     public abstract PollingStation build();
   }
@@ -86,7 +88,7 @@ public abstract class PollingStation {
     String line3;
     String streetName = "";
     String zipCode;
-    ArrayList<String> sources = new ArrayList<String>();
+    List<String> sources = new ArrayList<String>();
 
     String name;
     String pollingHours;
@@ -168,6 +170,8 @@ public abstract class PollingStation {
             + " "
             + zipCode;
 
+    ImmutableList<String> sourcesList = ImmutableList.copyOf(sources);
+
     return PollingStation.builder()
         .setName(name)
         .setAddress(address)
@@ -175,7 +179,7 @@ public abstract class PollingStation {
         .setStartDate(startDate)
         .setEndDate(endDate)
         .setLocationType(locationType)
-        .setSources(sources)
+        .setSources(sourcesList)
         .build();
   }
 
@@ -185,12 +189,13 @@ public abstract class PollingStation {
    * @param entity the Entity in Datastore that represents a PollingStation
    */
   public static PollingStation fromEntity(Entity entity) {
-    ArrayList<String> sources;
-    if (entity.getProperty(SOURCES_JSON_KEYWORD) == null) {
-      sources = new ArrayList<String>();
-    } else {
-      sources = (ArrayList<String>) entity.getProperty(SOURCES_JSON_KEYWORD);
-    }
+    List<String> sources =
+        entity.getProperty(SOURCES_JSON_KEYWORD) == null
+            ? new ArrayList<String>()
+            : (ArrayList<String>) entity.getProperty(SOURCES_JSON_KEYWORD);
+
+    ImmutableList<String> sourcesList = ImmutableList.copyOf(sources);
+
     return PollingStation.builder()
         .setName((String) entity.getProperty(NAME_JSON_KEYWORD))
         .setAddress((String) entity.getProperty(ADDRESS_JSON_KEYWORD))
@@ -198,7 +203,7 @@ public abstract class PollingStation {
         .setStartDate((String) entity.getProperty(START_DATE_JSON_KEYWORD))
         .setEndDate((String) entity.getProperty(END_DATE_JSON_KEYWORD))
         .setLocationType((String) entity.getProperty(LOCATION_TYPE_JSON_KEYWORD))
-        .setSources(sources)
+        .setSources(sourcesList)
         .build();
   }
 
@@ -215,7 +220,7 @@ public abstract class PollingStation {
     entity.setProperty(START_DATE_JSON_KEYWORD, this.getStartDate());
     entity.setProperty(END_DATE_JSON_KEYWORD, this.getEndDate());
     entity.setProperty(LOCATION_TYPE_JSON_KEYWORD, this.getLocationType());
-    entity.setProperty(SOURCES_JSON_KEYWORD, this.getSources());
+    entity.setProperty(SOURCES_JSON_KEYWORD, new ArrayList<String>(this.getSources()));
     return entity;
   }
 }

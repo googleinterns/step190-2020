@@ -171,29 +171,6 @@ function initializeMap() {
   geocoder = new google.maps.Geocoder();
 
   const urlParams = new URLSearchParams(window.location.search);
-  const address = urlParams.get('address');
-  
-  geocoder.geocode( { 'address': address}, function(results, status) {
-    if (status == 'OK') {
-      map = new google.maps.Map(document.getElementById("polling-stations-map"), {
-        center: results[0].geometry.location,
-        zoom: 13
-      });
-      console.log("Created map");
-      
-      const homeMarker = new google.maps.Marker({
-        position:results[0].geometry.location, 
-        map:map,
-        icon: "https://img.icons8.com/ios-filled/50/000000/home.png",
-        draggable: false
-     });
-     
-      console.log("Created user address marker");
-    } else {
-      alert('Geocode was not successful for the following reason: ' + status);
-    }
-  });
-
   let servletUrl = "/polling-stations?electionId=" + urlParams.get("electionId");
 
   fetch(servletUrl)
@@ -209,39 +186,61 @@ function initializeMap() {
 
       document.getElementById("no-polling-stations").innerText = "";
       document.getElementById("polling-stations-map").style.display = "block";
-
-      pollingStationList.forEach((pollingStation) => {
-        var type;
-        if (pollingStation.locationType == "dropOffLocation") {
-          type = "Drop off only.";
-        } else if (pollingStation.locationType == "earlyVoteSite") {
-          type = "Early vote site only.";
-        } else if (pollingStation.locationType == "pollingLocation") {
-          type = "Standard polling location.";
+      
+      const address = urlParams.get('address');
+      
+      geocoder.geocode( { 'address': address}, function(results, status) {
+        if (status == 'OK') {
+          map = new google.maps.Map(document.getElementById("polling-stations-map"), {
+            center: results[0].geometry.location,
+            zoom: 13
+          });
+          console.log("Created map");
+          
+          const homeMarker = new google.maps.Marker({
+            position:results[0].geometry.location, 
+            map:map,
+            icon: "https://img.icons8.com/ios-filled/50/000000/home.png",
+            draggable: false
+          });
+          console.log("Created user address marker");
+          
+          pollingStationList.forEach((pollingStation) => {
+            var type;
+            if (pollingStation.locationType == "dropOffLocation") {
+              type = "Drop off only.";
+            } else if (pollingStation.locationType == "earlyVoteSite") {
+              type = "Early vote site only.";
+            } else if (pollingStation.locationType == "pollingLocation") {
+              type = "Standard polling location.";
+            }
+    
+            var description =
+              '<div id="content">' +
+              '<div id="siteNotice">' +
+              "</div>" +
+              '<h3 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h3>' +
+              '<div id="bodyContent">' +
+              "<p>" + pollingStation.address + "</p>" +
+              "<p>Open " + pollingStation.pollingHours + " beginning " + pollingStation.startDate + 
+              " and until " + pollingStation.endDate + ".</p>" +
+              "<p>" + type + "</p>";
+              
+              if (pollingStation.sources !== undefined && pollingStation.sources.length != 0) {
+                description += "<p><i>" + "Source(s): ";
+                description += pollingStation.sources.join(" ,");
+                description += "</i><p>";
+                console.log("Added sources");
+              }
+              
+              description += "</div>" + "</div>";
+    
+            addPollingStation(pollingStation.address, map, pollingStation.name, description);
+            console.log("Added polling station marker");
+          });
+        } else {
+          alert('Geocode was not successful for the following reason: ' + status);
         }
-
-        var description =
-          '<div id="content">' +
-          '<div id="siteNotice">' +
-          "</div>" +
-          '<h3 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h3>' +
-          '<div id="bodyContent">' +
-          "<p>" + pollingStation.address + "</p>" +
-          "<p>Open " + pollingStation.pollingHours + " beginning " + pollingStation.startDate + 
-          " and until " + pollingStation.endDate + ".</p>" +
-          "<p>" + type + "</p>";
-          
-          if (pollingStation.sources !== undefined && pollingStation.sources.length != 0) {
-            description += "<p><i>" + "Source(s): ";
-            description += pollingStation.sources.join(" ,");
-            description += "</i><p>";
-            console.log("Added sources");
-          }
-          
-          description += "</div>" + "</div>";
-
-        addPollingStation(pollingStation.address, map, pollingStation.name, description);
-        console.log("Added polling station marker");
       });
     });
 }

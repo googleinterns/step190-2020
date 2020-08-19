@@ -4,9 +4,11 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
+import com.google.common.collect.ImmutableList;
 import com.google.sps.data.PollingStation;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
@@ -62,10 +64,11 @@ public class PollingStationTest {
     Assert.assertEquals(pollingStation.getEndDate(), "end");
     Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
 
-    ArrayList<String> sources = new ArrayList<String>();
+    List<String> sources = new ArrayList<String>();
     sources.add("Voting Information Project");
+    ImmutableList<String> sourcesList = ImmutableList.copyOf(sources);
 
-    Assert.assertEquals(pollingStation.getSources(), sources);
+    Assert.assertEquals(pollingStation.getSources(), sourcesList);
   }
 
   @Test
@@ -277,6 +280,7 @@ public class PollingStationTest {
     Assert.assertEquals(pollingStation.getStartDate(), "start");
     Assert.assertEquals(pollingStation.getEndDate(), "end");
     Assert.assertEquals(pollingStation.getLocationType(), "dropOffLocation");
+    Assert.assertEquals(pollingStation.getSources(), ImmutableList.of());
   }
 
   // Test creating a new Entity in Datastore from a PollingLocation object
@@ -290,7 +294,7 @@ public class PollingStationTest {
             .setStartDate("start")
             .setEndDate("end")
             .setLocationType("earlyVoteSite")
-            .setSources(new ArrayList<String>())
+            .setSources(ImmutableList.of())
             .build();
 
     Entity pollingStationEntity = pollingStation.toEntity();
@@ -301,5 +305,6 @@ public class PollingStationTest {
     Assert.assertEquals(pollingStationEntity.getProperty("startDate"), "start");
     Assert.assertEquals(pollingStationEntity.getProperty("endDate"), "end");
     Assert.assertEquals(pollingStationEntity.getProperty("locationType"), "earlyVoteSite");
+    Assert.assertEquals(pollingStationEntity.getProperty("sources"), new ArrayList<String>());
   }
 }
