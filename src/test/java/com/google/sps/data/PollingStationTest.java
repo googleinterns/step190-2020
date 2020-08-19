@@ -8,7 +8,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.sps.data.PollingStation;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
@@ -64,11 +63,8 @@ public class PollingStationTest {
     Assert.assertEquals(pollingStation.getEndDate(), "end");
     Assert.assertEquals(pollingStation.getLocationType(), "pollingLocation");
 
-    List<String> sources = new ArrayList<String>();
-    sources.add("Voting Information Project");
-    ImmutableList<String> sourcesList = ImmutableList.copyOf(sources);
-
-    Assert.assertEquals(pollingStation.getSources(), sourcesList);
+    Assert.assertEquals(
+        pollingStation.getSources(), ImmutableList.of("Voting Information Project"));
   }
 
   @Test

@@ -66,7 +66,7 @@ public abstract class PollingStation {
 
     public abstract Builder setLocationType(String type);
 
-    public abstract Builder setSources(ImmutableList<String> sources);
+    public abstract Builder setSources(List<String> sources);
 
     public abstract PollingStation build();
   }
@@ -88,7 +88,7 @@ public abstract class PollingStation {
     String line3;
     String streetName = "";
     String zipCode;
-    List<String> sources = new ArrayList<String>();
+    List<String> sources = new ArrayList<>();
 
     String name;
     String pollingHours;
@@ -189,12 +189,10 @@ public abstract class PollingStation {
    * @param entity the Entity in Datastore that represents a PollingStation
    */
   public static PollingStation fromEntity(Entity entity) {
-    List<String> sources =
+    ImmutableList<String> sources =
         entity.getProperty(SOURCES_JSON_KEYWORD) == null
-            ? new ArrayList<String>()
-            : (ArrayList<String>) entity.getProperty(SOURCES_JSON_KEYWORD);
-
-    ImmutableList<String> sourcesList = ImmutableList.copyOf(sources);
+            ? ImmutableList.of()
+            : ImmutableList.copyOf((ArrayList<String>) entity.getProperty(SOURCES_JSON_KEYWORD));
 
     return PollingStation.builder()
         .setName((String) entity.getProperty(NAME_JSON_KEYWORD))
@@ -203,7 +201,7 @@ public abstract class PollingStation {
         .setStartDate((String) entity.getProperty(START_DATE_JSON_KEYWORD))
         .setEndDate((String) entity.getProperty(END_DATE_JSON_KEYWORD))
         .setLocationType((String) entity.getProperty(LOCATION_TYPE_JSON_KEYWORD))
-        .setSources(sourcesList)
+        .setSources(sources)
         .build();
   }
 
