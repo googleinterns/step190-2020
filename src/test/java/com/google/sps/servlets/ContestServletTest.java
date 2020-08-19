@@ -421,7 +421,7 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[],"
                 + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
-                + "\"source\":\"Voter Information Project\"}]}");
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"}]}");
   }
 
   @After
