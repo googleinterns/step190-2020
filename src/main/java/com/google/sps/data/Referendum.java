@@ -69,28 +69,28 @@ public abstract class Referendum {
 
   // creates a new Referendum object by extracting the properties from "obj"
   public static Referendum fromJSONObject(JSONObject obj) throws JSONException {
-    String referendumDescription;
-    String referendumTitle;
+    String description;
+    String title;
     String source = "";
-    String referendumUrl;
+    String url;
 
     try {
-      referendumTitle = obj.getString(TITLE_JSON_KEYWORD);
+      title = obj.getString(TITLE_JSON_KEYWORD);
     } catch (JSONException e) {
       LOGGER.logp(Level.WARNING, SOURCE_CLASS, "fromJSONObject", "referendumTitle does not exist");
       throw new JSONException("Malformed referendum JSONObject: referendumTitle does not exist.");
     }
 
     try {
-      referendumUrl = obj.getString(URL_JSON_KEYWORD);
+      url = obj.getString(URL_JSON_KEYWORD);
     } catch (JSONException e) {
-      referendumUrl = "";
+      url = "";
     }
 
     try {
-      referendumDescription = obj.getString(DESCRIPTION_JSON_KEYWORD);
+      description = obj.getString(DESCRIPTION_JSON_KEYWORD);
     } catch (JSONException e) {
-      referendumDescription = "";
+      description = "";
     }
 
     if (obj.has(SOURCE_JSON_KEYWORD)) {
@@ -103,10 +103,10 @@ public abstract class Referendum {
     }
 
     return Referendum.builder()
-        .setTitle(referendumTitle)
-        .setDescription(referendumDescription)
+        .setTitle(title)
+        .setDescription(description)
         .setSource(source)
-        .setUrl(referendumUrl)
+        .setUrl(url)
         .build();
   }
 
