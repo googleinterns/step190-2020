@@ -312,7 +312,7 @@ public class ContestServletTest {
   }
 
   @Test
-  public void oneElection_contestMissingInDatastore_testDoGet() throws IOException {
+  public void oneElection_omitsContestMissingInDatastore_testDoGet() throws IOException {
     Entity electionEntity = new Entity("Election");
     Entity firstContestEntity = new Entity("Contest");
     Entity secondContestEntity = new Entity("Contest", 2);
@@ -343,16 +343,14 @@ public class ContestServletTest {
   }
 
   @Test
-  public void oneElection_candidateMissingInDatastore_testDoGet() throws IOException {
+  public void oneElection_omitsCandidateMissingInDatastore_testDoGet() throws IOException {
     Entity electionEntity = new Entity("Election");
     Entity contestEntity = new Entity("Contest");
-
-    Entity firstCandidateEntity = new Entity("Candidate");
-    Entity secondCandidateEntity = new Entity("Candidate");
-
     electionEntity.setPropertiesFrom(electionEntityOne);
     contestEntity.setPropertiesFrom(contestEntityOne);
 
+    Entity firstCandidateEntity = new Entity("Candidate");
+    Entity secondCandidateEntity = new Entity("Candidate");
     firstCandidateEntity.setPropertiesFrom(candidateEntityOne);
     secondCandidateEntity.setPropertiesFrom(candidateEntityTwo);
 
@@ -390,7 +388,7 @@ public class ContestServletTest {
   }
 
   @Test
-  public void oneElection_referendumMissingInDatastore_testDoGet() throws IOException {
+  public void oneElection_omitsReferendumMissingInDatastore_testDoGet() throws IOException {
     Entity electionEntity = new Entity("Election");
     Entity firstReferendumEntity = new Entity("Referendum");
     Entity secondReferendumEntity = new Entity("Referendum");
