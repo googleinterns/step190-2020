@@ -265,7 +265,7 @@ function addPollingStationMarker(map, position, title, description) {
  * @param {String} URL to be stripped.
  */
 Handlebars.registerHelper('stripUrl', function(urlString){
-  urlString = urlString.replace(/(^\w+:|^)\/\//, '');
+  urlString = urlString.replace(/(^\w+:|^)\/\/(www.)?/, '');
   if(urlString[urlString.length - 1] == '/'){
     urlString = urlString.slice(0, -1);
   }

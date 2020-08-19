@@ -20,14 +20,27 @@ import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
+import com.google.sps.servlets.ServletUtils;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /** A candidate for a public office position that will appear on voter ballots */
 @AutoValue
 public abstract class Candidate {
+  private static final String WE_VOTE_API_BASE_URL =
+      "https://api.wevoteusa.org/apis/v1/%s/?csrfmiddlewaretoken=%s";
+  private static final String WE_VOTE_SEARCH_ALL_METHOD = "searchAll";
+  private static final String WE_VOTE_BALLOT_ITEM_METHOD = "ballotItemRetrieve";
+  private static final String WE_VOTE_TOKEN =
+      "SvVojWyYxJk3vSPQqXOzVg8q9M9PpDBtF4qo8wcAVn0yUm18g97vi4RZXwgyshNi";
+  private static final String WE_VOTE_VOTER_ID =
+      "CmrnE4BCbd7E6vUMxCod49oSwY1AK1z7xxSybTtMBPdgA23aj2PO2pVLxPEJulNiyWfjQsUFpM3776tF68lTUlCS";
+  private static final String WE_VOTE_ITEM_KIND = "CANDIDATE";
+
   public static final String ENTITY_KIND = "Candidate";
   public static final String NAME_JSON_KEYWORD = "name";
   public static final String PARTY_JSON_KEYWORD = "party";
@@ -100,14 +113,60 @@ public abstract class Candidate {
       }
     }
 
+    String platformDescription = getPlatformDescriptionFromWeVoteApi(candidateName);
+
     return Candidate.builder()
         .setName(candidateName)
         .setPartyAffiliation(candidateParty)
         .setCampaignSite(candidateUrl)
-        // TODO(gianelgado): get value for platformDescription
-        .setPlatformDescription("")
+        .setPlatformDescription(platformDescription)
         .setChannels(channelsMap)
         .build();
+  }
+
+  /**
+   * Use the WeVote API to search for the name of a candidate, and use the we_vote_id associated
+   * with that candidate to find their Ballotpedia
+   */
+  public static String getPlatformDescriptionFromWeVoteApi(String candidateName) {
+    if (candidateName.equals("")) {
+      return "";
+    }
+
+    String candidateDescription;
+    try {
+      JSONObject searchObject =
+          ServletUtils.readFromApiUrl(
+              String.format(
+                  WE_VOTE_API_BASE_URL + "&text_from_search_field=%s&voter_device_id=%s",
+                  WE_VOTE_SEARCH_ALL_METHOD,
+                  WE_VOTE_TOKEN,
+                  candidateName.replaceAll(" ", "+"),
+                  WE_VOTE_VOTER_ID));
+
+      JSONArray searchObjectResult = searchObject.getJSONArray("search_results");
+
+      if (searchObjectResult.length() == 0) {
+        return "";
+      }
+
+      String candidateWeVoteId = ((JSONObject) searchObjectResult.get(0)).getString("we_vote_id");
+
+      JSONObject candidateObject =
+          ServletUtils.readFromApiUrl(
+              String.format(
+                  WE_VOTE_API_BASE_URL
+                      + "&kind_of_ballot_item=%s&ballot_item_id=&ballot_item_we_vote_id=%s",
+                  WE_VOTE_BALLOT_ITEM_METHOD,
+                  WE_VOTE_TOKEN,
+                  WE_VOTE_ITEM_KIND,
+                  candidateWeVoteId));
+      candidateDescription = candidateObject.getString("ballotpedia_candidate_summary");
+    } catch (IOException | JSONException e) {
+      return "";
+    }
+
+    return candidateDescription;
   }
 
   // Converts this Candidate object to a JSON string.

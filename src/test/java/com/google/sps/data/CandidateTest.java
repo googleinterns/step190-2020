@@ -61,6 +61,9 @@ public class CandidateTest {
     Assert.assertEquals(newCandidate.getPartyAffiliation(), "Green Party");
     Assert.assertEquals(newCandidate.getCampaignSite(), "www.janedoe.org");
     Assert.assertEquals(newCandidate.getChannels(), expectedChannelsMap);
+    Assert.assertEquals(
+        Candidate.getPlatformDescriptionFromWeVoteApi("Jeffrey Prang"),
+        "Jeffrey Prang is the county assessor of Los Angeles County, California. Prang took office in 2014.");
   }
 
   @Test
