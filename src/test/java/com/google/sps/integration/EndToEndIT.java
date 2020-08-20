@@ -44,16 +44,7 @@ public class EndToEndIT {
     // worth right now.
     String response = getUrlResponse("http://localhost:9876/election");
     System.out.println(response);
-    Assert.assertTrue(response.contains("Wyoming State Primary Election"));
-  }
-
-  @Test
-  public void testEndToEndContestsCall() throws Exception {
-    String response =
-        getUrlResponse(
-            "http://localhost:9876/contests?electionId=2000&address=1261+West+79th+Street+Los+Angeles+CA+90044+United+States");
-    System.out.println(response);
-    Assert.assertTrue(response.contains("Attorney General"));
+    Assert.assertTrue(response.contains("Oklahoma Primary Runoff Election and Special Elections"));
   }
 
   private String getUrlResponse(String urlAddress) throws Exception {
