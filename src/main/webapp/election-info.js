@@ -287,10 +287,21 @@ Handlebars.registerHelper('stripUrl', function(urlString){
   return urlString;
 })
 
+/** 
+ * Handlebars helper that converts an array into a comma-separated string
+ * 
+ * @param {Array} array to be converted
+ */
 Handlebars.registerHelper('withCommas', function(sourcesList){
   return sourcesList.join(", ");
 })
 
+/**
+ * Handlebars helper that convverts the locationType 
+ * of a PollingStation object into a user-friendly string
+ * 
+ * @param {String} the locationType
+ */
 Handlebars.registerHelper('findType', function(locationType){
   if (locationType == "dropOffLocation") {
     return "Drop off only.";
