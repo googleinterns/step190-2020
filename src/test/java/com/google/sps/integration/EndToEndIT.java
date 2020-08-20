@@ -16,7 +16,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 //   "**/IT*.java"
 //   "**/*IT.java"
 //   "**/*ITCase.java"
-public class ExampleIT {
+public class EndToEndIT {
   private WebDriver driver;
 
   @ClassRule
@@ -39,7 +39,7 @@ public class ExampleIT {
   }
 
   @Test
-  public void testEndToEnd() throws Exception {
+  public void testEndToEndElectionCall() throws Exception {
     // We should probably pass in the port number into the test, but IMO it's more trouble than it's
     // worth right now.
     String response = getUrlResponse("http://localhost:9876/election");

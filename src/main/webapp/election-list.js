@@ -30,7 +30,13 @@ function listElections() {
   }
 
   fetch('/election')
-    .then(response => response.json())
+    .then(response => {
+      if (response.ok) { // if HTTP-status is 200-299
+        return response.json();
+      } else {
+        Promise.reject(response.text());
+      }
+    })
     .then((electionList) => {
       // ocdDivisionId is in the form "ocd-division/country:us/state:<state_code>"
       // For example, Lousiana's ID is "ocd-division/country:us/state:la"
@@ -60,7 +66,9 @@ function listElections() {
 
       let electionListContainerElement = document.getElementById('election-list-content');
       electionListContainerElement.innerHTML = template(context);
-  });
+  })
+  .catch(error => alert(error));
+  
   updateLinksWithQueryParams(document.links);
 }
 
