@@ -206,19 +206,19 @@ function initializeMap() {
           pollingStationList.forEach((pollingStation) => {
 
             let descriptionTemplate =  
-              '<div id="content">' +
-                '<div id="siteNotice"></div>' +
-                '<h3 id="firstHeading" class="firstHeading"> {{pollingStation.name}} </h3>' +
-                '<div id="bodyContent">' +
-                  "<p> {{pollingStation.address}} </p>" +
-                  "<p>Open {{pollingStation.pollingHours}} beginning {{pollingStation.startDate}}" + 
-                  " and until {{pollingStation.endDate}}.</p>" +
-                  "<p> {{findType pollingStation.locationType}} </p>" +
-                  "{{#if pollingStation.sources}}" +
-                    "<p><i> Sources: {{withCommas pollingStation.sources}}</i></p>" +
-                  "{{/if}}" +
-                "</div>" +
-              "</div>";
+              `<div id="content">
+                <div id="siteNotice"></div> 
+                <h3 id="firstHeading" class="firstHeading"> {{pollingStation.name}} </h3> 
+                <div id="bodyContent">
+                <p> {{pollingStation.address}} </p>
+                  <p>Open {{pollingStation.pollingHours}} beginning {{pollingStation.startDate}}
+                   and until {{pollingStation.endDate}}.</p>
+                  <p> {{findType pollingStation.locationType}} </p>
+                  {{#if pollingStation.sources}}
+                    <p><i> Sources: {{withCommas pollingStation.sources}}</i></p>
+                  {{/if}}
+                </div>
+              </div>`;
 
             let template = Handlebars.compile(descriptionTemplate);
             let context = {pollingStation: pollingStation};
