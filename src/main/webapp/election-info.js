@@ -131,8 +131,6 @@ function populateClassesForTemplate(electionId){
           referendums.push(referendum);
       });
 
-      // TODO(anooshree): sort referendums by number?
-
       let source = document.getElementById('contests-referendums-template').innerHTML;
       let template = Handlebars.compile(source);
       let context = { contests: contests, 
@@ -206,34 +204,25 @@ function initializeMap() {
           console.log("Created user address marker");
           
           pollingStationList.forEach((pollingStation) => {
-            var type;
-            if (pollingStation.locationType == "dropOffLocation") {
-              type = "Drop off only.";
-            } else if (pollingStation.locationType == "earlyVoteSite") {
-              type = "Early vote site only.";
-            } else if (pollingStation.locationType == "pollingLocation") {
-              type = "Standard polling location.";
-            }
-    
-            var description =
+
+            let descriptionTemplate =  
               '<div id="content">' +
-              '<div id="siteNotice">' +
-              "</div>" +
-              '<h3 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h3>' +
-              '<div id="bodyContent">' +
-              "<p>" + pollingStation.address + "</p>" +
-              "<p>Open " + pollingStation.pollingHours + " beginning " + pollingStation.startDate + 
-              " and until " + pollingStation.endDate + ".</p>" +
-              "<p>" + type + "</p>";
-              
-              if (pollingStation.sources !== undefined && pollingStation.sources.length != 0) {
-                description += "<p><i>" + "Source(s): ";
-                description += pollingStation.sources.join(" ,");
-                description += "</i><p>";
-                console.log("Added sources");
-              }
-              
-              description += "</div>" + "</div>";
+                '<div id="siteNotice"></div>' +
+                '<h3 id="firstHeading" class="firstHeading"> {{pollingStation.name}} </h3>' +
+                '<div id="bodyContent">' +
+                  "<p> {{pollingStation.address}} </p>" +
+                  "<p>Open {{pollingStation.pollingHours}} beginning {{pollingStation.startDate}}" + 
+                  " and until {{pollingStation.endDate}}.</p>" +
+                  "<p> {{findType pollingStation.locationType}} </p>" +
+                  "{{#if pollingStation.sources}}" +
+                    "<p><i> Sources: {{withCommas pollingStation.sources}}</i></p>" +
+                  "{{/if}}" +
+                "</div>" +
+              "</div>";
+
+            let template = Handlebars.compile(descriptionTemplate);
+            let context = {pollingStation: pollingStation};
+            let description = template(context);
     
             addPollingStation(pollingStation.address, map, pollingStation.name, description);
             console.log("Added polling station marker");
@@ -296,4 +285,18 @@ Handlebars.registerHelper('stripUrl', function(urlString){
     urlString = urlString.slice(0, -1);
   }
   return urlString;
+})
+
+Handlebars.registerHelper('withCommas', function(sourcesList){
+  return sourcesList.join(", ");
+})
+
+Handlebars.registerHelper('findType', function(locationType){
+  if (locationType == "dropOffLocation") {
+    return "Drop off only.";
+  } else if (locationType == "earlyVoteSite") {
+    return "Early vote site only.";
+  } else if (locationType == "pollingLocation") {
+    return "Standard polling location.";
+  }
 })
