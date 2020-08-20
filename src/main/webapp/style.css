@@ -341,6 +341,14 @@ body{
   font-weight: bold;
 }
 
+#no-polling-stations {
+  margin-left: 17%;
+  margin-bottom: 20px;
+  margin-top: 40px;
+  font-weight: bold;
+  align-content: center;
+}
+
 .info-cards-wrapper {
   width: 100%;
 }

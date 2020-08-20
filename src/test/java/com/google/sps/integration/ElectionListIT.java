@@ -66,7 +66,6 @@ public class ElectionListIT {
     WebElement learnMoreButton = driver.findElement(By.id("state-learn-more-button"));
     learnMoreButton.click();
 
-    String targetElectionName = "Oklahoma+Primary+Runoff+Election+and+Special+Elections";
     String targetElectionID = "5015";
 
     Thread.sleep(2000);
