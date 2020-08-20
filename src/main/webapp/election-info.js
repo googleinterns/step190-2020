@@ -1,6 +1,12 @@
 function onElectionInfoLoad(){
   fetch('/election')
-  .then(response => response.json())
+  .then(response => {
+    if (response.ok) { // if HTTP-status is 200-299
+      return response.json();
+    } else {
+      Promise.reject(response.text());
+    }
+  })
   .then((electionList) => {
     let searchParams = new URLSearchParams(window.location.search);
     let electionId = searchParams.get("electionId");
@@ -30,7 +36,8 @@ function onElectionInfoLoad(){
     }
 
     titleTextElement.innerHTML = template(context);
-  });
+  })
+  .catch(() => alert('There has been an error.'));
 }
 
 /**
@@ -92,14 +99,16 @@ function callInfoCardServlet(electionId, address){
   fetch(servletUrl, {
     method: 'PUT'
   }).then((response) => {
+      let errorTextElement = document.getElementById('address-error-text');
       if (response.ok) { // if HTTP-status is 200-299
-        console.log('Called Info Card servlet successfully');
+        errorTextElement.style.display = "none";
         populateClassesForTemplate(electionId);
         initializeMap();
-        hideSpinner();
       } else {
-        alert("HTTP-Error: " + response.status);
+        errorTextElement.style.display = "block";
       }
+
+      hideSpinner();
   });
 }
 
