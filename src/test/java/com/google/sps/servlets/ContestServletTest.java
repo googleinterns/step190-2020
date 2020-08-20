@@ -6,8 +6,6 @@ import static org.mockito.Mockito.when;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
@@ -350,19 +348,14 @@ public class ContestServletTest {
     contestEntity.setPropertiesFrom(contestEntityOne);
 
     Entity firstCandidateEntity = new Entity("Candidate");
-    Entity secondCandidateEntity = new Entity("Candidate");
+    Entity secondCandidateEntity = new Entity("Candidate", 3);
     firstCandidateEntity.setPropertiesFrom(candidateEntityOne);
     secondCandidateEntity.setPropertiesFrom(candidateEntityTwo);
 
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     long contestId = ds.put(contestEntity).getId();
     long firstCandidateId = ds.put(firstCandidateEntity).getId();
-
-    // Delete the Entity from Datastore to mimic what happens at the beginning
-    // of a call to doGet() in ElectionServlet.
-    long secondCandidateId = ds.put(secondCandidateEntity).getId();
-    Key entityKey = KeyFactory.createKey("Candidate", secondCandidateEntity.getKey().getId());
-    ds.delete(entityKey);
+    long secondCandidateId = secondCandidateEntity.getKey().getId();
 
     Collection<Long> candidateSet = (Collection<Long>) contestEntity.getProperty("candidates");
     candidateSet.add(firstCandidateId);
@@ -391,7 +384,7 @@ public class ContestServletTest {
   public void oneElection_omitsReferendumMissingInDatastore_testDoGet() throws IOException {
     Entity electionEntity = new Entity("Election");
     Entity firstReferendumEntity = new Entity("Referendum");
-    Entity secondReferendumEntity = new Entity("Referendum");
+    Entity secondReferendumEntity = new Entity("Referendum", 4);
 
     electionEntity.setPropertiesFrom(electionEntityOne);
     firstReferendumEntity.setPropertiesFrom(referendumEntityOne);
@@ -399,10 +392,7 @@ public class ContestServletTest {
 
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     long referendumOneId = ds.put(firstReferendumEntity).getId();
-
-    long referendumTwoId = ds.put(secondReferendumEntity).getId();
-    Key entityKey = KeyFactory.createKey("Referendum", secondReferendumEntity.getKey().getId());
-    ds.delete(entityKey);
+    long referendumTwoId = secondReferendumEntity.getKey().getId();
 
     HashSet<Long> referendumSet = (HashSet<Long>) electionEntityOne.getProperty("referendums");
     referendumSet.add(referendumOneId);
