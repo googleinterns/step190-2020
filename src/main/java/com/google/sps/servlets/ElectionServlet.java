@@ -17,8 +17,12 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.gson.Gson;
 import com.google.sps.data.Election;
 import java.io.IOException;
@@ -57,7 +61,10 @@ public class ElectionServlet extends HttpServlet {
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(new Query(Election.ENTITY_KIND));
-    Transaction txn = datastore.beginTransaction();
+    // Have to make this a cross-group transaction because Election contains Embedded Entities for
+    // its PollingStations
+    TransactionOptions options = TransactionOptions.Builder.withXG(true);
+    Transaction txn = datastore.beginTransaction(options);
     try {
       for (Entity entity : results.asIterable()) {
         Key electionKey = KeyFactory.createKey(Election.ENTITY_KIND, entity.getKey().getId());
