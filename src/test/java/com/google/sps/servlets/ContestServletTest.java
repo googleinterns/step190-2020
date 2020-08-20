@@ -81,11 +81,13 @@ public class ContestServletTest {
     referendumEntityOne.setProperty("title", "myFirstReferendum");
     referendumEntityOne.setProperty("description", "This is a referendum.");
     referendumEntityOne.setProperty("source", "Voter Information Project");
+    referendumEntityOne.setProperty("url", "testUrl");
 
     referendumEntityTwo = new Entity("Referendum");
     referendumEntityTwo.setProperty("title", "mySecondReferendum");
     referendumEntityTwo.setProperty("description", "This is another referendum.");
     referendumEntityTwo.setProperty("source", "Voter Information Project");
+    referendumEntityTwo.setProperty("url", "testUrl");
   }
 
   @Test
@@ -248,7 +250,7 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[],"
                 + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
-                + "\"source\":\"Voter Information Project\"}]}");
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"}]}");
   }
 
   @Test
@@ -280,9 +282,9 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[],"
                 + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
-                + "\"source\":\"Voter Information Project\"},"
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"},"
                 + "{\"title\":\"mySecondReferendum\",\"description\":\"This is another referendum.\","
-                + "\"source\":\"Voter Information Project\"}]}");
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"}]}");
   }
 
   @Test
@@ -307,8 +309,8 @@ public class ContestServletTest {
     verify(printWriter).println("No electionId in the query URL.");
   }
 
-  @Test(expected = RuntimeException.class)
-  public void oneElection_contestMissingInDatastore_testDoGet() throws IOException {
+  @Test
+  public void oneElection_omitsContestMissingInDatastore_testDoGet() throws IOException {
     Entity electionEntity = new Entity("Election");
     Entity firstContestEntity = new Entity("Contest");
     Entity secondContestEntity = new Entity("Contest", 2);
@@ -327,9 +329,87 @@ public class ContestServletTest {
     ds.put(electionEntityOne);
 
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     ContestsServlet contestServlet = new ContestsServlet();
     contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\","
+                + "\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
+  }
+
+  @Test
+  public void oneElection_omitsCandidateMissingInDatastore_testDoGet() throws IOException {
+    Entity electionEntity = new Entity("Election");
+    Entity contestEntity = new Entity("Contest");
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    contestEntity.setPropertiesFrom(contestEntityOne);
+
+    Entity firstCandidateEntity = new Entity("Candidate");
+    Entity secondCandidateEntity = new Entity("Candidate", 3);
+    firstCandidateEntity.setPropertiesFrom(candidateEntityOne);
+    secondCandidateEntity.setPropertiesFrom(candidateEntityTwo);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long contestId = ds.put(contestEntity).getId();
+    long firstCandidateId = ds.put(firstCandidateEntity).getId();
+    long secondCandidateId = secondCandidateEntity.getKey().getId();
+
+    Collection<Long> candidateSet = (Collection<Long>) contestEntity.getProperty("candidates");
+    candidateSet.add(firstCandidateId);
+    candidateSet.add(secondCandidateId);
+    ds.put(contestEntity);
+
+    Collection<Long> contestSet = (Collection<Long>) electionEntity.getProperty("contests");
+    contestSet.add(contestId);
+    ds.put(electionEntity);
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[{\"name\":\"myFirstCandidate\","
+                + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
+                + "\"This is a cool candidate.\",\"channels\":{}}],"
+                + "\"description\":\"This contest is important.\",\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
+  }
+
+  @Test
+  public void oneElection_omitsReferendumMissingInDatastore_testDoGet() throws IOException {
+    Entity electionEntity = new Entity("Election");
+    Entity firstReferendumEntity = new Entity("Referendum");
+    Entity secondReferendumEntity = new Entity("Referendum", 4);
+
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    firstReferendumEntity.setPropertiesFrom(referendumEntityOne);
+    secondReferendumEntity.setPropertiesFrom(referendumEntityTwo);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long referendumOneId = ds.put(firstReferendumEntity).getId();
+    long referendumTwoId = secondReferendumEntity.getKey().getId();
+
+    HashSet<Long> referendumSet = (HashSet<Long>) electionEntityOne.getProperty("referendums");
+    referendumSet.add(referendumOneId);
+    referendumSet.add(referendumTwoId);
+    ds.put(electionEntityOne);
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "{\"contests\":[],"
+                + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"}]}");
   }
 
   @After
