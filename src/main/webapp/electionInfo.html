@@ -165,8 +165,11 @@
                       </button>
                       <div class="collapsible-content">
                         <p class="referendum-description">
-                          {{this.description}}
+                          <b>Overview: </b> {{this.description}}
                         </p>
+                        {{#if this.url}}
+                            <p><b>More information available at: </b><a href={{this.url}} target="_blank">{{stripUrl this.url}}</a></p>
+                        {{/if}}
                         {{#if this.source}}
                         <p class="source-text"><em>Source: {{this.source}}</em></p>
                         {{/if}}

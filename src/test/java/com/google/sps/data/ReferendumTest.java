@@ -44,6 +44,26 @@ public class ReferendumTest {
   public void allFieldsPresent_testFromJSONObject() throws Exception {
     JSONObject referendumJsonObject =
         new JSONObject(
+            "{\"type\": \"Referendum\",\"referendumTitle\": \"Proposition 1\", \"referendumUrl\": \"testUrl\","
+                + "\"referendumSubtitle\": \"Water Bond. Funding for Water Quality, Supply, Treatment, and Storage Projects.\","
+                + "\"sources\": [{\"name\": \"Voter Information Project\"},{\"name\": \"Ballot Information Project\"}]}");
+
+    Referendum referendum = Referendum.fromJSONObject(referendumJsonObject);
+
+    Assert.assertEquals(referendum.getTitle(), "Proposition 1");
+    Assert.assertEquals(
+        referendum.getDescription(),
+        "Water Bond. Funding for Water Quality, Supply, Treatment, and Storage Projects.");
+    Assert.assertEquals(
+        referendum.getSource(), "Voter Information Project, Ballot Information Project");
+    Assert.assertEquals(referendum.getUrl(), "testUrl");
+  }
+
+  // Test putting API JSON response for one election in an Election object and reading from it.
+  @Test
+  public void missingUrl_testFromJSONObject() throws Exception {
+    JSONObject referendumJsonObject =
+        new JSONObject(
             "{\"type\": \"Referendum\",\"referendumTitle\": \"Proposition 1\","
                 + "\"referendumSubtitle\": \"Water Bond. Funding for Water Quality, Supply, Treatment, and Storage Projects.\","
                 + "\"sources\": [{\"name\": \"Voter Information Project\"},{\"name\": \"Ballot Information Project\"}]}");
@@ -56,6 +76,7 @@ public class ReferendumTest {
         "Water Bond. Funding for Water Quality, Supply, Treatment, and Storage Projects.");
     Assert.assertEquals(
         referendum.getSource(), "Voter Information Project, Ballot Information Project");
+    Assert.assertEquals(referendum.getUrl(), "");
   }
 
   @Test
@@ -89,6 +110,7 @@ public class ReferendumTest {
             .setTitle("myTitle")
             .setDescription("myDescription")
             .setSource("mySource")
+            .setUrl("myUrl")
             .build();
 
     long entityKeyId = referendum.addToDatastore(ds);
@@ -105,6 +127,7 @@ public class ReferendumTest {
     entity.setProperty("title", "myTitle");
     entity.setProperty("description", "myDescription");
     entity.setProperty("source", "mySource");
+    entity.setProperty("url", "myUrl");
 
     Referendum referendum = Referendum.fromEntity(entity);
 
