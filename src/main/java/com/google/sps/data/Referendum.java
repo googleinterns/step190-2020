@@ -66,6 +66,7 @@ public abstract class Referendum {
     String referendumDescription;
     String referendumTitle;
     String source = "";
+    String url;
 
     try {
       referendumTitle = obj.getString(TITLE_JSON_KEYWORD);

@@ -43,7 +43,8 @@ public class ElectionServlet extends HttpServlet {
   private static final String BASE_URL = "https://www.googleapis.com/civicinfo/v2/elections?key=%s";
 
   /**
-   * Makes an API call to electionQuery in the Google Civic Information API. Deletes existing Election Entities from Datastore and creates and stores new Entities from the API response.
+   * Makes an API call to electionQuery in the Google Civic Information API. Deletes existing
+   * Election Entities from Datastore and creates and stores new Entities from the API response.
    *
    * @param request the HTTP request containing user address and electionId as parameters
    * @param response the HTTP response, contains error message if an error occurs
