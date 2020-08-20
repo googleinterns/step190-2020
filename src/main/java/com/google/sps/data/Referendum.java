@@ -74,7 +74,6 @@ public abstract class Referendum {
     String source = "";
     String url;
 
-
     try {
       title = obj.getString(TITLE_JSON_KEYWORD);
     } catch (JSONException e) {
