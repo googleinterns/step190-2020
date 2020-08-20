@@ -131,8 +131,6 @@ function populateClassesForTemplate(electionId){
           referendums.push(referendum);
       });
 
-      // TODO(anooshree): sort referendums by number?
-
       let source = document.getElementById('contests-referendums-template').innerHTML;
       let template = Handlebars.compile(source);
       let context = { contests: contests, 
@@ -171,50 +169,67 @@ function initializeMap() {
   geocoder = new google.maps.Geocoder();
 
   const urlParams = new URLSearchParams(window.location.search);
-  const address = urlParams.get('address');
-  
-  geocoder.geocode( { 'address': address}, function(results, status) {
-    if (status == 'OK') {
-      map = new google.maps.Map(document.getElementById("polling-stations-map"), {
-        center: results[0].geometry.location,
-        zoom: 13
-      });
-      console.log("Created map");
-    } else {
-      alert('Geocode was not successful for the following reason: ' + status);
-    }
-  });
-
   let servletUrl = "/polling-stations?electionId=" + urlParams.get("electionId");
 
   fetch(servletUrl)
     .then(response => response.json())
     .then((pollingStationList) => {
-      pollingStationList.forEach((pollingStation) => {
-        var type;
-        if (pollingStation.locationType == "dropOffLocation") {
-          type = "Drop off only.";
-        } else if (pollingStation.locationType == "earlyVoteSite") {
-          type = "Early vote site only.";
-        } else if (pollingStation.locationType == "pollingLocation") {
-          type = "Standard polling location.";
+      if (pollingStationList === undefined || pollingStationList.length == 0) {
+        document.getElementById("polling-stations-map").style.display = "none";
+        document.getElementById("no-polling-stations").innerText = 
+          "Sorry, we can't find any polling stations for this election near your address.";
+        console.log("displayed polling station message");
+        return;
+      }
+
+      document.getElementById("no-polling-stations").innerText = "";
+      document.getElementById("polling-stations-map").style.display = "block";
+      
+      const address = urlParams.get('address');
+      
+      geocoder.geocode( { 'address': address}, function(results, status) {
+        if (status == 'OK') {
+          map = new google.maps.Map(document.getElementById("polling-stations-map"), {
+            center: results[0].geometry.location,
+            zoom: 13
+          });
+          console.log("Created map");
+          
+          const homeMarker = new google.maps.Marker({
+            position:results[0].geometry.location, 
+            map:map,
+            icon: "https://img.icons8.com/ios-filled/50/000000/home.png",
+            draggable: false
+          });
+          console.log("Created user address marker");
+          
+          pollingStationList.forEach((pollingStation) => {
+
+            let descriptionTemplate =  
+              `<div id="content">
+                <div id="siteNotice"></div> 
+                <h3 id="firstHeading" class="firstHeading"> {{pollingStation.name}} </h3> 
+                <div id="bodyContent">
+                <p> {{pollingStation.address}} </p>
+                  <p>Open {{pollingStation.pollingHours}} beginning {{pollingStation.startDate}}
+                   and until {{pollingStation.endDate}}.</p>
+                  <p> {{findType pollingStation.locationType}} </p>
+                  {{#if pollingStation.sources}}
+                    <p><i> Sources: {{withCommas pollingStation.sources}}</i></p>
+                  {{/if}}
+                </div>
+              </div>`;
+
+            let template = Handlebars.compile(descriptionTemplate);
+            let context = {pollingStation: pollingStation};
+            let description = template(context);
+    
+            addPollingStation(pollingStation.address, map, pollingStation.name, description);
+            console.log("Added polling station marker");
+          });
+        } else {
+          alert('Geocode was not successful for the following reason: ' + status);
         }
-
-        const description =
-          '<div id="content">' +
-          '<div id="siteNotice">' +
-          "</div>" +
-          '<h2 id="firstHeading" class="firstHeading">'+ pollingStation.name + '</h2>' +
-          '<div id="bodyContent">' +
-          "<p>" + pollingStation.address + "</p>" +
-          "<p>Hours: Open " + pollingStation.pollingHours + " beginning " + pollingStation.startDate + 
-          " and until " + pollingStation.endDate + ".</p>" +
-          "<p>" + type + "</p>" +
-          "</div>" +
-          "</div>";
-
-        addPollingStation(pollingStation.address, map, pollingStation.name, description);
-        console.log("Added polling station marker");
       });
     });
 }
@@ -270,4 +285,29 @@ Handlebars.registerHelper('stripUrl', function(urlString){
     urlString = urlString.slice(0, -1);
   }
   return urlString;
+})
+
+/** 
+ * Handlebars helper that converts an array into a comma-separated string
+ * 
+ * @param {Array} array to be converted
+ */
+Handlebars.registerHelper('withCommas', function(sourcesList){
+  return sourcesList.join(", ");
+})
+
+/**
+ * Handlebars helper that convverts the locationType 
+ * of a PollingStation object into a user-friendly string
+ * 
+ * @param {String} the locationType
+ */
+Handlebars.registerHelper('findType', function(locationType){
+  if (locationType == "dropOffLocation") {
+    return "Drop off only.";
+  } else if (locationType == "earlyVoteSite") {
+    return "Early vote site only.";
+  } else if (locationType == "pollingLocation") {
+    return "Standard polling location.";
+  }
 })
