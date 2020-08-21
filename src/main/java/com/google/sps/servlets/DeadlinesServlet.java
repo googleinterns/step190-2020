@@ -92,6 +92,7 @@ public class DeadlinesServlet extends HttpServlet {
   }
 
   public static final String BASE_URL = "https://fvap.gov/xml-api";
+  public static final String DEADLINES_PARAM = "deadline-dates.xml";
 
   /**
    * Retrieves the deadllines for mail in voting and registration for a given state using the FVAP
@@ -112,7 +113,7 @@ public class DeadlinesServlet extends HttpServlet {
 
     JSONObject deadlinesObject =
         ServletUtils.readFromApiUrl(
-                String.format(BASE_URL + "/%s/deadline-dates.xml", fullStateName))
+                String.format(BASE_URL + "/%s/%s", fullStateName, DEADLINES_PARAM))
             .get();
 
     JSONArray datesAndDeadlines =

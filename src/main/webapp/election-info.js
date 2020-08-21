@@ -105,12 +105,9 @@ function callInfoCardServlet(electionId, address, state){
   }).then((response) => {
       let errorTextElement = document.getElementById('address-error-text');
       if (response.ok) { // if HTTP-status is 200-299
-<<<<<<< HEAD
         console.log('Called Info Card servlet successfully');
-        populateDeadlines(state);
-=======
         errorTextElement.style.display = "none";
->>>>>>> c1c3fb2a084326901f6684268bd97567c836b144
+        populateDeadlines(state);
         populateClassesForTemplate(electionId);
         initializeMap();
       } else {
@@ -123,25 +120,36 @@ function callInfoCardServlet(electionId, address, state){
 
 /**
  * Call GET on the Deadlines Servlet to retrieve the registration and mail-in 
- * deadlines for the user
+ * deadlines for the user and populate the information used in the Handlebars template
  * 
  * @param {String} state the user's state
  */
 function populateDeadlines(state) {
-  let deadlines = [];
+  let primaryDeadlines = [];
+  let runOffDeadlines = [];
+  let generalDeadlines = [];
+
   let servletUrl = `/deadlines?state=${state}`;
 
   fetch(servletUrl) 
     .then(response => response.json(servletUrl))
     .then((JSONobject) => {
       JSONobject.myArrayList.forEach((deadline) => {
-        deadlines.push(deadline.map);
+        let electionType = deadline['map']['election-type'];
+        if(electionType == "General Election") {
+          generalDeadlines.push(deadline.map);
+        } else if(electionType == "State Primary") {
+          primaryDeadlines.push(deadline.map);
+        } else if(electionType == "State Primary Runoff") {
+          runOffDeadlines.push(deadline.map);
+        }
       });
 
       let source = document.getElementById('deadlines-template').innerHTML;
       let template = Handlebars.compile(source);
-      let context = { deadlines : deadlines};
-      console.log(deadlines);
+      let context = {generalDeadlines : generalDeadlines,
+                     runOffDeadlines : runOffDeadlines,
+                     primaryDeadlines : primaryDeadlines};
 
       let deadlinesContainerElement = document.getElementById('dates-and-deadlines');
       deadlinesContainerElement.innerHTML = template(context);

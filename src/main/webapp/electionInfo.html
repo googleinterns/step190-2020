@@ -116,12 +116,30 @@
             <script id="deadlines-template" type="text/x-handlebars-template">
               <div class="row" id="deadlines-wrapper">
                 <div class="col-lg-8 col-lg-offset-2">
-                  <h3 id="deadlines-title"><b>Deadlines you should know: </b></h3>
-                  {{#each deadlines}}
-                  <p>
-                    {{processRule this.rule this.voting-request-type}} <b>{{formatDate this.date}}</b>
-                  </p>
-                  {{/each}}
+                  {{#if primaryDeadlines}}
+                    <h3 id="deadlines-title"><b>Key deadlines for this primary election: </b></h3>
+                    {{#each primaryDeadlines}}
+                    <p>
+                      {{processRule this.rule this.voting-request-type}} <b>{{formatDate this.date}}</b>
+                    </p>
+                    {{/each}}
+                  {{/if}}
+                  {{#if runOffDeadlines}}
+                    <h3 id="deadlines-title"><b>Key deadlines for this primary runoff election: </b></h3>
+                    {{#each runOffDeadlines}}
+                    <p>
+                      {{processRule this.rule this.voting-request-type}} <b>{{formatDate this.date}}</b>
+                    </p>
+                    {{/each}}
+                  {{/if}}
+                  {{#if generalDeadlines}}
+                    <h3 id="deadlines-title"><b>Key deadlines for the 2020 presidential election: </b></h3>
+                    {{#each generalDeadlines}}
+                    <p>
+                      {{processRule this.rule this.voting-request-type}} <b>{{formatDate this.date}}</b>
+                    </p>
+                    {{/each}}
+                  {{/if}}
                 </div>
               </div>
             </script>
