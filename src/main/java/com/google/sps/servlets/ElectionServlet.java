@@ -72,8 +72,7 @@ public class ElectionServlet extends HttpServlet {
     PreparedQuery results = datastore.prepare(new Query(Election.ENTITY_KIND));
     // Have to make this a cross-group transaction because Election contains Embedded Entities for
     // its PollingStations
-    TransactionOptions options = TransactionOptions.Builder.withXG(true);
-    Transaction txn = datastore.beginTransaction(options);
+    Transaction txn = datastore.beginTransaction(TransactionOptions.Builder.withXG(true));
     try {
       for (Entity entity : results.asIterable()) {
         Key electionKey = KeyFactory.createKey(Election.ENTITY_KIND, entity.getKey().getId());
