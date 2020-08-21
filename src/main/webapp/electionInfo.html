@@ -66,32 +66,36 @@
                   </div>
                   <div class="row address-row-wrapper">
                     <div class="col-md-2 col-md-offset-1">
-                      <input class="form-control" id="street_number" disabled="true">
+                      <input class="form-control" id="street_number">
                       <label class="control-label required">Street Number</label>
                     </div>
                     <div class="col-md-5">
-                      <input class="form-control" id="route" disabled="true">
+                      <input class="form-control" id="route">
                       <label class="control-label required">Street Name</label>
                     </div>
                     <div class="col-md-3">
-                      <input class="form-control field" id="locality" disabled="true">
+                      <input class="form-control field" id="locality">
                       <label class="control-label required">City</label>
                     </div>
                   </div>
   
                   <div class="row address-row-wrapper">
                     <div class="col-md-2 col-md-offset-2"> 
-                      <input class="form-control" id="administrative_area_level_1" disabled="true">
+                      <input class="form-control" id="administrative_area_level_1">
                       <label class="control-label required">State</label>
                     </div>
                     <div class="col-md-4">
-                      <input class="form-control" id="country" disabled="true">
+                      <input class="form-control" id="country">
                       <label class="control-label required">Country</label>
                     </div>
                     <div class="col-md-2">
-                      <input class="form-control" id="postal_code" disabled="true">
+                      <input class="form-control" id="postal_code">
                       <label class="control-label required">Zip Code</label>
                     </div>
+                  </div>
+
+                  <div id="address-error-wrapper">
+                    <p style="display: none" id="address-error-text">Invalid address.</p>
                   </div>
   
                   <div class="row address-row-wrapper" id="address-button-container">

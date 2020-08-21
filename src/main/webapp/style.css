@@ -305,6 +305,15 @@ body{
   text-decoration: none;
 }
 
+#address-error-wrapper {
+  height: 5px;
+}
+
+#address-error-text {
+  color: red;
+  font-style: italic;
+}
+
 .noborder {
   border: none;
   box-shadow: none;

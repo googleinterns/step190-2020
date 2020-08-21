@@ -94,7 +94,7 @@ public class ServletUtils {
    *
    * @param urlString a valid API URL, accessible with the project's API keys
    */
-  public static JSONObject readFromApiUrl(String urlString) throws IOException {
+  public static Optional<JSONObject> readFromApiUrl(String urlString) throws IOException {
     StringBuilder strBuf = new StringBuilder();
     HttpURLConnection conn = null;
     BufferedReader reader = null;
@@ -106,8 +106,8 @@ public class ServletUtils {
       conn.setRequestProperty("Accept", "application/json");
 
       if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-        throw new RuntimeException(
-            "HTTP GET Request Failed with Error code : " + conn.getResponseCode());
+        logger.log(Level.WARNING, conn.getResponseCode() + " error: Could not GET " + urlString);
+        return Optional.empty();
       }
 
       // Using IO Stream with Buffer for increased efficiency
@@ -146,7 +146,7 @@ public class ServletUtils {
       obj = new JSONObject(results);
     }
 
-    return obj;
+    return Optional.of(obj);
   }
 
   public static void deleteAllEntitiesOfKind(DatastoreService datastore, String entityKind) {
