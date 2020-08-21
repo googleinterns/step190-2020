@@ -112,6 +112,10 @@ function callInfoCardServlet(electionId, address, state){
         initializeMap();
       } else {
         errorTextElement.style.display = "block";
+        document.getElementById('polling-stations-map').style.height = '0';
+        document.getElementById('dates-and-deadlines').innerHTML = '';
+        document.getElementById('no-polling-stations').innerHTML = '';
+        document.getElementById('election-info-results').innerHTML = '';
       }
 
       hideSpinner();
@@ -185,6 +189,8 @@ function populateClassesForTemplate(electionId){
           referendums.push(referendum);
       });
 
+      referendums.sort(function(a, b){return (a.title < b.title) ? -1 : ((a.title > b.title) ? 1 : 0)});
+
       let source = document.getElementById('contests-referendums-template').innerHTML;
       let template = Handlebars.compile(source);
       let context = { contests: contests, 
@@ -193,6 +199,13 @@ function populateClassesForTemplate(electionId){
 
       let infoCardContainerElement = document.getElementById('election-info-results');
       infoCardContainerElement.innerHTML = template(context);
+
+      document.getElementById('street_number').value = '' ;
+      document.getElementById('route').value = '';
+      document.getElementById('locality').value = '';
+      document.getElementById('administrative_area_level_1').value = '';
+      document.getElementById('country').value = '';
+      document.getElementById('postal_code').value = '';
 
       let collapsibles = document.getElementsByClassName("collapsible");
 
@@ -224,6 +237,8 @@ function initializeMap() {
 
   const urlParams = new URLSearchParams(window.location.search);
   let servletUrl = "/polling-stations?electionId=" + urlParams.get("electionId");
+
+  document.getElementById('polling-stations-map').style.height = '600px';
 
   fetch(servletUrl)
     .then(response => response.json())

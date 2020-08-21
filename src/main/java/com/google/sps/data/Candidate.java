@@ -24,6 +24,7 @@ import com.google.sps.servlets.ServletUtils;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -164,7 +165,7 @@ public abstract class Candidate {
                       candidateWeVoteId))
               .get();
       candidateDescription = candidateObject.getString("ballotpedia_candidate_summary");
-    } catch (IOException | JSONException e) {
+    } catch (IOException | JSONException | NoSuchElementException e) {
       return "";
     }
 
