@@ -36,7 +36,7 @@ The first time you run this command will take longer to build than usual because
 
 ### Insert election data in your local Datastore
 ```
-curl -X PUT /election
+curl -X PUT localhost:8080/election
 ```
 
 ### Stop the local server
