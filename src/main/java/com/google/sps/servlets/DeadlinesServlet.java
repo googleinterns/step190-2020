@@ -28,9 +28,9 @@ import org.json.JSONObject;
 
 /** This servlet is used to retrieve the information on the voting deadlines for a user's state. */
 @WebServlet("/deadlines")
-public class DeadlinesServlet extends HttpServlet {
+public final class DeadlinesServlet extends HttpServlet {
 
-  public static final Map<String, String> STATE_MAP;
+  private static final Map<String, String> STATE_MAP;
 
   static {
     STATE_MAP = new HashMap<String, String>();
@@ -91,8 +91,8 @@ public class DeadlinesServlet extends HttpServlet {
     STATE_MAP.put("wy", "Wyoming");
   }
 
-  public static final String BASE_URL = "https://fvap.gov/xml-api";
-  public static final String DEADLINES_PARAM = "deadline-dates.xml";
+  private static final String BASE_URL = "https://fvap.gov/xml-api";
+  private static final String DEADLINES_PARAM = "deadline-dates.xml";
 
   /**
    * Retrieves the deadllines for mail in voting and registration for a given state using the FVAP

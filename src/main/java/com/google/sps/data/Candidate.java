@@ -31,15 +31,6 @@ import org.json.JSONObject;
 /** A candidate for a public office position that will appear on voter ballots */
 @AutoValue
 public abstract class Candidate {
-  private static final String WE_VOTE_API_BASE_URL =
-      "https://api.wevoteusa.org/apis/v1/%s/?csrfmiddlewaretoken=%s";
-  private static final String WE_VOTE_SEARCH_ALL_METHOD = "searchAll";
-  private static final String WE_VOTE_BALLOT_ITEM_METHOD = "ballotItemRetrieve";
-  private static final String WE_VOTE_TOKEN =
-      "SvVojWyYxJk3vSPQqXOzVg8q9M9PpDBtF4qo8wcAVn0yUm18g97vi4RZXwgyshNi";
-  private static final String WE_VOTE_VOTER_ID =
-      "CmrnE4BCbd7E6vUMxCod49oSwY1AK1z7xxSybTtMBPdgA23aj2PO2pVLxPEJulNiyWfjQsUFpM3776tF68lTUlCS";
-  private static final String WE_VOTE_ITEM_KIND = "CANDIDATE";
 
   public static final String ENTITY_KIND = "Candidate";
   public static final String NAME_JSON_KEYWORD = "name";
@@ -51,6 +42,16 @@ public abstract class Candidate {
   public static final String CAMPAIGN_URL_ENTITY_KEYWORD = "campaignSite";
   public static final String CHANNELS_ENTITY_KEYWORD = "channels";
   public static final String PLATFORM_ENTITY_KEYWORD = "platformDescription";
+
+  private static final String WE_VOTE_API_BASE_URL =
+      "https://api.wevoteusa.org/apis/v1/%s/?csrfmiddlewaretoken=%s";
+  private static final String WE_VOTE_SEARCH_ALL_METHOD = "searchAll";
+  private static final String WE_VOTE_BALLOT_ITEM_METHOD = "ballotItemRetrieve";
+  private static final String WE_VOTE_TOKEN =
+      "SvVojWyYxJk3vSPQqXOzVg8q9M9PpDBtF4qo8wcAVn0yUm18g97vi4RZXwgyshNi";
+  private static final String WE_VOTE_VOTER_ID =
+      "CmrnE4BCbd7E6vUMxCod49oSwY1AK1z7xxSybTtMBPdgA23aj2PO2pVLxPEJulNiyWfjQsUFpM3776tF68lTUlCS";
+  private static final String WE_VOTE_ITEM_KIND = "CANDIDATE";
 
   public abstract String getName();
 
@@ -113,13 +114,11 @@ public abstract class Candidate {
       }
     }
 
-    String platformDescription = getPlatformDescriptionFromWeVoteApi(candidateName);
-
     return Candidate.builder()
         .setName(candidateName)
         .setPartyAffiliation(candidateParty)
         .setCampaignSite(candidateUrl)
-        .setPlatformDescription(platformDescription)
+        .setPlatformDescription(getPlatformDescriptionFromWeVoteApi(candidateName))
         .setChannels(channelsMap)
         .build();
   }

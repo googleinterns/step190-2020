@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletResponse;
  * specified by query parameter.
  */
 @WebServlet("/contests")
-public class ContestsServlet extends HttpServlet {
+public final class ContestsServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Optional<String> electionIdOptional =

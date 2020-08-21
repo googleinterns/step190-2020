@@ -39,7 +39,7 @@ import org.json.JSONObject;
  * <p>TODO(anooshree): Write unit tests using the Power Mockito framework
  */
 @WebServlet("/election")
-public class ElectionServlet extends HttpServlet {
+public final class ElectionServlet extends HttpServlet {
 
   private static final String BASE_URL = "https://www.googleapis.com/civicinfo/v2/elections?key=%s";
 
