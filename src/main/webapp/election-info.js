@@ -27,7 +27,6 @@ function onElectionInfoLoad(){
           electionName: election.name 
         };
         electionInfoWrapperElement.style.removeProperty('display');
-        return;
       }
     });
 
@@ -117,9 +116,8 @@ function callInfoCardServlet(electionId, address, state){
         document.getElementById('dates-and-deadlines').style.display = 'none';
         document.getElementById('no-polling-stations').innerHTML = '';
         document.getElementById('election-info-results').innerHTML = '';
+        hideSpinner();
       }
-
-      hideSpinner();
   });
 }
 
@@ -160,6 +158,13 @@ function populateDeadlines(state) {
       deadlinesContainerElement.innerHTML = template(context);
       deadlinesContainerElement.style.display = 'block';
       console.log("processed deadlines");
+
+      hideSpinner();
+      window.scrollTo({
+        top: window.innerHeight - 40,
+        left: 0,
+        behavior: 'smooth'
+      });
   });
 }
 
