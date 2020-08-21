@@ -85,7 +85,7 @@ public class DeadlineServletTest {
             + "</deadline-date> </deadline-dates> </evag>";
 
     when(ServletUtils.readFromApiUrl(anyString()))
-        .thenReturn(new JSONObject(XML.toJSONObject(xmlString).toString()));
+        .thenReturn(Optional.of(new JSONObject(XML.toJSONObject(xmlString).toString())));
 
     when(httpServletRequest.getParameter("state")).thenReturn("ca");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);

@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.sps.servlets.ServletUtils;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Optional;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Assert;
@@ -76,9 +77,11 @@ public class CandidateTest {
                 + "\":\"www.janedoe.org\"}");
     mockStatic(ServletUtils.class);
     when(ServletUtils.readFromApiUrl(searchUrl))
-        .thenReturn(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}"));
+        .thenReturn(
+            Optional.of(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}")));
     when(ServletUtils.readFromApiUrl(candidateUrl))
-        .thenReturn(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}"));
+        .thenReturn(
+            Optional.of(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}")));
     Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
 
     Assert.assertEquals(newCandidate.getName(), "Jane Doe");
@@ -105,9 +108,11 @@ public class CandidateTest {
                 + "\":\"www.janedoe.org\"}");
     mockStatic(ServletUtils.class);
     when(ServletUtils.readFromApiUrl(searchUrl))
-        .thenReturn(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}"));
+        .thenReturn(
+            Optional.of(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}")));
     when(ServletUtils.readFromApiUrl(candidateUrl))
-        .thenReturn(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}"));
+        .thenReturn(
+            Optional.of(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}")));
 
     Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
     Assert.assertEquals(newCandidate.getName(), "Jane Doe");
@@ -131,9 +136,11 @@ public class CandidateTest {
                 + "\":\"www.janedoe.org\"}");
     mockStatic(ServletUtils.class);
     when(ServletUtils.readFromApiUrl(searchUrl))
-        .thenReturn(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}"));
+        .thenReturn(
+            Optional.of(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}")));
     when(ServletUtils.readFromApiUrl(candidateUrl))
-        .thenReturn(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}"));
+        .thenReturn(
+            Optional.of(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}")));
 
     Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
     Assert.assertEquals(newCandidate.getName(), "Jane Doe");
@@ -154,9 +161,11 @@ public class CandidateTest {
                 + "\":\"Green Party\"}");
     mockStatic(ServletUtils.class);
     when(ServletUtils.readFromApiUrl(searchUrl))
-        .thenReturn(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}"));
+        .thenReturn(
+            Optional.of(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}")));
     when(ServletUtils.readFromApiUrl(candidateUrl))
-        .thenReturn(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}"));
+        .thenReturn(
+            Optional.of(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}")));
 
     Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
     Assert.assertEquals(newCandidate.getName(), "Jane Doe");
@@ -176,9 +185,11 @@ public class CandidateTest {
                 + "\":\"www.janedoe.org\"}");
     mockStatic(ServletUtils.class);
     when(ServletUtils.readFromApiUrl(searchUrl))
-        .thenReturn(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}"));
+        .thenReturn(
+            Optional.of(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}")));
     when(ServletUtils.readFromApiUrl(candidateUrl))
-        .thenReturn(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}"));
+        .thenReturn(
+            Optional.of(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}")));
 
     Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
     Assert.assertEquals(newCandidate.getName(), "Jane Doe");
@@ -197,8 +208,8 @@ public class CandidateTest {
                 + Candidate.PARTY_JSON_KEYWORD
                 + "\":\"Green Party\"}");
     mockStatic(ServletUtils.class);
-    when(ServletUtils.readFromApiUrl(searchUrl)).thenReturn(new JSONObject("{}"));
-    when(ServletUtils.readFromApiUrl(candidateUrl)).thenReturn(new JSONObject("{}"));
+    when(ServletUtils.readFromApiUrl(searchUrl)).thenReturn(Optional.of(new JSONObject("{}")));
+    when(ServletUtils.readFromApiUrl(candidateUrl)).thenReturn(Optional.of(new JSONObject("{}")));
 
     Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
     Assert.assertEquals(newCandidate.getName(), "Jane Doe");

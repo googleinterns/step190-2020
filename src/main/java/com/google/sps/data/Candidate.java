@@ -138,12 +138,13 @@ public abstract class Candidate {
       // We need to search for the candidate's name to get their we_vote_id first.
       JSONObject searchObject =
           ServletUtils.readFromApiUrl(
-              String.format(
-                  WE_VOTE_API_BASE_URL + "&text_from_search_field=%s&voter_device_id=%s",
-                  WE_VOTE_SEARCH_ALL_METHOD,
-                  WE_VOTE_TOKEN,
-                  candidateName.replaceAll(" ", "+"),
-                  WE_VOTE_VOTER_ID));
+                  String.format(
+                      WE_VOTE_API_BASE_URL + "&text_from_search_field=%s&voter_device_id=%s",
+                      WE_VOTE_SEARCH_ALL_METHOD,
+                      WE_VOTE_TOKEN,
+                      candidateName.replaceAll(" ", "+"),
+                      WE_VOTE_VOTER_ID))
+              .get();
 
       JSONArray searchObjectResult = searchObject.getJSONArray("search_results");
 
@@ -155,13 +156,14 @@ public abstract class Candidate {
 
       JSONObject candidateObject =
           ServletUtils.readFromApiUrl(
-              String.format(
-                  WE_VOTE_API_BASE_URL
-                      + "&kind_of_ballot_item=%s&ballot_item_id=&ballot_item_we_vote_id=%s",
-                  WE_VOTE_BALLOT_ITEM_METHOD,
-                  WE_VOTE_TOKEN,
-                  WE_VOTE_ITEM_KIND,
-                  candidateWeVoteId));
+                  String.format(
+                      WE_VOTE_API_BASE_URL
+                          + "&kind_of_ballot_item=%s&ballot_item_id=&ballot_item_we_vote_id=%s",
+                      WE_VOTE_BALLOT_ITEM_METHOD,
+                      WE_VOTE_TOKEN,
+                      WE_VOTE_ITEM_KIND,
+                      candidateWeVoteId))
+              .get();
       candidateDescription = candidateObject.getString("ballotpedia_candidate_summary");
     } catch (IOException | JSONException e) {
       return "";
