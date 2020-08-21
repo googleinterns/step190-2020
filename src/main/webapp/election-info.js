@@ -114,6 +114,7 @@ function callInfoCardServlet(electionId, address, state){
         errorTextElement.style.display = "block";
         document.getElementById('polling-stations-map').style.height = '0';
         document.getElementById('dates-and-deadlines').innerHTML = '';
+        document.getElementById('dates-and-deadlines').style.display = 'none';
         document.getElementById('no-polling-stations').innerHTML = '';
         document.getElementById('election-info-results').innerHTML = '';
       }
@@ -157,6 +158,7 @@ function populateDeadlines(state) {
 
       let deadlinesContainerElement = document.getElementById('dates-and-deadlines');
       deadlinesContainerElement.innerHTML = template(context);
+      deadlinesContainerElement.style.display = 'block';
       console.log("processed deadlines");
   });
 }
@@ -200,6 +202,7 @@ function populateClassesForTemplate(electionId){
       let infoCardContainerElement = document.getElementById('election-info-results');
       infoCardContainerElement.innerHTML = template(context);
 
+      document.getElementById('autocomplete').value = '' ;
       document.getElementById('street_number').value = '' ;
       document.getElementById('route').value = '';
       document.getElementById('locality').value = '';

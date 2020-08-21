@@ -488,3 +488,9 @@ body{
   border-radius: 10px;
 }
 
+#dates-and-deadlines {
+  background: rgba(102, 142, 219, 0.36);
+  margin: 0 15%;
+  padding: 15px 30px;
+  border-radius: 10px;
+}
