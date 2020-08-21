@@ -1,3 +1,6 @@
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                'August', 'September', 'October', 'November', 'December'];
+
 function onElectionInfoLoad(){
   fetch('/election')
   .then(response => response.json())
@@ -66,7 +69,8 @@ function logAddressInput() {
 
   let searchParams = new URLSearchParams(window.location.search);
   
-  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"));
+  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"), 
+                      searchParams.get("state"));
 }
 
 function showSpinner() {
@@ -86,7 +90,7 @@ function hideSpinner() {
  * @param {String} electionId the id of the user's chosen election
  * @param {String} address the user's address
  */
-function callInfoCardServlet(electionId, address){
+function callInfoCardServlet(electionId, address, state){
   showSpinner();
   let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
   fetch(servletUrl, {
@@ -94,12 +98,41 @@ function callInfoCardServlet(electionId, address){
   }).then((response) => {
       if (response.ok) { // if HTTP-status is 200-299
         console.log('Called Info Card servlet successfully');
+        populateDeadlines(state);
         populateClassesForTemplate(electionId);
         initializeMap();
         hideSpinner();
       } else {
         alert("HTTP-Error: " + response.status);
       }
+  });
+}
+
+/**
+ * Call GET on the Deadlines Servlet to retrieve the registration and mail-in 
+ * deadlines for the user
+ * 
+ * @param {String} state the user's state
+ */
+function populateDeadlines(state) {
+  let deadlines = [];
+  let servletUrl = `/deadlines?state=${state}`;
+
+  fetch(servletUrl) 
+    .then(response => response.json(servletUrl))
+    .then((JSONobject) => {
+      JSONobject.myArrayList.forEach((deadline) => {
+        deadlines.push(deadline.map);
+      });
+
+      let source = document.getElementById('deadlines-template').innerHTML;
+      let template = Handlebars.compile(source);
+      let context = { deadlines : deadlines};
+      console.log(deadlines);
+
+      let deadlinesContainerElement = document.getElementById('dates-and-deadlines');
+      deadlinesContainerElement.innerHTML = template(context);
+      console.log("processed deadlines");
   });
 }
 
@@ -310,4 +343,77 @@ Handlebars.registerHelper('findType', function(locationType){
   } else if (locationType == "pollingLocation") {
     return "Standard polling location.";
   }
+})
+
+/**
+ * Handlebars helper that processes information from the FVAP API
+ * into a more understandable deadline for the user
+ * 
+ * @param {String} rule the rule for the deadline, which includes
+ *                      how information should be submitted and
+ *                      what the due date is for (postmarked, etc.)
+ * @param {String} votingType the type of action the voter is taking
+ * 
+ * @return {String} a statement summarizing the rule for the user
+ */
+Handlebars.registerHelper('processRule', function(rule, votingType){
+
+  let submissionType = "";
+  let dueDateType =  "";
+
+  if(rule.includes(":")) {
+    let splitRule = rule.split(":");
+    submissionType = splitRule[0].toLowerCase();
+    dueDateType = splitRule[1].toLowerCase();
+  } else {
+    dueDateType = rule.toLowerCase();
+    submissionType = "";
+  }
+
+  if(votingType == "Ballot Return") {
+    votingType = "a ballot";
+  }
+  if(votingType ==   "Ballot Request") {
+    votingType = "a ballot request";
+  }
+  if(votingType == "Registration") {
+    votingType = "voter registration"
+  }
+
+  votingType = votingType.toLowerCase();
+  votingType = votingType.charAt(0).toUpperCase() + votingType.slice(1);
+
+  dueDateType = dueDateType.replace("*", "");
+
+  return `${votingType} ${submissionType} must be ${dueDateType}`;
+})
+
+/**
+ * Formats the date returned by the FVAP API
+ * (ex. 2020-10-19T00:00:00 to October 19, 2020)
+ * 
+ * @param {String} date the date value provided by the API
+ * 
+ * @return {String} a formatted version of the date
+ */
+Handlebars.registerHelper('formatDate', function(date){
+  let apiDate = date.substring(0, date.length - 9);
+
+  if (apiDate == undefined) {
+    return 'Invalid date';
+  }
+
+  let dateParts = apiDate.split('-');
+
+  if (dateParts.length !== 3) {
+    return 'Invalid date';
+  }
+
+  let monthNum = parseInt(dateParts[1]);
+
+  if (monthNum > MONTHS.length) {
+    return 'Invalid date';
+  }
+
+  return `${MONTHS[monthNum - 1]} ${parseInt(dateParts[2])}, ${dateParts[0]}`;
 })

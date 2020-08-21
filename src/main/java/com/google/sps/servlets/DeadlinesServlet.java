@@ -14,16 +14,11 @@
 
 package com.google.sps.servlets;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.PreparedQuery;
-import com.google.appengine.api.datastore.Query;
 import com.google.gson.Gson;
-import com.google.sps.data.Election;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,107 +26,102 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-/**
- * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
- * can participate in on a given day.
- */
+/** This servlet is used to retrieve the information on the voting deadlines for a user's state. */
 @WebServlet("/deadlines")
 public class DeadlinesServlet extends HttpServlet {
 
-    public static final Map<String, String> STATE_MAP;
-    static {
-        STATE_MAP = new HashMap<String, String>();
-        STATE_MAP.put("AL", "Alabama");
-        STATE_MAP.put("AK", "Alaska");
-        STATE_MAP.put("AB", "Alberta");
-        STATE_MAP.put("AZ", "Arizona");
-        STATE_MAP.put("AR", "Arkansas");
-        STATE_MAP.put("BC", "British Columbia");
-        STATE_MAP.put("CA", "California");
-        STATE_MAP.put("CO", "Colorado");
-        STATE_MAP.put("CT", "Connecticut");
-        STATE_MAP.put("DE", "Delaware");
-        STATE_MAP.put("DC", "District Of Columbia");
-        STATE_MAP.put("FL", "Florida");
-        STATE_MAP.put("GA", "Georgia");
-        STATE_MAP.put("GU", "Guam");
-        STATE_MAP.put("HI", "Hawaii");
-        STATE_MAP.put("ID", "Idaho");
-        STATE_MAP.put("IL", "Illinois");
-        STATE_MAP.put("IN", "Indiana");
-        STATE_MAP.put("IA", "Iowa");
-        STATE_MAP.put("KS", "Kansas");
-        STATE_MAP.put("KY", "Kentucky");
-        STATE_MAP.put("LA", "Louisiana");
-        STATE_MAP.put("ME", "Maine");
-        STATE_MAP.put("MB", "Manitoba");
-        STATE_MAP.put("MD", "Maryland");
-        STATE_MAP.put("MA", "Massachusetts");
-        STATE_MAP.put("MI", "Michigan");
-        STATE_MAP.put("MN", "Minnesota");
-        STATE_MAP.put("MS", "Mississippi");
-        STATE_MAP.put("MO", "Missouri");
-        STATE_MAP.put("MT", "Montana");
-        STATE_MAP.put("NE", "Nebraska");
-        STATE_MAP.put("NV", "Nevada");
-        STATE_MAP.put("NB", "New Brunswick");
-        STATE_MAP.put("NH", "New Hampshire");
-        STATE_MAP.put("NJ", "New Jersey");
-        STATE_MAP.put("NM", "New Mexico");
-        STATE_MAP.put("NY", "New York");
-        STATE_MAP.put("NF", "Newfoundland");
-        STATE_MAP.put("NC", "North Carolina");
-        STATE_MAP.put("ND", "North Dakota");
-        STATE_MAP.put("NT", "Northwest Territories");
-        STATE_MAP.put("NS", "Nova Scotia");
-        STATE_MAP.put("NU", "Nunavut");
-        STATE_MAP.put("OH", "Ohio");
-        STATE_MAP.put("OK", "Oklahoma");
-        STATE_MAP.put("ON", "Ontario");
-        STATE_MAP.put("OR", "Oregon");
-        STATE_MAP.put("PA", "Pennsylvania");
-        STATE_MAP.put("PE", "Prince Edward Island");
-        STATE_MAP.put("PR", "Puerto Rico");
-        STATE_MAP.put("QC", "Quebec");
-        STATE_MAP.put("RI", "Rhode Island");
-        STATE_MAP.put("SK", "Saskatchewan");
-        STATE_MAP.put("SC", "South Carolina");
-        STATE_MAP.put("SD", "South Dakota");
-        STATE_MAP.put("TN", "Tennessee");
-        STATE_MAP.put("TX", "Texas");
-        STATE_MAP.put("UT", "Utah");
-        STATE_MAP.put("VT", "Vermont");
-        STATE_MAP.put("VI", "Virgin Islands");
-        STATE_MAP.put("VA", "Virginia");
-        STATE_MAP.put("WA", "Washington");
-        STATE_MAP.put("WV", "West Virginia");
-        STATE_MAP.put("WI", "Wisconsin");
-        STATE_MAP.put("WY", "Wyoming");
-        STATE_MAP.put("YT", "Yukon Territory");
-    }
+  public static final Map<String, String> STATE_MAP;
+
+  static {
+    STATE_MAP = new HashMap<String, String>();
+    STATE_MAP.put("al", "Alabama");
+    STATE_MAP.put("ak", "Alaska");
+    STATE_MAP.put("ab", "Alberta");
+    STATE_MAP.put("az", "Arizona");
+    STATE_MAP.put("ar", "Arkansas");
+    STATE_MAP.put("ca", "California");
+    STATE_MAP.put("co", "Colorado");
+    STATE_MAP.put("ct", "Connecticut");
+    STATE_MAP.put("de", "Delaware");
+    STATE_MAP.put("dc", "District Of Columbia");
+    STATE_MAP.put("fl", "Florida");
+    STATE_MAP.put("ga", "Georgia");
+    STATE_MAP.put("gu", "Guam");
+    STATE_MAP.put("hi", "Hawaii");
+    STATE_MAP.put("id", "Idaho");
+    STATE_MAP.put("il", "Illinois");
+    STATE_MAP.put("in", "Indiana");
+    STATE_MAP.put("ia", "Iowa");
+    STATE_MAP.put("ks", "Kansas");
+    STATE_MAP.put("ky", "Kentucky");
+    STATE_MAP.put("la", "Louisiana");
+    STATE_MAP.put("me", "Maine");
+    STATE_MAP.put("md", "Maryland");
+    STATE_MAP.put("ma", "Massachusetts");
+    STATE_MAP.put("mi", "Michigan");
+    STATE_MAP.put("mn", "Minnesota");
+    STATE_MAP.put("ms", "Mississippi");
+    STATE_MAP.put("mo", "Missouri");
+    STATE_MAP.put("mt", "Montana");
+    STATE_MAP.put("ne", "Nebraska");
+    STATE_MAP.put("nv", "Nevada");
+    STATE_MAP.put("nh", "New Hampshire");
+    STATE_MAP.put("nj", "New Jersey");
+    STATE_MAP.put("nm", "New Mexico");
+    STATE_MAP.put("ny", "New York");
+    STATE_MAP.put("nc", "North Carolina");
+    STATE_MAP.put("nd", "North Dakota");
+    STATE_MAP.put("oh", "Ohio");
+    STATE_MAP.put("ok", "Oklahoma");
+    STATE_MAP.put("or", "Oregon");
+    STATE_MAP.put("pa", "Pennsylvania");
+    STATE_MAP.put("pr", "Puerto Rico");
+    STATE_MAP.put("ri", "Rhode Island");
+    STATE_MAP.put("sc", "South Carolina");
+    STATE_MAP.put("sd", "South Dakota");
+    STATE_MAP.put("tn", "Tennessee");
+    STATE_MAP.put("tx", "Texas");
+    STATE_MAP.put("ut", "Utah");
+    STATE_MAP.put("vt", "Vermont");
+    STATE_MAP.put("vi", "Virgin Islands");
+    STATE_MAP.put("va", "Virginia");
+    STATE_MAP.put("wa", "Washington");
+    STATE_MAP.put("wv", "West Virginia");
+    STATE_MAP.put("wi", "Wisconsin");
+    STATE_MAP.put("wy", "Wyoming");
+  }
+
+  public static final String BASE_URL = "https://fvap.gov/xml-api";
 
   /**
-   * Retrieves the list of elections still open for voting on a given day in the form of a JSON
-   * object
+   * Retrieves the deadllines for mail in voting and registration for a given state using the FVAP
+   * API
    *
-   * @param request the HTTP request containing user address and electionId as parameters
+   * @param request the HTTP request containing the user's state
    * @param response the HTTP response, contains error message if an error occurs
    */
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    Query query = new Query(Election.ENTITY_KIND);
+    Optional<String> stateOptional = ServletUtils.getRequestParam(request, response, "state");
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    PreparedQuery results = datastore.prepare(query);
-
-    List<Election> elections = new ArrayList<Election>();
-
-    for (Entity entity : results.asIterable()) {
-      elections.add(Election.fromEntity(entity));
+    if (!stateOptional.isPresent()) {
+      return;
     }
 
+    String fullStateName = STATE_MAP.get(stateOptional.get());
+
+    JSONObject deadlinesObject =
+        ServletUtils.readFromApiUrl(
+            String.format(BASE_URL + "/%s/deadline-dates.xml", fullStateName));
+
+    JSONArray datesAndDeadlines =
+        deadlinesObject
+            .getJSONObject("evag")
+            .getJSONObject("deadline-dates")
+            .getJSONArray("deadline-date");
+
     Gson gson = new Gson();
-    String json = gson.toJson(elections);
+    String json = gson.toJson(datesAndDeadlines);
 
     response.setContentType("application/json;");
     response.getWriter().println(json);

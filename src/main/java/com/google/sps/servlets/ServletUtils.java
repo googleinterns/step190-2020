@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
+import org.json.XML;
 
 public class ServletUtils {
 
@@ -135,8 +136,15 @@ public class ServletUtils {
       }
     }
 
+    JSONObject obj;
+
+    // handle case where web API output is in XML
     String results = strBuf.toString();
-    JSONObject obj = new JSONObject(results);
+    if (results.startsWith("<")) {
+      obj = new JSONObject(XML.toJSONObject(results).toString());
+    } else {
+      obj = new JSONObject(results);
+    }
 
     return obj;
   }

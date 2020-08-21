@@ -474,3 +474,8 @@ body{
   visibility: visible;
 }
 
+#deadlines-wrapper {
+  border-color: #668EDB;
+  border-radius: 10px;
+}
+

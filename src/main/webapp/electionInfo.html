@@ -107,6 +107,20 @@
             </div>
 
             <div id="spinner"></div>
+
+            <div id='dates-and-deadlines'></div>
+            <script id="deadlines-template" type="text/x-handlebars-template">
+              <div class="row" id="deadlines-wrapper">
+                <div class="col-lg-8 col-lg-offset-2">
+                  <h3 id="deadlines-title"><b>Deadlines you should know: </b></h3>
+                  {{#each deadlines}}
+                  <p>
+                    {{processRule this.rule this.voting-request-type}} <b>{{formatDate this.date}}</b>
+                  </p>
+                  {{/each}}
+                </div>
+              </div>
+            </script>
             
             <h3 id="no-polling-stations"></h3>
 
@@ -120,7 +134,7 @@
             <script id="contests-referendums-template" type="text/x-handlebars-template">
               <div class="row info-cards-wrapper">
                 <div class="container-fluid">
-                  <h3 id="info-cards-title">What's on the ballot</h3>
+                  <h3 id="info-cards-title">What's on the ballot:</h3>
                   <div class="col-md-4 col-lg-offset-2 contests-wrapper">
                     {{#each contests}}
                     <div class="info-card">
