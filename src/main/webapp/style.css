@@ -357,6 +357,12 @@ body{
   font-weight: bold;
   font-size: 150% ;
   padding: 18px;
+  background-color: white;
+  border: none;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  outline: none;
 }
 
 .info-card {
@@ -383,15 +389,6 @@ body{
   background-color: #E5E5E5;
   color: #444;
   border: none;
-}
-
-.referendum-name {
-  background-color: white;
-  border: none;
-  width: 100%;
-  padding: 0;
-  text-align: left;
-  outline: none;
 }
 
 .referendum-description{
