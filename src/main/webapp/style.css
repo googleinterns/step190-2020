@@ -416,7 +416,7 @@ body{
 /* Style the collapsible content. Note: hidden by default */
 .collapsible-content {
   padding: 0px 18px;
-  max-height: 0;
+  height: 0px;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
 }

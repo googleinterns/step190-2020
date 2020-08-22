@@ -221,10 +221,10 @@ function populateClassesForTemplate(electionId){
         collapsibles[i].addEventListener("click", function() {
           this.classList.toggle("active");
           let content = this.nextElementSibling;
-          if (content.style.maxHeight){
-            content.style.maxHeight = null;
+          if (content.style.height && content.style.height !== '0px'){
+            content.style.height = '0px';
           } else {
-            content.style.maxHeight = content.scrollHeight + 36 + "px";
+            content.style.height = '100%'; 
           }
         });
       }

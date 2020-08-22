@@ -160,33 +160,34 @@
                   <div class="col-md-4 col-lg-offset-2 contests-wrapper">
                     {{#each contests}}
                     <div class="info-card">
-                      <div class="info-card-title">
+                      <button type="button" class="info-card-title referendum-name collapsible">
                         {{this.name}}
-                      </div>
-
-                      <div class="candidates-wrapper">
-                        {{#each this.candidates}}
-                        <div class="candidate">
-                          <button type="button" class="candidate-name collapsible">
-                            <b>{{this.name}} </b>({{this.partyAffiliation}})
-                          </button>
-                          
-                          <div class="collapsible-content candidate-info">
-                            {{#if this.platformDescription}}
-                            <p>{{this.platformDescription}}</p>
-                            {{/if}}
-                            {{#if this.campaignSite}}
-                            <p><b>Website: </b><a href={{this.campaignSite}} target="_blank">{{stripUrl this.campaignSite}}</a></p>
-                            {{/if}}
-                            {{#each this.channels}}
-                            <p><b>{{@key}}: </b><a href={{this}}>{{stripUrl this}}</a></p>
-                            {{/each}}
+                      </button>
+                      <div class="collapsible-content">
+                        <div class="candidates-wrapper">
+                          {{#each this.candidates}}
+                          <div class="candidate">
+                            <button type="button" class="candidate-name collapsible">
+                              <b>{{this.name}} </b>({{this.partyAffiliation}})
+                            </button>
+                            
+                            <div class="collapsible-content candidate-info">
+                              {{#if this.platformDescription}}
+                              <p>{{this.platformDescription}}</p>
+                              {{/if}}
+                              {{#if this.campaignSite}}
+                              <p><b>Website: </b><a href={{this.campaignSite}} target="_blank">{{stripUrl this.campaignSite}}</a></p>
+                              {{/if}}
+                              {{#each this.channels}}
+                              <p><b>{{@key}}: </b><a href={{this}}>{{stripUrl this}}</a></p>
+                              {{/each}}
+                            </div>
                           </div>
+                          {{/each}}
+                          {{#if this.source}}
+                          <p class="source-text"><em>Source: {{this.source}}</em></p>
+                          {{/if}}
                         </div>
-                        {{/each}}
-                        {{#if this.source}}
-                        <p class="source-text"><em>Source: {{this.source}}</em></p>
-                        {{/if}}
                       </div>
                     </div>
                     {{else}}
