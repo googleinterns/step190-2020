@@ -121,7 +121,7 @@ public final class InfoCardServlet extends HttpServlet {
                 ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID))
             .replaceAll(" ", "%20");
 
-    Optional<JSONObject> voterInfoData = ServletUtils.readFromApiUrl(url);
+    Optional<JSONObject> voterInfoData = ServletUtils.readFromApiUrl(url, false);
     if (!voterInfoData.isPresent()) {
       response.setContentType("text/html");
       response

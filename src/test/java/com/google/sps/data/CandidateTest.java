@@ -76,10 +76,10 @@ public class CandidateTest {
                 + Candidate.CAMPAIGN_URL_JSON_KEYWORD
                 + "\":\"www.janedoe.org\"}");
     mockStatic(ServletUtils.class);
-    when(ServletUtils.readFromApiUrl(searchUrl))
+    when(ServletUtils.readFromApiUrl(searchUrl, false))
         .thenReturn(
             Optional.of(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}")));
-    when(ServletUtils.readFromApiUrl(candidateUrl))
+    when(ServletUtils.readFromApiUrl(candidateUrl, false))
         .thenReturn(
             Optional.of(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}")));
     Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
@@ -107,10 +107,10 @@ public class CandidateTest {
                 + Candidate.CAMPAIGN_URL_JSON_KEYWORD
                 + "\":\"www.janedoe.org\"}");
     mockStatic(ServletUtils.class);
-    when(ServletUtils.readFromApiUrl(searchUrl))
+    when(ServletUtils.readFromApiUrl(searchUrl, false))
         .thenReturn(
             Optional.of(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}")));
-    when(ServletUtils.readFromApiUrl(candidateUrl))
+    when(ServletUtils.readFromApiUrl(candidateUrl, false))
         .thenReturn(
             Optional.of(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}")));
 
@@ -135,10 +135,10 @@ public class CandidateTest {
                 + Candidate.CAMPAIGN_URL_JSON_KEYWORD
                 + "\":\"www.janedoe.org\"}");
     mockStatic(ServletUtils.class);
-    when(ServletUtils.readFromApiUrl(searchUrl))
+    when(ServletUtils.readFromApiUrl(searchUrl, false))
         .thenReturn(
             Optional.of(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}")));
-    when(ServletUtils.readFromApiUrl(candidateUrl))
+    when(ServletUtils.readFromApiUrl(candidateUrl, false))
         .thenReturn(
             Optional.of(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}")));
 
@@ -160,10 +160,10 @@ public class CandidateTest {
                 + Candidate.PARTY_JSON_KEYWORD
                 + "\":\"Green Party\"}");
     mockStatic(ServletUtils.class);
-    when(ServletUtils.readFromApiUrl(searchUrl))
+    when(ServletUtils.readFromApiUrl(searchUrl, false))
         .thenReturn(
             Optional.of(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}")));
-    when(ServletUtils.readFromApiUrl(candidateUrl))
+    when(ServletUtils.readFromApiUrl(candidateUrl, false))
         .thenReturn(
             Optional.of(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}")));
 
@@ -184,10 +184,10 @@ public class CandidateTest {
                 + Candidate.CAMPAIGN_URL_JSON_KEYWORD
                 + "\":\"www.janedoe.org\"}");
     mockStatic(ServletUtils.class);
-    when(ServletUtils.readFromApiUrl(searchUrl))
+    when(ServletUtils.readFromApiUrl(searchUrl, false))
         .thenReturn(
             Optional.of(new JSONObject("{\"search_results\": [{\"we_vote_id\": \"myId\"}]}")));
-    when(ServletUtils.readFromApiUrl(candidateUrl))
+    when(ServletUtils.readFromApiUrl(candidateUrl, false))
         .thenReturn(
             Optional.of(new JSONObject("{\"ballotpedia_candidate_summary\": \"mySummary\"}")));
 
@@ -208,8 +208,10 @@ public class CandidateTest {
                 + Candidate.PARTY_JSON_KEYWORD
                 + "\":\"Green Party\"}");
     mockStatic(ServletUtils.class);
-    when(ServletUtils.readFromApiUrl(searchUrl)).thenReturn(Optional.of(new JSONObject("{}")));
-    when(ServletUtils.readFromApiUrl(candidateUrl)).thenReturn(Optional.of(new JSONObject("{}")));
+    when(ServletUtils.readFromApiUrl(searchUrl, false))
+        .thenReturn(Optional.of(new JSONObject("{}")));
+    when(ServletUtils.readFromApiUrl(candidateUrl, false))
+        .thenReturn(Optional.of(new JSONObject("{}")));
 
     Candidate newCandidate = Candidate.fromJSONObject(candidateJSON);
     Assert.assertEquals(newCandidate.getName(), "Jane Doe");

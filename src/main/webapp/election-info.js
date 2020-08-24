@@ -139,11 +139,11 @@ function populateDeadlines(state) {
     .then((JSONobject) => {
       JSONobject.myArrayList.forEach((deadline) => {
         let electionType = deadline['map']['election-type'];
-        if(electionType == "General Election") {
+        if (electionType == "General Election") {
           generalDeadlines.push(deadline.map);
-        } else if(electionType == "State Primary") {
+        } else if (electionType == "State Primary") {
           primaryDeadlines.push(deadline.map);
-        } else if(electionType == "State Primary Runoff") {
+        } else if (electionType == "State Primary Runoff") {
           runOffDeadlines.push(deadline.map);
         }
       });
@@ -357,7 +357,7 @@ function addPollingStationMarker(map, position, title, description) {
  * @param {String} URL to be stripped.
  */
 Handlebars.registerHelper('stripUrl', function(urlString){
-  urlString = urlString.replace(/(^\w+:|^)\/\/(www.)?/, '');
+  urlString = urlString.replace(/(^\w+:|^)\/\/(www\.)?/, '');
   if(urlString[urlString.length - 1] == '/'){
     urlString = urlString.slice(0, -1);
   }
@@ -405,7 +405,7 @@ Handlebars.registerHelper('processRule', function(rule, votingType){
   let submissionType = "";
   let dueDateType =  "";
 
-  if(rule.includes(":")) {
+  if (rule.includes(":")) {
     let splitRule = rule.split(":");
     submissionType = splitRule[0].toLowerCase();
     dueDateType = splitRule[1].toLowerCase();
@@ -414,16 +414,12 @@ Handlebars.registerHelper('processRule', function(rule, votingType){
     submissionType = "";
   }
 
-  if(votingType == "Ballot Return") {
-    votingType = "a ballot";
-  }
-  if(votingType ==   "Ballot Request") {
-    votingType = "a ballot request";
-  }
-  if(votingType == "Registration") {
-    votingType = "voter registration"
-  }
+  // format votingType string for grammatical accuracy in return string
+  votingType = votingType.replace("Ballot", "a ballot");
+  votingType = votingType.replace("Return", "");
+  votingType = votingType.replace("Registration", "voter registration");
 
+  // formatting to capitalize just the first letter of the votingType variable
   votingType = votingType.toLowerCase();
   votingType = votingType.charAt(0).toUpperCase() + votingType.slice(1);
 
@@ -434,30 +430,19 @@ Handlebars.registerHelper('processRule', function(rule, votingType){
 
 /**
  * Formats the date returned by the FVAP API
- * (ex. 2020-10-19T00:00:00 to October 19, 2020)
+ * (ex. 2020-10-19T00:00:00 to Monday, October 19, 2020)
  * 
  * @param {String} date the date value provided by the API
  * 
  * @return {String} a formatted version of the date
  */
 Handlebars.registerHelper('formatDate', function(date){
-  let apiDate = date.substring(0, date.length - 9);
-
-  if (apiDate == undefined) {
+  if (date == undefined) {
     return 'Invalid date';
   }
 
-  let dateParts = apiDate.split('-');
+  let event = new Date(date);
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
-  if (dateParts.length !== 3) {
-    return 'Invalid date';
-  }
-
-  let monthNum = parseInt(dateParts[1]);
-
-  if (monthNum > MONTHS.length) {
-    return 'Invalid date';
-  }
-
-  return `${MONTHS[monthNum - 1]} ${parseInt(dateParts[2])}, ${dateParts[0]}`;
+  return event.toLocaleDateString('en-US', options);
 })

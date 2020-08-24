@@ -143,7 +143,8 @@ public abstract class Candidate {
                       WE_VOTE_SEARCH_ALL_METHOD,
                       WE_VOTE_TOKEN,
                       candidateName.replaceAll(" ", "+"),
-                      WE_VOTE_VOTER_ID))
+                      WE_VOTE_VOTER_ID),
+                  false)
               .get();
 
       JSONArray searchObjectResult = searchObject.getJSONArray("search_results");
@@ -162,7 +163,8 @@ public abstract class Candidate {
                       WE_VOTE_BALLOT_ITEM_METHOD,
                       WE_VOTE_TOKEN,
                       WE_VOTE_ITEM_KIND,
-                      candidateWeVoteId))
+                      candidateWeVoteId),
+                  false)
               .get();
       candidateDescription = candidateObject.getString("ballotpedia_candidate_summary");
     } catch (IOException | JSONException | NoSuchElementException e) {

@@ -1,5 +1,6 @@
 package com.google.sps.servlets;
 
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,6 +62,17 @@ public class DeadlineServletTest {
   }
 
   @Test
+  public void invalidQueryParameter_testDoGet() throws IOException {
+    when(httpServletRequest.getParameter("state")).thenReturn("ZZ");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    DeadlinesServlet deadlinesServlet = new DeadlinesServlet();
+    deadlinesServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter).println("ZZ is not a valid state abbreviation.");
+  }
+
+  @Test
   public void californiaUrl_testDoGet() throws IOException {
     mockStatic(ServletUtils.class);
     when(ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "state"))
@@ -84,7 +96,7 @@ public class DeadlineServletTest {
             + "<election-type>General Election</election-type> <voting-request-type>Ballot Return</voting-request-type>"
             + "</deadline-date> </deadline-dates> </evag>";
 
-    when(ServletUtils.readFromApiUrl(anyString()))
+    when(ServletUtils.readFromApiUrl(anyString(), anyBoolean()))
         .thenReturn(Optional.of(new JSONObject(XML.toJSONObject(xmlString).toString())));
 
     when(httpServletRequest.getParameter("state")).thenReturn("ca");
