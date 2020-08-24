@@ -114,7 +114,7 @@ function callInfoCardServlet(electionId, address, state){
         document.getElementById('polling-stations-map').style.height = '0';
         document.getElementById('dates-and-deadlines').innerHTML = '';
         document.getElementById('dates-and-deadlines').style.display = 'none';
-        document.getElementById('no-polling-stations').innerHTML = '';
+        document.getElementById('polling-station-status').innerHTML = '';
         document.getElementById('election-info-results').innerHTML = '';
         hideSpinner();
       }
@@ -253,13 +253,13 @@ function initializeMap() {
     .then((pollingStationList) => {
       if (pollingStationList === undefined || pollingStationList.length == 0) {
         document.getElementById("polling-stations-map").style.display = "none";
-        document.getElementById("no-polling-stations").innerText = 
+        document.getElementById("polling-station-status").innerText = 
           "Sorry, we can't find any polling stations for this election near your address.";
         console.log("displayed polling station message");
         return;
       }
 
-      document.getElementById("no-polling-stations").innerText = "";
+      document.getElementById("polling-station-status").innerText = "Polling stations near you for this election:";
       document.getElementById("polling-stations-map").style.display = "block";
       
       const address = urlParams.get('address');
