@@ -38,6 +38,7 @@ function onElectionInfoLoad(){
     }
 
     titleTextElement.innerHTML = template(context);
+    populateDeadlines(searchParams.get("state"));
   })
   .catch(() => alert('There has been an error.'));
 }
@@ -75,8 +76,7 @@ function logAddressInput() {
 
   let searchParams = new URLSearchParams(window.location.search);
   
-  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"), 
-                      searchParams.get("state"));
+  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"));
 }
 
 function showSpinner() {
@@ -96,7 +96,7 @@ function hideSpinner() {
  * @param {String} electionId the id of the user's chosen election
  * @param {String} address the user's address
  */
-function callInfoCardServlet(electionId, address, state){
+function callInfoCardServlet(electionId, address){
   showSpinner();
   let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
   fetch(servletUrl, {
@@ -106,7 +106,6 @@ function callInfoCardServlet(electionId, address, state){
       if (response.ok) { // if HTTP-status is 200-299
         console.log('Called Info Card servlet successfully');
         errorTextElement.style.display = "none";
-        populateDeadlines(state);
         populateClassesForTemplate(electionId);
         initializeMap();
       } else {
@@ -159,12 +158,7 @@ function populateDeadlines(state) {
       deadlinesContainerElement.style.display = 'block';
       console.log("processed deadlines");
 
-      hideSpinner();
-      window.scrollTo({
-        top: window.innerHeight - 40,
-        left: 0,
-        behavior: 'smooth'
-      });
+      
   });
 }
 
@@ -228,6 +222,13 @@ function populateClassesForTemplate(electionId){
           }
         });
       }
+
+      hideSpinner();
+      window.scrollTo({
+        top: window.innerHeight - 40,
+        left: 0,
+        behavior: 'smooth'
+      });
   });
 }
 
