@@ -27,7 +27,6 @@ function onElectionInfoLoad(){
           electionName: election.name 
         };
         electionInfoWrapperElement.style.removeProperty('display');
-        return;
       }
     });
 
@@ -112,9 +111,13 @@ function callInfoCardServlet(electionId, address, state){
         initializeMap();
       } else {
         errorTextElement.style.display = "block";
+        document.getElementById('polling-stations-map').style.height = '0';
+        document.getElementById('dates-and-deadlines').innerHTML = '';
+        document.getElementById('dates-and-deadlines').style.display = 'none';
+        document.getElementById('no-polling-stations').innerHTML = '';
+        document.getElementById('election-info-results').innerHTML = '';
+        hideSpinner();
       }
-
-      hideSpinner();
   });
 }
 
@@ -153,7 +156,15 @@ function populateDeadlines(state) {
 
       let deadlinesContainerElement = document.getElementById('dates-and-deadlines');
       deadlinesContainerElement.innerHTML = template(context);
+      deadlinesContainerElement.style.display = 'block';
       console.log("processed deadlines");
+
+      hideSpinner();
+      window.scrollTo({
+        top: window.innerHeight - 40,
+        left: 0,
+        behavior: 'smooth'
+      });
   });
 }
 
@@ -185,6 +196,8 @@ function populateClassesForTemplate(electionId){
           referendums.push(referendum);
       });
 
+      referendums.sort(function(a, b){return (a.title < b.title) ? -1 : ((a.title > b.title) ? 1 : 0)});
+
       let source = document.getElementById('contests-referendums-template').innerHTML;
       let template = Handlebars.compile(source);
       let context = { contests: contests, 
@@ -194,16 +207,24 @@ function populateClassesForTemplate(electionId){
       let infoCardContainerElement = document.getElementById('election-info-results');
       infoCardContainerElement.innerHTML = template(context);
 
+      document.getElementById('autocomplete').value = '' ;
+      document.getElementById('street_number').value = '' ;
+      document.getElementById('route').value = '';
+      document.getElementById('locality').value = '';
+      document.getElementById('administrative_area_level_1').value = '';
+      document.getElementById('country').value = '';
+      document.getElementById('postal_code').value = '';
+
       let collapsibles = document.getElementsByClassName("collapsible");
 
       for (let i = 0; i < collapsibles.length; i++) {
         collapsibles[i].addEventListener("click", function() {
           this.classList.toggle("active");
           let content = this.nextElementSibling;
-          if (content.style.maxHeight){
-            content.style.maxHeight = null;
+          if (content.style.height && content.style.height !== '0px'){
+            content.style.height = '0px';
           } else {
-            content.style.maxHeight = content.scrollHeight + 36 + "px";
+            content.style.height = '100%'; 
           }
         });
       }
@@ -224,6 +245,8 @@ function initializeMap() {
 
   const urlParams = new URLSearchParams(window.location.search);
   let servletUrl = "/polling-stations?electionId=" + urlParams.get("electionId");
+
+  document.getElementById('polling-stations-map').style.height = '600px';
 
   fetch(servletUrl)
     .then(response => response.json())

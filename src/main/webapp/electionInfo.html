@@ -112,10 +112,10 @@
 
             <div id="spinner"></div>
 
-            <div id='dates-and-deadlines'></div>
+            <div id="dates-and-deadlines" style="display: none"></div>
             <script id="deadlines-template" type="text/x-handlebars-template">
               <div class="row" id="deadlines-wrapper">
-                <div class="col-lg-8 col-lg-offset-2">
+                <div class="col-lg-12">
                   {{#if primaryDeadlines}}
                     <h3 id="deadlines-title"><b>Key deadlines for this primary election: </b></h3>
                     {{#each primaryDeadlines}}
@@ -148,7 +148,7 @@
 
             <div class="row" id="map-container">
               <div class="col-lg-8 col-lg-offset-2" id="map-wrapper">
-                <div id="polling-stations-map" style="height:600px"></div>
+                <div id="polling-stations-map"></div>
               </div>
             </div>
 
@@ -160,33 +160,34 @@
                   <div class="col-md-4 col-lg-offset-2 contests-wrapper">
                     {{#each contests}}
                     <div class="info-card">
-                      <div class="info-card-title">
+                      <button type="button" class="info-card-title collapsible">
                         {{this.name}}
-                      </div>
-
-                      <div class="candidates-wrapper">
-                        {{#each this.candidates}}
-                        <div class="candidate">
-                          <button type="button" class="candidate-name collapsible">
-                            <b>{{this.name}} </b>({{this.partyAffiliation}})
-                          </button>
-                          
-                          <div class="collapsible-content candidate-info">
-                            {{#if this.platformDescription}}
-                            <p>{{this.platformDescription}}</p>
-                            {{/if}}
-                            {{#if this.campaignSite}}
-                            <p><b>Website: </b><a href={{this.campaignSite}} target="_blank">{{stripUrl this.campaignSite}}</a></p>
-                            {{/if}}
-                            {{#each this.channels}}
-                            <p><b>{{@key}}: </b><a href={{this}}>{{stripUrl this}}</a></p>
-                            {{/each}}
+                      </button>
+                      <div class="collapsible-content">
+                        <div class="candidates-wrapper">
+                          {{#each this.candidates}}
+                          <div class="candidate">
+                            <button type="button" class="candidate-name collapsible">
+                              <b>{{this.name}} </b>({{this.partyAffiliation}})
+                            </button>
+                            
+                            <div class="collapsible-content candidate-info">
+                              {{#if this.platformDescription}}
+                              <p>{{this.platformDescription}}</p>
+                              {{/if}}
+                              {{#if this.campaignSite}}
+                              <p><b>Website: </b><a href={{this.campaignSite}} target="_blank">{{stripUrl this.campaignSite}}</a></p>
+                              {{/if}}
+                              {{#each this.channels}}
+                              <p><b>{{@key}}: </b><a href={{this}}>{{stripUrl this}}</a></p>
+                              {{/each}}
+                            </div>
                           </div>
+                          {{/each}}
+                          {{#if this.source}}
+                          <p class="source-text"><em>Source: {{this.source}}</em></p>
+                          {{/if}}
                         </div>
-                        {{/each}}
-                        {{#if this.source}}
-                        <p class="source-text"><em>Source: {{this.source}}</em></p>
-                        {{/if}}
                       </div>
                     </div>
                     {{else}}
@@ -196,7 +197,7 @@
                   <div class="col-md-4 referendums-wrapper">
                     {{#each referendums}}
                     <div class="info-card">
-                      <button type="button" class="info-card-title referendum-name collapsible">
+                      <button type="button" class="info-card-title collapsible">
                         {{this.title}}
                       </button>
                       <div class="collapsible-content">
