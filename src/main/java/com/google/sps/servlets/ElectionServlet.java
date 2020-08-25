@@ -17,8 +17,12 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
+import com.google.appengine.api.datastore.Transaction;
+import com.google.appengine.api.datastore.TransactionOptions;
 import com.google.gson.Gson;
 import com.google.sps.data.Election;
 import java.io.IOException;
@@ -44,35 +48,46 @@ public final class ElectionServlet extends HttpServlet {
   private static final String BASE_URL = "https://www.googleapis.com/civicinfo/v2/elections?key=%s";
 
   /**
-   * Makes an API call to electionQuery in the Google Civic Information API. Puts Election Entities
-   * in Datastore from the response.
+   * Makes an API call to electionQuery in the Google Civic Information API. Deletes existing
+   * Election Entities from Datastore and creates and stores new Entities from the API response.
    *
    * @param request the HTTP request containing user address and electionId as parameters
    * @param response the HTTP response, contains error message if an error occurs
    */
   @Override
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    ServletUtils.deleteAllEntitiesOfKind(datastore, Election.ENTITY_KIND);
-
     String electionApiKey = ServletUtils.getApiKey("112408856470", "election-api-key", "1");
-
     Optional<JSONObject> electionQueryData =
-        ServletUtils.readFromApiUrl(String.format(BASE_URL, electionApiKey));
+        ServletUtils.readFromApiUrl(String.format(BASE_URL, electionApiKey), /* isXml= */ false);
     if (!electionQueryData.isPresent()) {
       response.setContentType("text/html");
       response.getWriter().println("Could not query electionQuery.");
       response.setStatus(404);
       return;
     }
-
     JSONArray electionQueryArray =
         electionQueryData.get().getJSONArray(Election.ELECTIONS_JSON_KEYWORD);
 
-    for (Object o : electionQueryArray) {
-      JSONObject election = (JSONObject) o;
-      // TODO(anooshree): store Key name returned by addToDatastore(), to be used in PollingStation.
-      Election.fromElectionQuery(election).addToDatastore(datastore);
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    PreparedQuery results = datastore.prepare(new Query(Election.ENTITY_KIND));
+    // Have to make this a cross-group transaction because Election contains Embedded Entities for
+    // its PollingStations
+    Transaction txn = datastore.beginTransaction(TransactionOptions.Builder.withXG(true));
+    try {
+      for (Entity entity : results.asIterable()) {
+        Key electionKey = KeyFactory.createKey(Election.ENTITY_KIND, entity.getKey().getId());
+        datastore.delete(electionKey);
+      }
+
+      for (Object obj : electionQueryArray) {
+        Election.fromElectionQuery((JSONObject) obj).addToDatastore(datastore);
+      }
+
+      txn.commit();
+    } finally {
+      if (txn.isActive()) {
+        txn.rollback();
+      }
     }
   }
 

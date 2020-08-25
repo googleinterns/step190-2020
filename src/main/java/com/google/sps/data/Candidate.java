@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,6 +55,8 @@ public abstract class Candidate {
   private static final String WE_VOTE_VOTER_ID =
       "CmrnE4BCbd7E6vUMxCod49oSwY1AK1z7xxSybTtMBPdgA23aj2PO2pVLxPEJulNiyWfjQsUFpM3776tF68lTUlCS";
   private static final String WE_VOTE_ITEM_KIND = "CANDIDATE";
+
+  private static final Logger logger = Logger.getLogger(Candidate.class.getName());
 
   public abstract String getName();
 
@@ -143,7 +147,8 @@ public abstract class Candidate {
                       WE_VOTE_SEARCH_ALL_METHOD,
                       WE_VOTE_TOKEN,
                       candidateName.replaceAll(" ", "+"),
-                      WE_VOTE_VOTER_ID))
+                      WE_VOTE_VOTER_ID),
+                  false)
               .get();
 
       JSONArray searchObjectResult = searchObject.getJSONArray("search_results");
@@ -162,10 +167,12 @@ public abstract class Candidate {
                       WE_VOTE_BALLOT_ITEM_METHOD,
                       WE_VOTE_TOKEN,
                       WE_VOTE_ITEM_KIND,
-                      candidateWeVoteId))
+                      candidateWeVoteId),
+                  /* isXml= */ false)
               .get();
       candidateDescription = candidateObject.getString("ballotpedia_candidate_summary");
     } catch (IOException | JSONException | NoSuchElementException e) {
+      logger.log(Level.WARNING, "Was unable to retrieve description from given URL");
       return "";
     }
 
