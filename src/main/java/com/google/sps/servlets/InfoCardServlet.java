@@ -37,7 +37,7 @@ import org.json.JSONObject;
  * <p>TODO(caseyprice): Write unit tests using Mockito framework
  */
 @WebServlet("/info-cards")
-public class InfoCardServlet extends HttpServlet {
+public final class InfoCardServlet extends HttpServlet {
   private static final String BASE_URL =
       "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?address=%s&electionId=%s&key=%s";
   private static final String PROJECT_ID = "112408856470";
@@ -121,7 +121,7 @@ public class InfoCardServlet extends HttpServlet {
                 ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID))
             .replaceAll(" ", "%20");
 
-    Optional<JSONObject> voterInfoData = ServletUtils.readFromApiUrl(url);
+    Optional<JSONObject> voterInfoData = ServletUtils.readFromApiUrl(url, /* isXml= */ false);
     if (!voterInfoData.isPresent()) {
       response.setContentType("text/html");
       response

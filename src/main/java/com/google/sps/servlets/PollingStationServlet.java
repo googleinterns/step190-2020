@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletResponse;
  * use to vote in a given election.
  */
 @WebServlet("/polling-stations")
-public class PollingStationServlet extends HttpServlet {
+public final class PollingStationServlet extends HttpServlet {
 
   /**
    * If there is an electionID present in the website URL, this method retrieves the polling

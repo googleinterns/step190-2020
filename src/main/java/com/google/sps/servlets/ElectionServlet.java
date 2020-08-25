@@ -43,7 +43,7 @@ import org.json.JSONObject;
  * <p>TODO(anooshree): Write unit tests using the Power Mockito framework
  */
 @WebServlet("/election")
-public class ElectionServlet extends HttpServlet {
+public final class ElectionServlet extends HttpServlet {
 
   private static final String BASE_URL = "https://www.googleapis.com/civicinfo/v2/elections?key=%s";
 
@@ -58,7 +58,7 @@ public class ElectionServlet extends HttpServlet {
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String electionApiKey = ServletUtils.getApiKey("112408856470", "election-api-key", "1");
     Optional<JSONObject> electionQueryData =
-        ServletUtils.readFromApiUrl(String.format(BASE_URL, electionApiKey));
+        ServletUtils.readFromApiUrl(String.format(BASE_URL, electionApiKey), /* isXml= */ false);
     if (!electionQueryData.isPresent()) {
       response.setContentType("text/html");
       response.getWriter().println("Could not query electionQuery.");

@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
+import org.json.XML;
 
 public class ServletUtils {
 
@@ -92,8 +93,11 @@ public class ServletUtils {
    * Reads the information avaiable at the provided API URL into a JSON object
    *
    * @param urlString a valid API URL, accessible with the project's API keys
+   * @param isXML indicates whether or not the input webpage is in XML
+   * @return an Option JSONObject containing information from the provided URL
    */
-  public static Optional<JSONObject> readFromApiUrl(String urlString) throws IOException {
+  public static Optional<JSONObject> readFromApiUrl(String urlString, boolean isXML)
+      throws IOException {
     StringBuilder strBuf = new StringBuilder();
     HttpURLConnection conn = null;
     BufferedReader reader = null;
@@ -135,8 +139,11 @@ public class ServletUtils {
       }
     }
 
+    JSONObject obj;
+
+    // handle case where web API output is in XML
     String results = strBuf.toString();
-    JSONObject obj = new JSONObject(results);
+    obj = isXML ? new JSONObject(XML.toJSONObject(results).toString()) : new JSONObject(results);
 
     return Optional.of(obj);
   }

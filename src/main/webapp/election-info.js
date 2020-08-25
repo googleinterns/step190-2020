@@ -24,7 +24,6 @@ function onElectionInfoLoad(){
           electionName: election.name 
         };
         electionInfoWrapperElement.style.removeProperty('display');
-        return;
       }
     });
 
@@ -73,7 +72,8 @@ function logAddressInput() {
 
   let searchParams = new URLSearchParams(window.location.search);
   
-  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"));
+  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"), 
+                      searchParams.get("state"));
 }
 
 function showSpinner() {
@@ -93,7 +93,7 @@ function hideSpinner() {
  * @param {String} electionId the id of the user's chosen election
  * @param {String} address the user's address
  */
-function callInfoCardServlet(electionId, address){
+function callInfoCardServlet(electionId, address, state){
   showSpinner();
   let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
   fetch(servletUrl, {
@@ -101,14 +101,67 @@ function callInfoCardServlet(electionId, address){
   }).then((response) => {
       let errorTextElement = document.getElementById('address-error-text');
       if (response.ok) { // if HTTP-status is 200-299
+        console.log('Called Info Card servlet successfully');
         errorTextElement.style.display = "none";
+        populateDeadlines(state);
         populateClassesForTemplate(electionId);
         initializeMap();
       } else {
         errorTextElement.style.display = "block";
+        document.getElementById('polling-stations-map').style.height = '0';
+        document.getElementById('dates-and-deadlines').innerHTML = '';
+        document.getElementById('dates-and-deadlines').style.display = 'none';
+        document.getElementById('polling-station-status').innerHTML = '';
+        document.getElementById('election-info-results').innerHTML = '';
+        hideSpinner();
       }
+  });
+}
+
+/**
+ * Call GET on the Deadlines Servlet to retrieve the registration and mail-in 
+ * deadlines for the user and populate the information used in the Handlebars template
+ * 
+ * @param {String} state the user's state
+ */
+function populateDeadlines(state) {
+  let primaryDeadlines = [];
+  let runOffDeadlines = [];
+  let generalDeadlines = [];
+
+  let servletUrl = `/deadlines?state=${state}`;
+
+  fetch(servletUrl) 
+    .then(response => response.json(servletUrl))
+    .then((JSONobject) => {
+      JSONobject.myArrayList.forEach((deadline) => {
+        let electionType = deadline['map']['election-type'];
+        if (electionType == "General Election") {
+          generalDeadlines.push(deadline.map);
+        } else if (electionType == "State Primary") {
+          primaryDeadlines.push(deadline.map);
+        } else if (electionType == "State Primary Runoff") {
+          runOffDeadlines.push(deadline.map);
+        }
+      });
+
+      let source = document.getElementById('deadlines-template').innerHTML;
+      let template = Handlebars.compile(source);
+      let context = {generalDeadlines : generalDeadlines,
+                     runOffDeadlines : runOffDeadlines,
+                     primaryDeadlines : primaryDeadlines};
+
+      let deadlinesContainerElement = document.getElementById('dates-and-deadlines');
+      deadlinesContainerElement.innerHTML = template(context);
+      deadlinesContainerElement.style.display = 'block';
+      console.log("processed deadlines");
 
       hideSpinner();
+      window.scrollTo({
+        top: window.innerHeight - 40,
+        left: 0,
+        behavior: 'smooth'
+      });
   });
 }
 
@@ -140,6 +193,8 @@ function populateClassesForTemplate(electionId){
           referendums.push(referendum);
       });
 
+      referendums.sort(function(a, b){return (a.title < b.title) ? -1 : ((a.title > b.title) ? 1 : 0)});
+
       let source = document.getElementById('contests-referendums-template').innerHTML;
       let template = Handlebars.compile(source);
       let context = { contests: contests, 
@@ -149,16 +204,24 @@ function populateClassesForTemplate(electionId){
       let infoCardContainerElement = document.getElementById('election-info-results');
       infoCardContainerElement.innerHTML = template(context);
 
+      document.getElementById('autocomplete').value = '' ;
+      document.getElementById('street_number').value = '' ;
+      document.getElementById('route').value = '';
+      document.getElementById('locality').value = '';
+      document.getElementById('administrative_area_level_1').value = '';
+      document.getElementById('country').value = '';
+      document.getElementById('postal_code').value = '';
+
       let collapsibles = document.getElementsByClassName("collapsible");
 
       for (let i = 0; i < collapsibles.length; i++) {
         collapsibles[i].addEventListener("click", function() {
           this.classList.toggle("active");
           let content = this.nextElementSibling;
-          if (content.style.maxHeight){
-            content.style.maxHeight = null;
+          if (content.style.height && content.style.height !== '0px'){
+            content.style.height = '0px';
           } else {
-            content.style.maxHeight = content.scrollHeight + 36 + "px";
+            content.style.height = '100%'; 
           }
         });
       }
@@ -180,18 +243,20 @@ function initializeMap() {
   const urlParams = new URLSearchParams(window.location.search);
   let servletUrl = "/polling-stations?electionId=" + urlParams.get("electionId");
 
+  document.getElementById('polling-stations-map').style.height = '600px';
+
   fetch(servletUrl)
     .then(response => response.json())
     .then((pollingStationList) => {
       if (pollingStationList === undefined || pollingStationList.length == 0) {
         document.getElementById("polling-stations-map").style.display = "none";
-        document.getElementById("no-polling-stations").innerText = 
+        document.getElementById("polling-station-status").innerText = 
           "Sorry, we can't find any polling stations for this election near your address.";
         console.log("displayed polling station message");
         return;
       }
 
-      document.getElementById("no-polling-stations").innerText = "";
+      document.getElementById("polling-station-status").innerText = "Polling stations near you for this election:";
       document.getElementById("polling-stations-map").style.display = "block";
       
       const address = urlParams.get('address');
@@ -289,7 +354,7 @@ function addPollingStationMarker(map, position, title, description) {
  * @param {String} URL to be stripped.
  */
 Handlebars.registerHelper('stripUrl', function(urlString){
-  urlString = urlString.replace(/(^\w+:|^)\/\//, '');
+  urlString = urlString.replace(/(^\w+:|^)\/\/(www\.)?/, '');
   if(urlString[urlString.length - 1] == '/'){
     urlString = urlString.slice(0, -1);
   }
@@ -319,4 +384,70 @@ Handlebars.registerHelper('findType', function(locationType){
   } else if (locationType == "pollingLocation") {
     return "Standard polling location.";
   }
+})
+
+/**
+ * Handlebars helper that processes information from the FVAP API
+ * into a more understandable deadline for the user
+ * 
+ * @param {String} rule the rule for the deadline, which includes
+ *                      how information should be submitted and
+ *                      what the due date is for (postmarked, etc.)
+ * @param {String} votingType the type of action the voter is taking
+ * 
+ * @return {String} a statement summarizing the rule for the user
+ */
+Handlebars.registerHelper('processRule', function(rule, votingType){
+
+  let submissionType = "";
+  let dueDateType =  "";
+
+  if (rule.includes(":")) {
+    let splitRule = rule.split(":");
+    submissionType = splitRule[0].toLowerCase();
+    dueDateType = splitRule[1].toLowerCase();
+  } else {
+    dueDateType = rule.toLowerCase();
+    submissionType = "";
+  }
+
+  // format votingType string for grammatical accuracy in return string
+  switch(votingType) {
+    case "Registration": 
+      votingType = "Voter registration";
+      break;
+    case "Ballot Return":
+      votingType = "A ballot";
+      break;
+    case "Ballot Request":
+      votingType = "A ballot request";
+      break;
+  }
+
+  // formatting to capitalize just the first letter of the votingType variable
+  votingType = votingType.toLowerCase();
+  votingType = votingType.charAt(0).toUpperCase() + votingType.slice(1);
+
+  dueDateType = dueDateType.replace("*", "");
+
+  return `${votingType} ${submissionType} must be ${dueDateType}`;
+})
+
+/**
+ * Formats the date returned by the FVAP API
+ * (ex. 2020-10-19T00:00:00 to Monday, October 19, 2020)
+ * 
+ * @param {String} date the date value provided by the API
+ * 
+ * @return {String} a formatted version of the date
+ */
+Handlebars.registerHelper('formatDate', function(date){
+  if (date == undefined) {
+    return 'Invalid date';
+  }
+
+  let event = new Date(date);
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+
+  return event.toLocaleDateString('en-US', options);
 })

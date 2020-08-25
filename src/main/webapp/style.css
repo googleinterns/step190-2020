@@ -341,7 +341,7 @@ body{
   font-weight: bold;
 }
 
-#no-polling-stations {
+#polling-station-status {
   margin-left: 17%;
   margin-bottom: 20px;
   margin-top: 40px;
@@ -357,6 +357,12 @@ body{
   font-weight: bold;
   font-size: 150% ;
   padding: 18px;
+  background-color: white;
+  border: none;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  outline: none;
 }
 
 .info-card {
@@ -385,15 +391,6 @@ body{
   border: none;
 }
 
-.referendum-name {
-  background-color: white;
-  border: none;
-  width: 100%;
-  padding: 0;
-  text-align: left;
-  outline: none;
-}
-
 .referendum-description{
   padding: 2%;
 }
@@ -416,7 +413,7 @@ body{
 /* Style the collapsible content. Note: hidden by default */
 .collapsible-content {
   padding: 0px 18px;
-  max-height: 0;
+  height: 0px;
   overflow: hidden;
   transition: max-height 0.2s ease-out;
 }
@@ -483,3 +480,14 @@ body{
   visibility: visible;
 }
 
+#deadlines-wrapper {
+  border-color: #668EDB;
+  border-radius: 10px;
+}
+
+#dates-and-deadlines {
+  background: rgba(102, 142, 219, 0.36);
+  margin: 0 15%;
+  padding: 15px 30px;
+  border-radius: 10px;
+}
