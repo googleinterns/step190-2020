@@ -1,6 +1,3 @@
-const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
-                'August', 'September', 'October', 'November', 'December'];
-
 function onElectionInfoLoad(){
   fetch('/election')
   .then(response => {
@@ -415,9 +412,17 @@ Handlebars.registerHelper('processRule', function(rule, votingType){
   }
 
   // format votingType string for grammatical accuracy in return string
-  votingType = votingType.replace("Ballot", "a ballot");
-  votingType = votingType.replace("Return", "");
-  votingType = votingType.replace("Registration", "voter registration");
+  switch(votingType) {
+    case "Registration": 
+      votingType = "Voter registration";
+      break;
+    case "Ballot Return":
+      votingType = "A ballot";
+      break;
+    case "Ballot Request":
+      votingType = "A ballot request";
+      break;
+  }
 
   // formatting to capitalize just the first letter of the votingType variable
   votingType = votingType.toLowerCase();

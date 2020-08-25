@@ -1,3 +1,7 @@
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                'August', 'September', 'October', 'November', 'December'];
+
+
 function onElectionListLoad(){
   let searchParams = new URLSearchParams(window.location.search);
   let selectedState = searchParams.get("state");
