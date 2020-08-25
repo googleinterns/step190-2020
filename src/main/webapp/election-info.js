@@ -44,7 +44,7 @@ function onElectionInfoLoad(){
  * Enable the submit button if this element contains text.
  */
 setInterval(function() {
-  if(document.getElementById('autocomplete').value == '' ) {
+  if (document.getElementById('autocomplete').value == '' ) {
     document.getElementById('submit-address-button').disabled = true;
   } else { 
     document.getElementById('submit-address-button').disabled = false;
