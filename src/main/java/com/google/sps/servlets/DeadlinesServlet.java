@@ -129,8 +129,13 @@ public final class DeadlinesServlet extends HttpServlet {
             .getJSONObject("deadline-dates")
             .getJSONArray("deadline-date");
 
+    JSONObject deadlines = new JSONObject();
+    deadlines.put("dates", datesAndDeadlines);
+    deadlines.put("state", fullStateName);
+    // datesAndDeadlines.append(fullStateName);
+
     Gson gson = new Gson();
-    String json = gson.toJson(datesAndDeadlines);
+    String json = gson.toJson(deadlines);
 
     response.setContentType("application/json;");
     response.getWriter().println(json);

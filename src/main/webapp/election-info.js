@@ -117,7 +117,7 @@ function populateDeadlines(state) {
   fetch(servletUrl) 
     .then(response => response.json(servletUrl))
     .then((JSONobject) => {
-      JSONobject.myArrayList.forEach((deadline) => {
+      JSONobject.map.dates.myArrayList.forEach((deadline) => {
         let electionType = deadline['map']['election-type'];
         if (electionType == "General Election") {
           generalDeadlines.push(deadline.map);
@@ -130,9 +130,10 @@ function populateDeadlines(state) {
 
       let source = document.getElementById('deadlines-template').innerHTML;
       let template = Handlebars.compile(source);
-      let context = {generalDeadlines : generalDeadlines,
-                     runOffDeadlines : runOffDeadlines,
-                     primaryDeadlines : primaryDeadlines};
+      let context = {state: JSONobject.map.state,
+                     generalDeadlines: generalDeadlines,
+                     runOffDeadlines: runOffDeadlines,
+                     primaryDeadlines: primaryDeadlines};
 
       let deadlinesContainerElement = document.getElementById('dates-and-deadlines');
       deadlinesContainerElement.innerHTML = template(context);
