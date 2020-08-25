@@ -123,14 +123,14 @@ public final class DeadlinesServlet extends HttpServlet {
                 /* isXml= */ true)
             .get();
 
-    JSONArray datesAndDeadlines =
+    JSONArray dates =
         deadlinesObject
             .getJSONObject("evag")
             .getJSONObject("deadline-dates")
             .getJSONArray("deadline-date");
 
     JSONObject deadlines = new JSONObject();
-    deadlines.put("dates", datesAndDeadlines);
+    deadlines.put("dates", dates);
     deadlines.put("state", fullStateName);
 
     Gson gson = new Gson();
