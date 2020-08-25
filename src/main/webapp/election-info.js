@@ -35,6 +35,7 @@ function onElectionInfoLoad(){
     }
 
     titleTextElement.innerHTML = template(context);
+    populateDeadlines(searchParams.get("state"));
   })
   .catch(() => alert('There has been an error.'));
 }
@@ -43,12 +44,7 @@ function onElectionInfoLoad(){
  * Enable the submit button if this element contains text.
  */
 setInterval(function() {
-  if(document.getElementById('street_number').value == '' 
-      || document.getElementById('route').value == ''
-      || document.getElementById('locality').value == ''
-      || document.getElementById('administrative_area_level_1').value == ''
-      || document.getElementById('country').value == ''
-      || document.getElementById('postal_code').value == '') { 
+  if(document.getElementById('autocomplete').value == '' ) {
     document.getElementById('submit-address-button').disabled = true;
   } else { 
     document.getElementById('submit-address-button').disabled = false;
@@ -60,20 +56,10 @@ setInterval(function() {
  * query URL and call functions to populate the info cards
  */
 function logAddressInput() {
-  let streetNumber = document.getElementById('street_number').value;
-  let route = document.getElementById('route').value;
-  let city = document.getElementById('locality').value;
-  let state = document.getElementById('administrative_area_level_1').value;
-  let zipCode = document.getElementById('postal_code').value;
-  let country = document.getElementById('country').value;
-
-  addQueryParameter("address", 
-                    `${streetNumber} ${route} ${city} ${state} ${zipCode} ${country}`);
+  addQueryParameter("address", document.getElementById('autocomplete').value);
 
   let searchParams = new URLSearchParams(window.location.search);
-  
-  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"), 
-                      searchParams.get("state"));
+  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"));
 }
 
 function showSpinner() {
@@ -93,7 +79,7 @@ function hideSpinner() {
  * @param {String} electionId the id of the user's chosen election
  * @param {String} address the user's address
  */
-function callInfoCardServlet(electionId, address, state){
+function callInfoCardServlet(electionId, address){
   showSpinner();
   let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
   fetch(servletUrl, {
@@ -103,14 +89,11 @@ function callInfoCardServlet(electionId, address, state){
       if (response.ok) { // if HTTP-status is 200-299
         console.log('Called Info Card servlet successfully');
         errorTextElement.style.display = "none";
-        populateDeadlines(state);
         populateClassesForTemplate(electionId);
         initializeMap();
       } else {
         errorTextElement.style.display = "block";
         document.getElementById('polling-stations-map').style.height = '0';
-        document.getElementById('dates-and-deadlines').innerHTML = '';
-        document.getElementById('dates-and-deadlines').style.display = 'none';
         document.getElementById('polling-station-status').innerHTML = '';
         document.getElementById('election-info-results').innerHTML = '';
         hideSpinner();
@@ -155,13 +138,6 @@ function populateDeadlines(state) {
       deadlinesContainerElement.innerHTML = template(context);
       deadlinesContainerElement.style.display = 'block';
       console.log("processed deadlines");
-
-      hideSpinner();
-      window.scrollTo({
-        top: window.innerHeight - 40,
-        left: 0,
-        behavior: 'smooth'
-      });
   });
 }
 
@@ -204,27 +180,26 @@ function populateClassesForTemplate(electionId){
       let infoCardContainerElement = document.getElementById('election-info-results');
       infoCardContainerElement.innerHTML = template(context);
 
-      document.getElementById('autocomplete').value = '' ;
-      document.getElementById('street_number').value = '' ;
-      document.getElementById('route').value = '';
-      document.getElementById('locality').value = '';
-      document.getElementById('administrative_area_level_1').value = '';
-      document.getElementById('country').value = '';
-      document.getElementById('postal_code').value = '';
-
       let collapsibles = document.getElementsByClassName("collapsible");
 
       for (let i = 0; i < collapsibles.length; i++) {
         collapsibles[i].addEventListener("click", function() {
-          this.classList.toggle("active");
           let content = this.nextElementSibling;
           if (content.style.height && content.style.height !== '0px'){
             content.style.height = '0px';
           } else {
             content.style.height = '100%'; 
           }
+          this.classList.toggle("active");
         });
       }
+
+      hideSpinner();
+      window.scrollTo({
+        top: window.innerHeight - 80,
+        left: 0,
+        behavior: 'smooth'
+      });
   });
 }
 
@@ -348,7 +323,7 @@ function addPollingStationMarker(map, position, title, description) {
 }
 
 /**
- * Handlebars helper that removes the beginning "http://", "https://" and the trailing "/"
+ * Handlebars helper that removes the beginning "http://", "https://", any "www.", and the trailing "/"
  * from the supplied URL string.
  * 
  * @param {String} URL to be stripped.
