@@ -143,11 +143,7 @@ public class ServletUtils {
 
     // handle case where web API output is in XML
     String results = strBuf.toString();
-    if (isXML) {
-      obj = new JSONObject(XML.toJSONObject(results).toString());
-    } else {
-      obj = new JSONObject(results);
-    }
+    obj = isXML ? new JSONObject(XML.toJSONObject(results).toString()) : new JSONObject(results);
 
     return Optional.of(obj);
   }

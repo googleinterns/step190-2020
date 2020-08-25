@@ -58,7 +58,7 @@ public final class ElectionServlet extends HttpServlet {
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String electionApiKey = ServletUtils.getApiKey("112408856470", "election-api-key", "1");
     Optional<JSONObject> electionQueryData =
-        ServletUtils.readFromApiUrl(String.format(BASE_URL, electionApiKey), false);
+        ServletUtils.readFromApiUrl(String.format(BASE_URL, electionApiKey), /* isXml= */ false);
     if (!electionQueryData.isPresent()) {
       response.setContentType("text/html");
       response.getWriter().println("Could not query electionQuery.");

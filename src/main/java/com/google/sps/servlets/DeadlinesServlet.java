@@ -119,7 +119,8 @@ public final class DeadlinesServlet extends HttpServlet {
 
     JSONObject deadlinesObject =
         ServletUtils.readFromApiUrl(
-                String.format(BASE_URL + "/%s/%s", fullStateName, DEADLINES_PARAM), true)
+                String.format(BASE_URL + "/%s/%s", fullStateName, DEADLINES_PARAM),
+                /* isXml= */ true)
             .get();
 
     JSONArray datesAndDeadlines =
