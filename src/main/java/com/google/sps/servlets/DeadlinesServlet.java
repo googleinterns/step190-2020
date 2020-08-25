@@ -132,7 +132,6 @@ public final class DeadlinesServlet extends HttpServlet {
     JSONObject deadlines = new JSONObject();
     deadlines.put("dates", datesAndDeadlines);
     deadlines.put("state", fullStateName);
-    // datesAndDeadlines.append(fullStateName);
 
     Gson gson = new Gson();
     String json = gson.toJson(deadlines);
