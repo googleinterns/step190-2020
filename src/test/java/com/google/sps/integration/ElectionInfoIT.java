@@ -62,9 +62,8 @@ public class ElectionInfoIT {
   }
 
   /**
-   * TODO(anooshree): Resolve issue of being unable to test address input box locally due to API
-   * restrictions Tests if the submit button allows submission when the site is first loaded, but
-   * the user has not entered an address
+   * Tests if the submit button allows submission when the site is first loaded, but the user has
+   * not entered an address
    */
   @Test
   public void addressSubmission_onClick_blocksSubmissionWithoutAddress() {
@@ -75,10 +74,6 @@ public class ElectionInfoIT {
     Assert.assertEquals(
         "http://localhost:9876/electionInfo.html?state=ca&electionId=2000", driver.getCurrentUrl());
   }
-
-  // TODO(anooshree): Check that Query URL updates after address submission
-
-  // TODO(anooshree): Check that content loads for a valid URL
 
   @After
   public void tearDown() {
