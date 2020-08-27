@@ -1,3 +1,5 @@
+var electionScope;
+
 function onElectionInfoLoad(){
   fetch('/election')
   .then(response => {
@@ -19,6 +21,7 @@ function onElectionInfoLoad(){
 
     electionList.forEach((election) => {
       if (electionId == election.id) {
+        electionScope = election.scope;
         context = { 
           electionIdInQuery: true,
           electionName: election.name 
@@ -136,7 +139,8 @@ function populateDeadlines(state) {
     .then((JSONobject) => {
       JSONobject.myArrayList.forEach((deadline) => {
         let electionType = deadline['map']['election-type'];
-        if (electionType == "General Election") {
+        if (electionType == "General Election" &&
+            electionScope == "ocd-division/country:us") {
           generalDeadlines.push(deadline.map);
         } else if (electionType == "State Primary") {
           primaryDeadlines.push(deadline.map);
