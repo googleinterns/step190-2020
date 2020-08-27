@@ -107,7 +107,7 @@ public class DeadlineServletTest {
 
     verify(printWriter)
         .println(
-            "{\"myArrayList\":[{\"map\":{\"date\":\"2020-10-19T00:00:00\","
+            "{\"map\":{\"dates\":{\"myArrayList\":[{\"map\":{\"date\":\"2020-10-19T00:00:00\","
                 + "\"election-type\":\"General Election\",\"rule\":\"By Mail: Postmarked by\","
                 + "\"voting-request-type\":\"Registration\"}},{\"map\":{\"date\":"
                 + "\"2020-10-19T00:00:00\",\"election-type\":\"General Election\",\"rule\":"
@@ -117,6 +117,7 @@ public class DeadlineServletTest {
                 + "{\"date\":\"2020-11-03T00:00:00\",\"election-type\":\"General Election\",\"rule\":"
                 + "\"Return by Mail: Postmarked by*\",\"voting-request-type\":\"Ballot Return\"}},"
                 + "{\"map\":{\"date\":\"2020-11-03T20:00:00\",\"election-type\":\"General Election\","
-                + "\"rule\":\"Return by Fax: Received by\",\"voting-request-type\":\"Ballot Return\"}}]}");
+                + "\"rule\":\"Return by Fax: Received by\",\"voting-request-type\":\"Ballot Return\"}}]},"
+                + "\"state\":\"California\"}}");
   }
 }

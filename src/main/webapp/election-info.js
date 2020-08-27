@@ -38,6 +38,7 @@ function onElectionInfoLoad(){
     }
 
     titleTextElement.innerHTML = template(context);
+    populateDeadlines(searchParams.get("state"));
   })
   .catch(() => alert('There has been an error.'));
 }
@@ -46,12 +47,7 @@ function onElectionInfoLoad(){
  * Enable the submit button if this element contains text.
  */
 setInterval(function() {
-  if(document.getElementById('street_number').value == '' 
-      || document.getElementById('route').value == ''
-      || document.getElementById('locality').value == ''
-      || document.getElementById('administrative_area_level_1').value == ''
-      || document.getElementById('country').value == ''
-      || document.getElementById('postal_code').value == '') { 
+  if (document.getElementById('autocomplete').value == '' ) {
     document.getElementById('submit-address-button').disabled = true;
   } else { 
     document.getElementById('submit-address-button').disabled = false;
@@ -63,20 +59,16 @@ setInterval(function() {
  * query URL and call functions to populate the info cards
  */
 function logAddressInput() {
-  let streetNumber = document.getElementById('street_number').value;
-  let route = document.getElementById('route').value;
-  let city = document.getElementById('locality').value;
-  let state = document.getElementById('administrative_area_level_1').value;
-  let zipCode = document.getElementById('postal_code').value;
-  let country = document.getElementById('country').value;
-
-  addQueryParameter("address", 
-                    `${streetNumber} ${route} ${city} ${state} ${zipCode} ${country}`);
+  addQueryParameter("address", document.getElementById('autocomplete').value);
 
   let searchParams = new URLSearchParams(window.location.search);
+<<<<<<< HEAD
   
   callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"), 
                       searchParams.get("state"));
+=======
+  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"));
+>>>>>>> 09b48e733b961acd5b36f69d61afba4fb0628378
 }
 
 function showSpinner() {
@@ -112,14 +104,18 @@ function callInfoCardServlet(electionId, address, state){
       } else {
         errorTextElement.style.display = "block";
         document.getElementById('polling-stations-map').style.height = '0';
+<<<<<<< HEAD
         document.getElementById('dates-and-deadlines').innerHTML = '';
         document.getElementById('dates-and-deadlines').style.display = 'none';
+=======
+>>>>>>> 09b48e733b961acd5b36f69d61afba4fb0628378
         document.getElementById('polling-station-status').innerHTML = '';
         document.getElementById('election-info-results').innerHTML = '';
         hideSpinner();
       }
   });
 }
+<<<<<<< HEAD
 
 /**
  * Call GET on the Deadlines Servlet to retrieve the registration and mail-in 
@@ -166,6 +162,47 @@ function populateDeadlines(state) {
         left: 0,
         behavior: 'smooth'
       });
+=======
+
+/**
+ * Call GET on the Deadlines Servlet to retrieve the registration and mail-in 
+ * deadlines for the user and populate the information used in the Handlebars template
+ * 
+ * @param {String} state the user's state
+ */
+function populateDeadlines(state) {
+  let primaryDeadlines = [];
+  let runOffDeadlines = [];
+  let generalDeadlines = [];
+
+  let servletUrl = `/deadlines?state=${state}`;
+
+  fetch(servletUrl) 
+    .then(response => response.json(servletUrl))
+    .then((JSONobject) => {
+      JSONobject.map.dates.myArrayList.forEach((deadline) => {
+        let electionType = deadline['map']['election-type'];
+        if (electionType == "General Election") {
+          generalDeadlines.push(deadline.map);
+        } else if (electionType == "State Primary") {
+          primaryDeadlines.push(deadline.map);
+        } else if (electionType == "State Primary Runoff") {
+          runOffDeadlines.push(deadline.map);
+        }
+      });
+
+      let source = document.getElementById('deadlines-template').innerHTML;
+      let template = Handlebars.compile(source);
+      let context = {state: JSONobject.map.state,
+                     generalDeadlines: generalDeadlines,
+                     runOffDeadlines: runOffDeadlines,
+                     primaryDeadlines: primaryDeadlines};
+
+      let deadlinesContainerElement = document.getElementById('dates-and-deadlines');
+      deadlinesContainerElement.innerHTML = template(context);
+      deadlinesContainerElement.style.display = 'block';
+      console.log("processed deadlines");
+>>>>>>> 09b48e733b961acd5b36f69d61afba4fb0628378
   });
 }
 
@@ -220,15 +257,22 @@ function populateClassesForTemplate(electionId){
 
       for (let i = 0; i < collapsibles.length; i++) {
         collapsibles[i].addEventListener("click", function() {
-          this.classList.toggle("active");
           let content = this.nextElementSibling;
           if (content.style.height && content.style.height !== '0px'){
             content.style.height = '0px';
           } else {
             content.style.height = '100%'; 
           }
+          this.classList.toggle("active");
         });
       }
+
+      hideSpinner();
+      window.scrollTo({
+        top: window.innerHeight - 80,
+        left: 0,
+        behavior: 'smooth'
+      });
   });
 }
 
@@ -352,7 +396,7 @@ function addPollingStationMarker(map, position, title, description) {
 }
 
 /**
- * Handlebars helper that removes the beginning "http://", "https://" and the trailing "/"
+ * Handlebars helper that removes the beginning "http://", "https://", any "www.", and the trailing "/"
  * from the supplied URL string.
  * 
  * @param {String} URL to be stripped.
@@ -454,4 +498,8 @@ Handlebars.registerHelper('formatDate', function(date){
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
   return event.toLocaleDateString('en-US', options);
+<<<<<<< HEAD
 })
+=======
+})
+>>>>>>> 09b48e733b961acd5b36f69d61afba4fb0628378
