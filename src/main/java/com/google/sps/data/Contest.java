@@ -46,11 +46,12 @@ public abstract class Contest {
   public static final String CANDIDATES_JSON_KEYWORD = "candidates";
   public static final String SOURCE_JSON_KEYWORD = "sources";
   public static final String SOURCE_NAME_JSON_KEYWORD = "name";
-  public static final String DISTRICT_JSON_KEYWORD = "district";
+  public static final String DIVISION_JSON_KEYWORD = "district";
   public static final String NAME_ENTITY_KEYWORD = "name";
   public static final String CANDIDATES_ENTITY_KEYWORD = "candidates";
   public static final String DESCRIPTION_ENTITY_KEYWORD = "description";
   public static final String SOURCE_ENTITY_KEYWORD = "source";
+  public static final String DIVISION_ENTITY_KEYWORD = "division";
 
   private static final Logger logger = Logger.getLogger(Contest.class.getName());
 
@@ -63,6 +64,8 @@ public abstract class Contest {
   public abstract String getDescription();
 
   public abstract String getSource();
+
+  public abstract String getDivisions();
 
   public static Builder builder() {
     return new AutoValue_Contest.Builder();
@@ -78,6 +81,8 @@ public abstract class Contest {
 
     public abstract Builder setSource(String source);
 
+    public abstract Builder setDivision(String divisionId);
+
     public abstract Contest build();
   }
 
@@ -88,6 +93,7 @@ public abstract class Contest {
       throws JSONException {
     Set<Long> candidateKeyIds = new HashSet<>();
     String source = "";
+    String division = "";
 
     if (contestData.has(CANDIDATES_JSON_KEYWORD)) {
       for (Object candidateObject : contestData.getJSONArray(CANDIDATES_JSON_KEYWORD)) {
@@ -106,12 +112,17 @@ public abstract class Contest {
               .collect(Collectors.joining(", "));
     }
 
+    if (contestData.has(DIVISION_JSON_KEYWORD)) {
+      division = contestData.getJSONObject(DIVISION_JSON_KEYWORD).getString("id");
+    }
+
     return Contest.builder()
         .setName(contestData.getString(NAME_JSON_KEYWORD))
         .setCandidates(candidateKeyIds)
         // TODO(gianelgado): get value for description
         .setDescription("")
         .setSource(source)
+        .setDivision(division)
         .build();
   }
 
@@ -155,6 +166,7 @@ public abstract class Contest {
         .setDescription((String) entity.getProperty(DESCRIPTION_ENTITY_KEYWORD))
         .setCandidates(candidates)
         .setSource((String) entity.getProperty(SOURCE_ENTITY_KEYWORD))
+        .setDivision((String) entity.getProperty(DIVISION_ENTITY_KEYWORD))
         .build();
   }
 
@@ -166,6 +178,7 @@ public abstract class Contest {
     entity.setProperty(CANDIDATES_ENTITY_KEYWORD, this.getCandidates());
     entity.setProperty(DESCRIPTION_ENTITY_KEYWORD, this.getDescription());
     entity.setProperty(SOURCE_ENTITY_KEYWORD, this.getSource());
+    entity.setProperty(DIVISION_ENTITY_KEYWORD, this.getDivision());
     datastore.put(entity);
     return entity.getKey().getId();
   }

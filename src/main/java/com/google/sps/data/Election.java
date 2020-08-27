@@ -182,7 +182,7 @@ public abstract class Election {
   public static Election fromEntity(Entity entity) {
     Set<Long> contests = new HashSet<>();
     Set<Long> referendums = new HashSet<>();
-    ImmutableSet<EmbeddedEntity> pollingStationSet = ImmutableSet.of();
+    Set<String> divisions = new HashSet<>();
 
     if (entity.getProperty(CONTESTS_ENTITY_KEYWORD) != null) {
       contests = new HashSet<>((Collection<Long>) entity.getProperty(CONTESTS_ENTITY_KEYWORD));
@@ -194,7 +194,7 @@ public abstract class Election {
     }
 
     if (entity.getProperty(DIVISIONS_ENTITY_KEYWORD) != null) {
-      
+      divisions = new Hashset<>((Collection<Long>) entity.getProperty(DIVISIONS_ENTITY_KEYWORD));   
     }
 
 
@@ -205,6 +205,7 @@ public abstract class Election {
         .setScope((String) entity.getProperty(SCOPE_ENTITY_KEYWORD))
         .setContests(contests)
         .setReferendums(referendums)
+        .setDivisions(divisions);
         .build();
   }
 
