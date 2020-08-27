@@ -63,23 +63,6 @@ public final class InfoCardServlet extends HttpServlet {
   public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    // Temporary solution to repeated information in the Datastore.
-    // TODO(gianelgado): Remove these deletes and handle only putting
-    //   data that is new
-    logger.logp(
-        Level.INFO,
-        SOURCE_CLASS,
-        "doPut",
-        "Deleting all Entities of Contest, Candidate, Referendum, and PollingStation.");
-    ServletUtils.deleteAllEntitiesOfKind(datastore, Contest.ENTITY_KIND);
-    ServletUtils.deleteAllEntitiesOfKind(datastore, Candidate.ENTITY_KIND);
-    ServletUtils.deleteAllEntitiesOfKind(datastore, Referendum.ENTITY_KIND);
-    ServletUtils.deleteAllEntitiesOfKind(datastore, PollingStation.ENTITY_KIND);
-    logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "Successfully deleted Entities.");
-
-    // call representativeInfoByAddress Query
-
-
     Optional<String> optionalAddress = ServletUtils.getRequestParam(request, response, "address");
     Optional<String> optionalElectionId =
         ServletUtils.getRequestParam(request, response, "electionId");
@@ -104,7 +87,7 @@ public final class InfoCardServlet extends HttpServlet {
       response
           .getWriter()
           .println(
-              "Could not query with electionId " + electionId + " and address " + address + ".");
+              "Could not get division information for address " + address + ".");
       response.setStatus(400);
       return;
     }
@@ -146,7 +129,6 @@ public final class InfoCardServlet extends HttpServlet {
     electionEntity.setProperty("divisions", updatedDivisions);
     electionEntity.setProperty("contests", new HashSet<Long>());
     electionEntity.setProperty("referendums", new HashSet<Long>());
-
 
     String url =
         String.format(

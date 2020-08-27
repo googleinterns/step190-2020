@@ -84,6 +84,10 @@ public abstract class Election {
     return toBuilder().setReferendums(referendums).build();
   }
 
+  public Election withDivisions(Set<String> divisions) {
+    return toBuilder().setDivisions(divisions).build();
+  }
+
   @AutoValue.Builder
   public abstract static class Builder {
     public abstract Builder setId(String id);
@@ -137,28 +141,33 @@ public abstract class Election {
       throws JSONException {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> referendumKeyList = this.getReferendums();
+    Set<String> divisionsList = this.getDivisions();
 
     if (voterInfoQueryData.has(CONTESTS_JSON_KEYWORD)) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray(CONTESTS_JSON_KEYWORD);
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
-        String currentDistrict = contest.getJSONObject(Contest.DISTRICT_JSON_KEYWORD).getString("id");
+        String currentDivision = contest.getJSONObject(Contest.DISTRICT_JSON_KEYWORD).getString("id");
+        divisionsList.add(currentDivision);
 
         // Referendums are a separate contest type, so separate them out from the office positions
         // and put them in their own object field.
-        if (divisions.contains(currentDistrict) && contest.getString(Contest.TYPE_JSON_KEYWORD).equals(Referendum.ENTITY_KIND)) {
-          long referendumEntityKeyId = Referendum.fromJSONObject(contest).addToDatastore(datastore);
-          referendumKeyList.add(referendumEntityKeyId);
-        } else if(divisions.contains(currentDistrict)) {
-          long contestEntityKeyId =
-              Contest.fromJSONObject(datastore, contest).addToDatastore(datastore);
-          contestKeyList.add(contestEntityKeyId);
+        if(divisions.contains(currentDivision)){
+          if (contest.getString(Contest.TYPE_JSON_KEYWORD).equals(Referendum.ENTITY_KIND)) {
+            long referendumEntityKeyId = Referendum.fromJSONObject(contest).addToDatastore(datastore);
+            referendumKeyList.add(referendumEntityKeyId);
+          } else {
+            long contestEntityKeyId =
+                Contest.fromJSONObject(datastore, contest).addToDatastore(datastore);
+            contestKeyList.add(contestEntityKeyId);
+          }
         }
       }
     }
 
     return this.withContests(contestKeyList)
-        .withReferendums(referendumKeyList);
+        .withReferendums(referendumKeyList)
+        .withDivisions(divisionsList);
   }
 
   /**
@@ -169,8 +178,7 @@ public abstract class Election {
    */
   public boolean isPopulatedByVoterInfoQuery() {
     return !getContests().isEmpty()
-        && !getReferendums().isEmpty()
-        && !getPollingStations().isEmpty();
+        && !getReferendums().isEmpty();
   }
 
   /**
@@ -205,7 +213,7 @@ public abstract class Election {
         .setScope((String) entity.getProperty(SCOPE_ENTITY_KEYWORD))
         .setContests(contests)
         .setReferendums(referendums)
-        .setDivisions(divisions);
+        .setDivisions(divisions)
         .build();
   }
 
