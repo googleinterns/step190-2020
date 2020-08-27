@@ -40,7 +40,7 @@ public final class DeadlinesServlet extends HttpServlet {
           .put("co", "Colorado")
           .put("ct", "Connecticut")
           .put("de", "Delaware")
-          .put("dc", "District Of Columbia")
+          .put("dc", "District%20Of%20Columbia")
           .put("fl", "Florida")
           .put("ga", "Georgia")
           .put("gu", "Guam")
@@ -62,28 +62,28 @@ public final class DeadlinesServlet extends HttpServlet {
           .put("mt", "Montana")
           .put("ne", "Nebraska")
           .put("nv", "Nevada")
-          .put("nh", "New Hampshire")
-          .put("nj", "New Jersey")
-          .put("nm", "New Mexico")
-          .put("ny", "New York")
-          .put("nc", "North Carolina")
-          .put("nd", "North Dakota")
+          .put("nh", "New%20Hampshire")
+          .put("nj", "New%20Jersey")
+          .put("nm", "New%20Mexico")
+          .put("ny", "New%20York")
+          .put("nc", "North%20Carolina")
+          .put("nd", "North%20Dakota")
           .put("oh", "Ohio")
           .put("ok", "Oklahoma")
           .put("or", "Oregon")
           .put("pa", "Pennsylvania")
-          .put("pr", "Puerto Rico")
-          .put("ri", "Rhode Island")
-          .put("sc", "South Carolina")
-          .put("sd", "South Dakota")
+          .put("pr", "Puerto%20Rico")
+          .put("ri", "Rhode%20Island")
+          .put("sc", "South%20Carolina")
+          .put("sd", "South%20Dakota")
           .put("tn", "Tennessee")
           .put("tx", "Texas")
           .put("ut", "Utah")
           .put("vt", "Vermont")
-          .put("vi", "Virgin Islands")
+          .put("vi", "Virgin%20Islands")
           .put("va", "Virginia")
           .put("wa", "Washington")
-          .put("wv", "West Virginia")
+          .put("wv", "West%20Virginia")
           .put("wi", "Wisconsin")
           .put("wy", "Wyoming")
           .build();
@@ -131,7 +131,7 @@ public final class DeadlinesServlet extends HttpServlet {
 
     JSONObject deadlines = new JSONObject();
     deadlines.put("dates", dates);
-    deadlines.put("state", fullStateName);
+    deadlines.put("state", fullStateName.replace("%20", " "));
 
     Gson gson = new Gson();
     String json = gson.toJson(deadlines);

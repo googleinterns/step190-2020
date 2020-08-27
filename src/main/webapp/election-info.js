@@ -125,13 +125,15 @@ function populateDeadlines(state) {
     .then(response => response.json(servletUrl))
     .then((JSONobject) => {
       JSONobject.map.dates.myArrayList.forEach((deadline) => {
-        let electionType = deadline['map']['election-type'];
+        let electionType = (deadline['map']['election-type']).replace("*", "");
         if (electionType == "General Election" &&
             electionScope == "ocd-division/country:us") {
           generalDeadlines.push(deadline.map);
-        } else if (electionType == "State Primary") {
+        } else if (electionType == "State Primary" &&
+                   electionScope != "ocd-division/country:us") {
           primaryDeadlines.push(deadline.map);
-        } else if (electionType == "State Primary Runoff") {
+        } else if (electionType == "State Primary Runoff" &&
+                   electionScope != "ocd-division/country:us") {
           runOffDeadlines.push(deadline.map);
         }
       });
@@ -385,6 +387,13 @@ Handlebars.registerHelper('processRule', function(rule, votingType){
 
   let submissionType = "";
   let dueDateType =  "";
+
+  // default rule for due date if not indicated in API
+  if (rule === undefined) {
+    rule = "Received by";
+  }
+
+  rule = rule.replace(/\*/g, '');
 
   if (rule.includes(":")) {
     let splitRule = rule.split(":");
