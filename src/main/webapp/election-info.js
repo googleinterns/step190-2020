@@ -47,7 +47,7 @@ function onElectionInfoLoad(){
  * Enable the submit button if this element contains text.
  */
 setInterval(function() {
-  if (document.getElementById('autocomplete').value == '' ) {
+  if(document.getElementById('autocomplete').value == '' ) {
     document.getElementById('submit-address-button').disabled = true;
   } else { 
     document.getElementById('submit-address-button').disabled = false;
@@ -59,16 +59,12 @@ setInterval(function() {
  * query URL and call functions to populate the info cards
  */
 function logAddressInput() {
-  addQueryParameter("address", document.getElementById('autocomplete').value);
+  let address = document.getElementById('autocomplete').value;
+
+  addQueryParameter("address", address);
 
   let searchParams = new URLSearchParams(window.location.search);
-<<<<<<< HEAD
-  
-  callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"), 
-                      searchParams.get("state"));
-=======
   callInfoCardServlet(searchParams.get("electionId"), searchParams.get("address"));
->>>>>>> 09b48e733b961acd5b36f69d61afba4fb0628378
 }
 
 function showSpinner() {
@@ -88,7 +84,7 @@ function hideSpinner() {
  * @param {String} electionId the id of the user's chosen election
  * @param {String} address the user's address
  */
-function callInfoCardServlet(electionId, address, state){
+function callInfoCardServlet(electionId, address){
   showSpinner();
   let servletUrl = "/info-cards?electionId=" + electionId + "&address=" + address;
   fetch(servletUrl, {
@@ -98,71 +94,19 @@ function callInfoCardServlet(electionId, address, state){
       if (response.ok) { // if HTTP-status is 200-299
         console.log('Called Info Card servlet successfully');
         errorTextElement.style.display = "none";
-        populateDeadlines(state);
         populateClassesForTemplate(electionId);
         initializeMap();
       } else {
         errorTextElement.style.display = "block";
         document.getElementById('polling-stations-map').style.height = '0';
-<<<<<<< HEAD
         document.getElementById('dates-and-deadlines').innerHTML = '';
         document.getElementById('dates-and-deadlines').style.display = 'none';
-=======
->>>>>>> 09b48e733b961acd5b36f69d61afba4fb0628378
         document.getElementById('polling-station-status').innerHTML = '';
         document.getElementById('election-info-results').innerHTML = '';
         hideSpinner();
       }
   });
 }
-<<<<<<< HEAD
-
-/**
- * Call GET on the Deadlines Servlet to retrieve the registration and mail-in 
- * deadlines for the user and populate the information used in the Handlebars template
- * 
- * @param {String} state the user's state
- */
-function populateDeadlines(state) {
-  let primaryDeadlines = [];
-  let runOffDeadlines = [];
-  let generalDeadlines = [];
-
-  let servletUrl = `/deadlines?state=${state}`;
-
-  fetch(servletUrl) 
-    .then(response => response.json(servletUrl))
-    .then((JSONobject) => {
-      JSONobject.myArrayList.forEach((deadline) => {
-        let electionType = deadline['map']['election-type'];
-        if (electionType == "General Election" &&
-            electionScope == "ocd-division/country:us") {
-          generalDeadlines.push(deadline.map);
-        } else if (electionType == "State Primary") {
-          primaryDeadlines.push(deadline.map);
-        } else if (electionType == "State Primary Runoff") {
-          runOffDeadlines.push(deadline.map);
-        }
-      });
-
-      let source = document.getElementById('deadlines-template').innerHTML;
-      let template = Handlebars.compile(source);
-      let context = {generalDeadlines : generalDeadlines,
-                     runOffDeadlines : runOffDeadlines,
-                     primaryDeadlines : primaryDeadlines};
-
-      let deadlinesContainerElement = document.getElementById('dates-and-deadlines');
-      deadlinesContainerElement.innerHTML = template(context);
-      deadlinesContainerElement.style.display = 'block';
-      console.log("processed deadlines");
-
-      hideSpinner();
-      window.scrollTo({
-        top: window.innerHeight - 40,
-        left: 0,
-        behavior: 'smooth'
-      });
-=======
 
 /**
  * Call GET on the Deadlines Servlet to retrieve the registration and mail-in 
@@ -182,7 +126,8 @@ function populateDeadlines(state) {
     .then((JSONobject) => {
       JSONobject.map.dates.myArrayList.forEach((deadline) => {
         let electionType = deadline['map']['election-type'];
-        if (electionType == "General Election") {
+        if (electionType == "General Election" &&
+            electionScope == "ocd-division/country:us") {
           generalDeadlines.push(deadline.map);
         } else if (electionType == "State Primary") {
           primaryDeadlines.push(deadline.map);
@@ -202,7 +147,6 @@ function populateDeadlines(state) {
       deadlinesContainerElement.innerHTML = template(context);
       deadlinesContainerElement.style.display = 'block';
       console.log("processed deadlines");
->>>>>>> 09b48e733b961acd5b36f69d61afba4fb0628378
   });
 }
 
@@ -244,14 +188,6 @@ function populateClassesForTemplate(electionId){
 
       let infoCardContainerElement = document.getElementById('election-info-results');
       infoCardContainerElement.innerHTML = template(context);
-
-      document.getElementById('autocomplete').value = '' ;
-      document.getElementById('street_number').value = '' ;
-      document.getElementById('route').value = '';
-      document.getElementById('locality').value = '';
-      document.getElementById('administrative_area_level_1').value = '';
-      document.getElementById('country').value = '';
-      document.getElementById('postal_code').value = '';
 
       let collapsibles = document.getElementsByClassName("collapsible");
 
@@ -498,8 +434,4 @@ Handlebars.registerHelper('formatDate', function(date){
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
   return event.toLocaleDateString('en-US', options);
-<<<<<<< HEAD
 })
-=======
-})
->>>>>>> 09b48e733b961acd5b36f69d61afba4fb0628378
