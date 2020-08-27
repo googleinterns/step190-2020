@@ -49,8 +49,7 @@ public abstract class Election {
   public static final String EARLY_VOTE_LOCATION_TYPE = "earlyVoteSite";
   public static final String DROP_OFF_JSON_KEYWORD = "dropOffLocations";
   public static final String DROP_OFF_LOCATION_TYPE = "dropOffLocation";
-  public static final String POLLING_LOCATION_JSON_KEYWORD = "pollingLocations";
-  public static final String POLLING_LOCATION_TYPE = "pollingLocation";
+  public static final String DIVISIONS_ENTITY_KEYWORD = "divisions";
 
   public abstract String getId();
 
@@ -68,7 +67,8 @@ public abstract class Election {
   // represents their Key names.
   public abstract Set<Long> getReferendums();
 
-  public abstract ImmutableSet<EmbeddedEntity> getPollingStations();
+  // This Election has 
+  public abstract Set<String> getDivisions();
 
   public static Builder builder() {
     return new AutoValue_Election.Builder();
@@ -82,10 +82,6 @@ public abstract class Election {
 
   public Election withReferendums(Set<Long> referendums) {
     return toBuilder().setReferendums(referendums).build();
-  }
-
-  public Election withPollingStations(ImmutableSet<EmbeddedEntity> pollingStations) {
-    return toBuilder().setPollingStations(pollingStations).build();
   }
 
   @AutoValue.Builder
@@ -102,7 +98,7 @@ public abstract class Election {
 
     public abstract Builder setReferendums(Set<Long> Referendums);
 
-    public abstract Builder setPollingStations(ImmutableSet<EmbeddedEntity> pollingStations);
+    public abstract Builder setDivisions(Set<String> divisions);
 
     public abstract Election build();
   }
@@ -122,7 +118,7 @@ public abstract class Election {
         .setScope(electionQueryData.getString(SCOPE_JSON_KEYWORD))
         .setContests(new HashSet<Long>())
         .setReferendums(new HashSet<Long>())
-        .setPollingStations(ImmutableSet.of())
+        .setDivisions(new HashSet<Long>())
         .build();
   }
 
@@ -134,27 +130,26 @@ public abstract class Election {
    * @param datastore the Datastore to store this election's list of contests
    * @param voterInfoQueryData the JSON output of a voterInfoQuery to the Google Civic Information
    *     API
+   * @param divisions the set of divisions which limit the contests to be added
    * @return the new Election object
    */
-  public Election fromVoterInfoQuery(DatastoreService datastore, JSONObject voterInfoQueryData)
+  public Election fromVoterInfoQuery(DatastoreService datastore, JSONObject voterInfoQueryData, Set<String> divisions)
       throws JSONException {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> referendumKeyList = this.getReferendums();
-
-    List<EmbeddedEntity> pollingStations = new ArrayList<>(this.getPollingStations());
-    ImmutableSet<EmbeddedEntity> pollingStationSet;
 
     if (voterInfoQueryData.has(CONTESTS_JSON_KEYWORD)) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray(CONTESTS_JSON_KEYWORD);
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
+        String currentDistrict = contest.getJSONObject(Contest.DISTRICT_JSON_KEYWORD).getString("id");
 
         // Referendums are a separate contest type, so separate them out from the office positions
         // and put them in their own object field.
-        if (contest.getString(Contest.TYPE_JSON_KEYWORD).equals(Referendum.ENTITY_KIND)) {
+        if (divisions.contains(currentDistrict) && contest.getString(Contest.TYPE_JSON_KEYWORD).equals(Referendum.ENTITY_KIND)) {
           long referendumEntityKeyId = Referendum.fromJSONObject(contest).addToDatastore(datastore);
           referendumKeyList.add(referendumEntityKeyId);
-        } else {
+        } else if(divisions.contains(currentDistrict)) {
           long contestEntityKeyId =
               Contest.fromJSONObject(datastore, contest).addToDatastore(datastore);
           contestKeyList.add(contestEntityKeyId);
@@ -162,64 +157,8 @@ public abstract class Election {
       }
     }
 
-    if (voterInfoQueryData.has(EARLY_VOTE_JSON_KEYWORD)) {
-      JSONArray earlyVoteSiteData = voterInfoQueryData.getJSONArray(EARLY_VOTE_JSON_KEYWORD);
-      for (Object earlyVoteSite : earlyVoteSiteData) {
-        JSONObject earlyVoteSiteJSON = (JSONObject) earlyVoteSite;
-        pollingStations.add(
-            createPollingStation(earlyVoteSiteJSON, EARLY_VOTE_LOCATION_TYPE, datastore));
-      }
-    }
-
-    if (voterInfoQueryData.has(DROP_OFF_JSON_KEYWORD)) {
-      JSONArray dropOffData = voterInfoQueryData.getJSONArray(DROP_OFF_JSON_KEYWORD);
-      for (Object dropOff : dropOffData) {
-        JSONObject dropOffJSON = (JSONObject) dropOff;
-        pollingStations.add(createPollingStation(dropOffJSON, DROP_OFF_LOCATION_TYPE, datastore));
-      }
-    }
-
-    if (voterInfoQueryData.has(POLLING_LOCATION_JSON_KEYWORD)) {
-      JSONArray pollingLocationData =
-          voterInfoQueryData.getJSONArray(POLLING_LOCATION_JSON_KEYWORD);
-      for (Object pollingLocation : pollingLocationData) {
-        JSONObject pollingLocationJSON = (JSONObject) pollingLocation;
-        pollingStations.add(
-            createPollingStation(pollingLocationJSON, POLLING_LOCATION_TYPE, datastore));
-      }
-    }
-
-    pollingStationSet = ImmutableSet.copyOf((Collection<EmbeddedEntity>) pollingStations);
-
     return this.withContests(contestKeyList)
-        .withReferendums(referendumKeyList)
-        .withPollingStations(pollingStationSet);
-  }
-
-  /**
-   * Creates a EmbeddedEntity to add to this object's list of polling stations given adequete
-   * information in JSON format and the type of the polling station
-   *
-   * @param pollingStationJSON the JSON from the Civic Information API call representing the polling
-   *     station
-   * @param locationType a string signifying if this location is a polling station, drop-off
-   *     location, or early vote site
-   * @param datastore an object representing our project's Datastore that can be used to store the
-   *     Entities we are creating
-   */
-  public EmbeddedEntity createPollingStation(
-      JSONObject pollingStationJSON, String locationType, DatastoreService datastore) {
-    PollingStation pollingStationObject =
-        PollingStation.fromJSONObject(pollingStationJSON, locationType);
-
-    Entity pollingStationEntity = pollingStationObject.toEntity();
-    datastore.put(pollingStationEntity);
-
-    EmbeddedEntity embeddedPollingStation = new EmbeddedEntity();
-    embeddedPollingStation.setPropertiesFrom(pollingStationEntity);
-    embeddedPollingStation.setKey(pollingStationEntity.getKey());
-
-    return embeddedPollingStation;
+        .withReferendums(referendumKeyList);
   }
 
   /**
@@ -254,11 +193,10 @@ public abstract class Election {
           new HashSet<>((Collection<Long>) entity.getProperty(REFERENDUMS_ENTITY_KEYWORD));
     }
 
-    if (entity.getProperty(POLLING_STATIONS_ENTITY_KEYWORD) != null) {
-      pollingStationSet =
-          ImmutableSet.copyOf(
-              (Collection<EmbeddedEntity>) entity.getProperty(POLLING_STATIONS_ENTITY_KEYWORD));
+    if (entity.getProperty(DIVISIONS_ENTITY_KEYWORD) != null) {
+      
     }
+
 
     return Election.builder()
         .setId((String) entity.getProperty(ID_ENTITY_KEYWORD))
@@ -267,7 +205,6 @@ public abstract class Election {
         .setScope((String) entity.getProperty(SCOPE_ENTITY_KEYWORD))
         .setContests(contests)
         .setReferendums(referendums)
-        .setPollingStations(pollingStationSet)
         .build();
   }
 
@@ -300,8 +237,7 @@ public abstract class Election {
     entity.setProperty(SCOPE_ENTITY_KEYWORD, this.getScope());
     entity.setProperty(CONTESTS_ENTITY_KEYWORD, this.getContests());
     entity.setProperty(REFERENDUMS_ENTITY_KEYWORD, this.getReferendums());
-    entity.setProperty(
-        POLLING_STATIONS_ENTITY_KEYWORD, new ArrayList<EmbeddedEntity>(this.getPollingStations()));
+    entity.setProperty(DIVISIONS_ENTITY_KEYWORD, this.getDivisions());
     datastore.put(entity);
     return entity.getKey().getId();
   }

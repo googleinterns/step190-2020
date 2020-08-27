@@ -46,6 +46,7 @@ public abstract class Contest {
   public static final String CANDIDATES_JSON_KEYWORD = "candidates";
   public static final String SOURCE_JSON_KEYWORD = "sources";
   public static final String SOURCE_NAME_JSON_KEYWORD = "name";
+  public static final String DISTRICT_JSON_KEYWORD = "district";
   public static final String NAME_ENTITY_KEYWORD = "name";
   public static final String CANDIDATES_ENTITY_KEYWORD = "candidates";
   public static final String DESCRIPTION_ENTITY_KEYWORD = "description";

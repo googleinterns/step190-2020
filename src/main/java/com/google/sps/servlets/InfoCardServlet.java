@@ -28,7 +28,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Cookie;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 /**
  * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
@@ -38,13 +40,15 @@ import org.json.JSONObject;
  */
 @WebServlet("/info-cards")
 public final class InfoCardServlet extends HttpServlet {
-  private static final String BASE_URL =
+  private static final String VOTER_QUERY_URL =
       "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?address=%s&electionId=%s&key=%s";
+  private static final String REPRESENTATIVE_QUERY_URL = "https://civicinfo.googleapis.com/civicinfo/v2/representatives?address=%s&fields=divisions";    
   private static final String PROJECT_ID = "112408856470";
   private static final String SECRET_MANAGER_ID = "election-api-key";
   private static final String VERSION_ID = "1";
   private static final String SOURCE_CLASS = InfoCardServlet.class.getName();
   private static final Logger logger = Logger.getLogger(SOURCE_CLASS);
+  private static final int SECONDS_PER_HOUR = 3600;
 
   /**
    * Makes an API call to voterInfoQuery in the Google Civic Information API using the user-chosen
@@ -73,6 +77,9 @@ public final class InfoCardServlet extends HttpServlet {
     ServletUtils.deleteAllEntitiesOfKind(datastore, PollingStation.ENTITY_KIND);
     logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "Successfully deleted Entities.");
 
+    // call representativeInfoByAddress Query
+
+
     Optional<String> optionalAddress = ServletUtils.getRequestParam(request, response, "address");
     Optional<String> optionalElectionId =
         ServletUtils.getRequestParam(request, response, "electionId");
@@ -89,6 +96,21 @@ public final class InfoCardServlet extends HttpServlet {
     String address = optionalAddress.get();
     String electionId = optionalElectionId.get();
 
+    String divisionsCallUrl = String.format(REPRESENTATIVE_QUERY_URL, address);
+    Optional<JSONObject> divisionsInfoData = ServletUtils.readFromApiUrl(divisionsCallUrl, /* isXml= */ false);
+
+    if (!divisionsInfoData.isPresent()) {
+      response.setContentType("text/html");
+      response
+          .getWriter()
+          .println(
+              "Could not query with electionId " + electionId + " and address " + address + ".");
+      response.setStatus(400);
+      return;
+    }
+
+    JSONObject addressDivisions = divisionsInfoData.get().getJSONObject("divisions");
+
     Optional<Entity> optionalEntity = ServletUtils.findElectionInDatastore(datastore, electionId);
 
     if (!optionalEntity.isPresent()) {
@@ -103,19 +125,32 @@ public final class InfoCardServlet extends HttpServlet {
     logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "Got election ID and user address.");
 
     Entity electionEntity = optionalEntity.get();
+    Election election = Election.fromEntity(electionEntity);
+
+    ImmutableSet<String> divisionsQueried = election.getDivisions();
+    ImmutableSet<String> addressDivisionsSet = ImmutableSet.copyOf(addressDivisions.keys());
+
+    response.addCookie(generateDivisionsCookie(addressDivisionSet));
+
+    if(divisionsQueried.containsAll(addressDivisionsSet)){
+      return;
+    }
 
     // TODO(gianelgado): Find solution to avoid repeated information in Datastore
     //                   that ideally doesn't require deletion of all entities on each
     //                   call to doPut().
+
+    HashSet<String> updatedDivisions = new HashSet<>(divisionsQueried);
+    ImmutableSet<String> newDivisions = getRelativeComplementSet(addressDivisionsSet, divisionsQueried);
+    updatedDivisions.addAll(newDivisions);
+    electionEntity.setProperty("divisions", updatedDivisions);
     electionEntity.setProperty("contests", new HashSet<Long>());
     electionEntity.setProperty("referendums", new HashSet<Long>());
-    electionEntity.setProperty("pollingStations", ImmutableSet.of());
 
-    Election election = Election.fromEntity(electionEntity);
 
     String url =
         String.format(
-                BASE_URL,
+                VOTER_QUERY_URL,
                 address,
                 electionId,
                 ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID))
@@ -134,8 +169,25 @@ public final class InfoCardServlet extends HttpServlet {
 
     logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "Performing PUT on election from API response.");
     election
-        .fromVoterInfoQuery(datastore, voterInfoData.get())
+        .fromVoterInfoQuery(datastore, voterInfoData.get(), newDivisions)
         .putInDatastore(datastore, electionEntity);
     logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "PUT /info-cards is complete.");
   }
+
+  private static Cookie generateDivisionsCookie(Collection<String> divisions){
+    String divisionsJsonArray = new JSONArray(divisions).toString(); 
+    Cookie divisionsCookie = new Cookie("addressDivisions", divisionsJsonArray);
+    divisionsCookie.setPath("/contests");
+    divisionsCookie.setMaxAge(SECONDS_PER_HOUR);
+    divisionsCookie.setComment("Electoral divisions the queried address belongs to");
+    return divisionsCookie;
+  }
+
+  private static ImmutableSet<String> getRelativeComplementSet(Set<String> firstSet, Set<String> secondSet){
+    HashSet<String> copyOfFirstSet = new HashSet<>(firstSet);
+    copyOfFirstSet.removeAll(secondSet);
+    return ImmutableSet.copyOf(copyOfFirstSet);
+  }
 }
+
+
