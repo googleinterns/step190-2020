@@ -44,7 +44,7 @@ public class EndToEndIT {
     // worth right now.
     String response = getUrlResponse("http://localhost:9876/election");
     System.out.println(response);
-    Assert.assertTrue(response.contains("Oklahoma Primary Runoff Election and Special Elections"));
+    Assert.assertTrue(response.contains("Rhode Island State Primary Election"));
   }
 
   private String getUrlResponse(String urlAddress) throws Exception {

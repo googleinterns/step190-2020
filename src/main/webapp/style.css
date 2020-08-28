@@ -237,8 +237,6 @@ body{
 }
 
 .input-wrapper {
-  margin-top: 3%;
-  margin-bottom: 3%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -249,13 +247,13 @@ body{
   flex-direction: column;
 }
 
-#locationField {
-  margin-bottom: 2.5%;
-}
-
-
 #autocomplete {
-  width: 70%;
+  width: 80%;
+  border: 1px solid #C5C5C5;
+  border-radius: 20px;
+  font-size: 18px;
+  outline: none;
+  padding: 5px 20px;
 }
 
 .election-name {
@@ -263,7 +261,7 @@ body{
 }
 
 .address-row-wrapper{
-  margin-bottom: 3%;
+  margin-bottom: 2%;
 }
 
 .generic-button {
@@ -279,6 +277,7 @@ body{
   text-align: center;
   color: #FFFFFF;
   border-radius: 10px;
+  border: 1px solid #668EDB;
   display: flex;
   justify-content: center;
   align-content: center;
@@ -288,6 +287,7 @@ body{
 .generic-button:disabled {
   background-color: #B8D2EA;
   color: #9A9A9A;
+  border: 1px solid white;
 }
 
 .generic-button:enabled:hover, div.generic-button:hover{
@@ -299,6 +299,7 @@ body{
 
 .generic-button:disabled:hover {
   cursor: not-allowed;
+  border: 1px solid white;
 }
 
 #address-button-container div a{
@@ -318,17 +319,6 @@ body{
 .noborder {
   border: none;
   box-shadow: none;
-}
-
-.form-control {
-  background-color: #FFFFFF !important;
-  border-radius: 20px;
-  font-size: 18px;
-}
-
-.required:after {
-  content:" *";
-  color: red;
 }
 
 #chosen-election {
@@ -416,7 +406,6 @@ body{
   padding: 0px 18px;
   height: 0px;
   overflow: hidden;
-  transition: max-height 0.2s ease-out;
 }
 
 .candidate-info {

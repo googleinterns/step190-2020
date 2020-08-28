@@ -61,18 +61,18 @@ public class ElectionListIT {
   @Test
   public void electionSelection_onClick_redirectAndUpdateElectionQueryParameters()
       throws InterruptedException {
-    driver.get("http://localhost:9876/electionlist.html?state=ok");
+    driver.get("http://localhost:9876/electionlist.html?state=ri");
 
     WebElement learnMoreButton = driver.findElement(By.id("state-learn-more-button"));
     learnMoreButton.click();
 
-    String targetElectionID = "5015";
+    String targetElectionID = "5018";
 
-    Thread.sleep(2000);
+    Thread.sleep(4000);
 
     Assert.assertEquals(
         String.format(
-            "http://localhost:9876/electionInfo.html?state=ok&electionId=%s", targetElectionID),
+            "http://localhost:9876/electionInfo.html?state=ri&electionId=%s", targetElectionID),
         driver.getCurrentUrl());
   }
 

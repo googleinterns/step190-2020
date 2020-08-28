@@ -62,9 +62,8 @@ public class ElectionInfoIT {
   }
 
   /**
-   * TODO(anooshree): Resolve issue of being unable to test address input box locally due to API
-   * restrictions Tests if the submit button allows submission when the site is first loaded, but
-   * the user has not entered an address
+   * Tests if the submit button allows submission when the site is first loaded, but the user has
+   * not entered an address
    */
   @Test
   public void addressSubmission_onClick_blocksSubmissionWithoutAddress() {
@@ -76,9 +75,21 @@ public class ElectionInfoIT {
         "http://localhost:9876/electionInfo.html?state=ca&electionId=2000", driver.getCurrentUrl());
   }
 
-  // TODO(anooshree): Check that Query URL updates after address submission
+  /**
+   * Tests if the deadlines appear upon page load, given that the user's state is present in the
+   * query parameters.
+   */
+  @Test
+  public void stateInQueryUrl_displayDatesAndDeadlinesOnScreen() throws InterruptedException {
+    driver.get("http://localhost:9876/electionInfo.html?state=ca&electionId=2000");
+    Thread.sleep(5000);
 
-  // TODO(anooshree): Check that content loads for a valid URL
+    WebElement contentElement = driver.findElement(By.id("deadlines-template"));
+    WebElement paragraphElement =
+        contentElement.findElement(By.xpath("//h3[@id='general-deadlines-title']/b"));
+    Assert.assertEquals(
+        "Key deadlines in California for this national election:", paragraphElement.getText());
+  }
 
   @After
   public void tearDown() {
