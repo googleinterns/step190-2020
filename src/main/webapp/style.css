@@ -308,6 +308,13 @@ body{
 
 #address-error-wrapper {
   height: 5px;
+  margin: 10px;
+}
+
+#user-clarification-wrapper {
+  height: 5px;
+  font-style: italic;
+  margin: 10px;
 }
 
 #address-error-text {
