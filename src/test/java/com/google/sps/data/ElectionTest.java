@@ -70,7 +70,7 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setReferendums(new HashSet<Long>())
-            .setPollingStations(ImmutableSet.of())
+            .setDivisions(new HashSet<String>())
             .build();
 
     long updatedEntityKeyId = updatedElection.putInDatastore(ds, entity);
@@ -94,7 +94,7 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setReferendums(new HashSet<Long>())
-            .setPollingStations(ImmutableSet.of())
+            .setDivisions(new HashSet<String>())
             .build();
 
     long entityKeyId = election.addToDatastore(ds);
@@ -128,7 +128,7 @@ public class ElectionTest {
     Assert.assertEquals(election.getScope(), "myScope");
     Assert.assertEquals(election.getContests(), someIds);
     Assert.assertEquals(election.getReferendums(), someIds);
-    Assert.assertEquals(election.getPollingStations(), ImmutableSet.of());
+    Assert.assertEquals(election.getDivisions(), ImmutableSet.of());
   }
 
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading
@@ -144,27 +144,24 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setReferendums(new HashSet<Long>())
-            .setPollingStations(ImmutableSet.of())
+            .setDivisions(new HashSet<String>())
             .build();
     JSONObject voterInfoQueryJson =
         new JSONObject(
             "{\"election\": {\"id\": \"9999\"},"
-                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\","
+                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
                 + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteOne.com\"}]},"
-                + "{\"type\": \"type2\",\"office\": \"officeName\","
+                + "{\"type\": \"type2\",\"office\": \"officeName\", \"district\":{\"id\": \"mySecondDistrict\"},"
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\":\"www.siteOne.com\"},"
-                + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\":\"www.siteTwo.com\"}]}],"
-                + "\"earlyVoteSites\": [{\"id\": \"pollingId\","
-                + "\"address\": {\"locationName\": \"name\",\"line1\": \"1\","
-                + "\"line2\": \"2\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\","
-                + "\"zip\": \"zip\"},\"pollingHours\": \"-\",\"name\": \"pollingStation\","
-                + "\"startDate\": \"start\",\"endDate\": \"end\"}]}");
+                + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\":\"www.siteTwo.com\"}]}]}");
 
-    Election updatedElection = election.fromVoterInfoQuery(ds, voterInfoQueryJson);
+    Election updatedElection =
+        election.fromVoterInfoQuery(
+            ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict", "mySecondDistrict"));
 
     Assert.assertEquals(updatedElection.getContests().size(), 2);
-    Assert.assertEquals(updatedElection.getPollingStations().size(), 1);
+    Assert.assertEquals(updatedElection.getDivisions().size(), 2);
   }
 
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading
@@ -180,19 +177,21 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setReferendums(new HashSet<Long>())
-            .setPollingStations(ImmutableSet.of())
+            .setDivisions(new HashSet<String>())
             .build();
     JSONObject voterInfoQueryJson =
         new JSONObject(
             "{\"election\": {\"id\": \"9999\"},"
-                + "\"contests\": [{\"type\": \"Referendum\","
+                + "\"contests\": [{\"type\": \"Referendum\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"referendumTitle\": \"Proposition 1\","
                 + "\"referendumSubtitle\": \"Subtitle text for Prop 1.\"},"
-                + "{\"type\": \"Referendum\","
+                + "{\"type\": \"Referendum\", \"district\":{\"id\": \"mySecondDistrict\"},"
                 + "\"referendumTitle\": \"Proposition 2\","
                 + "\"referendumSubtitle\": \"Subtitle text for Prop 2.\"}]}]}");
 
-    Election updatedElection = election.fromVoterInfoQuery(ds, voterInfoQueryJson);
+    Election updatedElection =
+        election.fromVoterInfoQuery(
+            ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict", "mySecondDistrict"));
 
     Assert.assertEquals(updatedElection.getReferendums().size(), 2);
   }
@@ -210,34 +209,30 @@ public class ElectionTest {
             .setScope("myScope")
             .setContests(new HashSet<Long>())
             .setReferendums(new HashSet<Long>())
-            .setPollingStations(ImmutableSet.of())
+            .setDivisions(new HashSet<String>())
             .build();
     JSONObject voterInfoQueryJson =
         new JSONObject(
             "{\"election\": {\"id\": \"9999\"},"
-                + "\"earlyVoteSites\": [{\"id\": \"pollingId\","
-                + "\"address\": {\"locationName\": \"name\",\"line1\": \"1\","
-                + "\"line2\": \"2\",\"line3\": \"3\",\"city\": \"city\",\"state\": \"state\","
-                + "\"zip\": \"zip\"},\"pollingHours\": \"-\",\"name\": \"pollingStation\","
-                + "\"startDate\": \"start\",\"endDate\": \"end\"}],"
-                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\","
+                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
                 + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteTwo.com\"}]},"
-                + "{\"type\": \"type2\",\"office\": \"officeName\","
+                + "{\"type\": \"type2\",\"office\": \"officeName\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
                 + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteOne.com\"}]},"
-                + "{\"type\": \"Referendum\","
+                + "{\"type\": \"Referendum\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"referendumTitle\": \"Proposition 1\","
                 + "\"referendumSubtitle\": \"Subtitle text for Prop 1.\"},"
-                + "{\"type\": \"Referendum\","
+                + "{\"type\": \"Referendum\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"referendumTitle\": \"Proposition 2\","
                 + "\"referendumSubtitle\": \"Subtitle text for Prop 2.\"}]}]}");
 
-    Election updatedElection = election.fromVoterInfoQuery(ds, voterInfoQueryJson);
+    Election updatedElection =
+        election.fromVoterInfoQuery(ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict"));
 
     Assert.assertEquals(updatedElection.getContests().size(), 2);
     Assert.assertEquals(updatedElection.getReferendums().size(), 2);
-    Assert.assertEquals(updatedElection.getPollingStations().size(), 1);
+    Assert.assertEquals(updatedElection.getDivisions().size(), 1);
     Assert.assertTrue(updatedElection.isPopulatedByVoterInfoQuery());
   }
 
@@ -254,21 +249,22 @@ public class ElectionTest {
     JSONObject voterInfoQueryJson =
         new JSONObject(
             "{\"election\": {\"id\": \"9999\"},"
-                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\","
+                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
                 + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteTwo.com\"}]},"
-                + "{\"type\": \"type2\",\"office\": \"officeName\","
+                + "{\"type\": \"type2\",\"office\": \"officeName\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
                 + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteTwo.com\"}]},"
-                + "{\"type\": \"Referendum\","
+                + "{\"type\": \"Referendum\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"referendumTitle\": \"Proposition 1\","
                 + "\"referendumSubtitle\": \"Subtitle text for Prop 1.\"},"
-                + "{\"type\": \"Referendum\","
+                + "{\"type\": \"Referendum\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"referendumTitle\": \"Proposition 2\","
                 + "\"referendumSubtitle\": \"Subtitle text for Prop 2.\"}]}]}");
 
     Election election =
-        Election.fromElectionQuery(electionJson).fromVoterInfoQuery(ds, voterInfoQueryJson);
+        Election.fromElectionQuery(electionJson)
+            .fromVoterInfoQuery(ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict"));
 
     Assert.assertEquals(election.getId(), "9999");
     Assert.assertEquals(election.getName(), "myElection");
@@ -276,5 +272,6 @@ public class ElectionTest {
     Assert.assertEquals(election.getScope(), "myScope");
     Assert.assertEquals(election.getContests().size(), 2);
     Assert.assertEquals(election.getReferendums().size(), 2);
+    Assert.assertEquals(election.getDivisions().size(), 1);
   }
 }

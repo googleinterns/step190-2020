@@ -49,6 +49,8 @@ public class ContestTest {
                 + "\":\"General\",\""
                 + Contest.NAME_JSON_KEYWORD
                 + "\":\"Governer\",\""
+                + Contest.DIVISION_JSON_KEYWORD
+                + "\":{\"id\":\"myFirstDistrict\"},\""
                 + Contest.CANDIDATES_JSON_KEYWORD
                 + "\":["
                 + "{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
@@ -63,6 +65,7 @@ public class ContestTest {
     Assert.assertEquals(candidateIds.size(), 2);
     Assert.assertEquals(newContest.getName(), "Governer");
     Assert.assertEquals(newContest.getDescription(), "");
+    Assert.assertEquals(newContest.getDivision(), "myFirstDistrict");
     Assert.assertEquals(newContest.getSource(), "Voter Information Project");
   }
 
@@ -99,6 +102,7 @@ public class ContestTest {
             .setCandidates(candidateIdSet)
             .setDescription("Race for California Governer")
             .setSource("Voter Information Project")
+            .setDivision("myFirstDistrict")
             .build();
 
     JsonElement returnedContestJSON = JsonParser.parseString(newContest.toJsonString(ds));
@@ -117,6 +121,9 @@ public class ContestTest {
                 + Contest.DESCRIPTION_ENTITY_KEYWORD
                 + "\":\"Race for California Governer\""
                 + ",\""
+                + Contest.DIVISION_ENTITY_KEYWORD
+                + "\":\"myFirstDistrict\""
+                + ",\""
                 + Contest.SOURCE_ENTITY_KEYWORD
                 + "\":\"Voter Information Project\"}");
 
@@ -132,6 +139,7 @@ public class ContestTest {
     newContestEntity.setProperty(
         Contest.DESCRIPTION_ENTITY_KEYWORD, "Race for California Governer");
     newContestEntity.setProperty(Contest.SOURCE_ENTITY_KEYWORD, "Voter Information Project");
+    newContestEntity.setProperty(Contest.DIVISION_ENTITY_KEYWORD, "myFirstDistrict");
 
     Contest newContest = Contest.fromEntity(newContestEntity);
 
@@ -152,6 +160,7 @@ public class ContestTest {
             .setCandidates(idSet)
             .setDescription("Race for California Governer")
             .setSource("Voter Information Project")
+            .setDivision("myFirstDistrict")
             .build();
 
     long contestId = newContest.addToDatastore(ds);
