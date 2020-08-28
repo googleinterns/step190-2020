@@ -22,15 +22,16 @@ import com.google.sps.data.*;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Cookie;
-import org.json.JSONObject;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * This servlet is used to retrieve the information on the ongoing elections that an eligible voter
@@ -42,7 +43,8 @@ import org.json.JSONArray;
 public final class InfoCardServlet extends HttpServlet {
   private static final String VOTER_QUERY_URL =
       "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?address=%s&electionId=%s&key=%s";
-  private static final String REPRESENTATIVE_QUERY_URL = "https://civicinfo.googleapis.com/civicinfo/v2/representatives?address=%s&fields=divisions";    
+  private static final String REPRESENTATIVE_QUERY_URL =
+      "https://civicinfo.googleapis.com/civicinfo/v2/representatives?address=%s&fields=divisions&key=%s";
   private static final String PROJECT_ID = "112408856470";
   private static final String SECRET_MANAGER_ID = "election-api-key";
   private static final String VERSION_ID = "1";
@@ -79,15 +81,19 @@ public final class InfoCardServlet extends HttpServlet {
     String address = optionalAddress.get();
     String electionId = optionalElectionId.get();
 
-    String divisionsCallUrl = String.format(REPRESENTATIVE_QUERY_URL, address);
-    Optional<JSONObject> divisionsInfoData = ServletUtils.readFromApiUrl(divisionsCallUrl, /* isXml= */ false);
+    String divisionsCallUrl =
+        String.format(
+            REPRESENTATIVE_QUERY_URL,
+            address,
+            ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID));
+    Optional<JSONObject> divisionsInfoData =
+        ServletUtils.readFromApiUrl(divisionsCallUrl, /* isXml= */ false);
 
     if (!divisionsInfoData.isPresent()) {
       response.setContentType("text/html");
       response
           .getWriter()
-          .println(
-              "Could not get division information for address " + address + ".");
+          .println("Could not get division information for address " + address + ".");
       response.setStatus(400);
       return;
     }
@@ -110,12 +116,12 @@ public final class InfoCardServlet extends HttpServlet {
     Entity electionEntity = optionalEntity.get();
     Election election = Election.fromEntity(electionEntity);
 
-    ImmutableSet<String> divisionsQueried = election.getDivisions();
+    ImmutableSet<String> divisionsQueried = ImmutableSet.copyOf(election.getDivisions());
     ImmutableSet<String> addressDivisionsSet = ImmutableSet.copyOf(addressDivisions.keys());
 
-    response.addCookie(generateDivisionsCookie(addressDivisionSet));
+    response.addCookie(generateDivisionsCookie(addressDivisionsSet));
 
-    if(divisionsQueried.containsAll(addressDivisionsSet)){
+    if (divisionsQueried.containsAll(addressDivisionsSet)) {
       return;
     }
 
@@ -124,7 +130,8 @@ public final class InfoCardServlet extends HttpServlet {
     //                   call to doPut().
 
     HashSet<String> updatedDivisions = new HashSet<>(divisionsQueried);
-    ImmutableSet<String> newDivisions = getRelativeComplementSet(addressDivisionsSet, divisionsQueried);
+    ImmutableSet<String> newDivisions =
+        getRelativeComplementSet(addressDivisionsSet, divisionsQueried);
     updatedDivisions.addAll(newDivisions);
     electionEntity.setProperty("divisions", updatedDivisions);
     electionEntity.setProperty("contests", new HashSet<Long>());
@@ -156,8 +163,8 @@ public final class InfoCardServlet extends HttpServlet {
     logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "PUT /info-cards is complete.");
   }
 
-  private static Cookie generateDivisionsCookie(Collection<String> divisions){
-    String divisionsJsonArray = new JSONArray(divisions).toString(); 
+  private static Cookie generateDivisionsCookie(Set<String> divisions) {
+    String divisionsJsonArray = new JSONArray(divisions).toString();
     Cookie divisionsCookie = new Cookie("addressDivisions", divisionsJsonArray);
     divisionsCookie.setPath("/contests");
     divisionsCookie.setMaxAge(SECONDS_PER_HOUR);
@@ -165,11 +172,10 @@ public final class InfoCardServlet extends HttpServlet {
     return divisionsCookie;
   }
 
-  private static ImmutableSet<String> getRelativeComplementSet(Set<String> firstSet, Set<String> secondSet){
+  private static ImmutableSet<String> getRelativeComplementSet(
+      Set<String> firstSet, Set<String> secondSet) {
     HashSet<String> copyOfFirstSet = new HashSet<>(firstSet);
     copyOfFirstSet.removeAll(secondSet);
     return ImmutableSet.copyOf(copyOfFirstSet);
   }
 }
-
-

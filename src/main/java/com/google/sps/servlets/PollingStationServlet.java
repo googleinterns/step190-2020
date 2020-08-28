@@ -16,11 +16,7 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.EmbeddedEntity;
-import com.google.appengine.api.datastore.Entity;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
-import com.google.sps.data.Election;
 import com.google.sps.data.PollingStation;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +26,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * This servlet is used to retrieve the information on polling stations that an eligible voter can
@@ -37,6 +35,13 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet("/polling-stations")
 public final class PollingStationServlet extends HttpServlet {
+
+  private static final String POLLING_STATION_QUERY_URL =
+      "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?address=%s&electionId=%s"
+          + "&fields=pollingLocations,earlyVoteSites,dropOffLocations&key=%s";
+  private static final String PROJECT_ID = "112408856470";
+  private static final String SECRET_MANAGER_ID = "election-api-key";
+  private static final String VERSION_ID = "1";
 
   /**
    * If there is an electionID present in the website URL, this method retrieves the polling
@@ -51,38 +56,55 @@ public final class PollingStationServlet extends HttpServlet {
     Optional<String> electionIdOptional =
         ServletUtils.getRequestParam(request, response, "electionId");
 
-    if (!electionIdOptional.isPresent()) {
+    Optional<String> addressOptional = ServletUtils.getRequestParam(request, response, "address");
+
+    if (!electionIdOptional.isPresent() || !addressOptional.isPresent()) {
       return;
     }
 
     String electionId = electionIdOptional.get();
+    String address = addressOptional.get();
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
-    Optional<Entity> electionEntityOptional =
-        ServletUtils.findElectionInDatastore(datastore, electionId);
+    String url =
+        String.format(
+                POLLING_STATION_QUERY_URL,
+                address,
+                electionId,
+                ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID))
+            .replaceAll(" ", "%20");
 
-    if (!electionEntityOptional.isPresent()) {
+    Optional<JSONObject> pollingInfoData = ServletUtils.readFromApiUrl(url, /* isXml= */ false);
+    List<PollingStation> pollingStations = new ArrayList<PollingStation>();
+
+    if (!pollingInfoData.isPresent()) {
       response.setContentType("text/html");
-      response.getWriter().println("Election with id " + electionId + " was not found.");
+      response.getWriter().println("Polling locations for " + address + " were not found.");
       response.setStatus(400);
       return;
     }
 
-    Election election = Election.fromEntity(electionEntityOptional.get());
+    JSONObject pollingInfo = pollingInfoData.get();
 
-    ImmutableSet<EmbeddedEntity> pollingStationEntities = election.getPollingStations();
-    List<PollingStation> pollingStations = new ArrayList<PollingStation>();
-
-    for (EmbeddedEntity embeddedEntity : pollingStationEntities) {
-      Entity entity = new Entity(embeddedEntity.getKey());
-      entity.setPropertiesFrom(embeddedEntity);
-      pollingStations.add(PollingStation.fromEntity(entity));
-    }
+    addToPollingStationList(pollingStations, "earlyVoteSites", pollingInfo);
+    addToPollingStationList(pollingStations, "dropOffLocation", pollingInfo);
+    addToPollingStationList(pollingStations, "pollingLocations", pollingInfo);
 
     Gson gson = new Gson();
     String json = gson.toJson(pollingStations);
 
     response.setContentType("application/json;");
     response.getWriter().println(json);
+  }
+
+  private static void addToPollingStationList(
+      List<PollingStation> pollingStations, String locationType, JSONObject pollingInfo) {
+    if (pollingInfo.has(locationType)) {
+      JSONArray pollingData = pollingInfo.getJSONArray(locationType);
+      for (Object pollingLocation : pollingData) {
+        JSONObject pollingLocationJSON = (JSONObject) pollingLocation;
+        pollingStations.add(PollingStation.fromJSONObject(pollingLocationJSON, locationType));
+      }
+    }
   }
 }

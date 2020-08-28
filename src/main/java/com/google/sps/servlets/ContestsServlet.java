@@ -18,6 +18,7 @@ import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.api.datastore.KeyFactory;
+import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -25,7 +26,6 @@ import com.google.gson.JsonParser;
 import com.google.sps.data.Contest;
 import com.google.sps.data.Election;
 import com.google.sps.data.Referendum;
-import com.google.common.collect.ImmutableSet;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -33,10 +33,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Cookie;
+import org.json.JSONArray;
 
 /**
  * This servlet is used to retrieve the information of all the contests present on the election
@@ -53,9 +54,17 @@ public final class ContestsServlet extends HttpServlet {
       return;
     }
 
+    ImmutableSet<String> addressDivisions = ImmutableSet.of();
+    try {
+      addressDivisions = getAddressDivisionSetFromCookie(request);
+    } catch (Exception e) {
+      response.setContentType("text/html");
+      response.getWriter().println(e.getMessage());
+      response.setStatus(400);
+      return;
+    }
 
-    
-    ImmutableSet<String> addressDivisions = getAddressDivisionSetFromCookie(request);
+    final ImmutableSet<String> finalAddressDivisions = ImmutableSet.copyOf(addressDivisions);
 
     String electionId = electionIdOptional.get();
 
@@ -81,7 +90,9 @@ public final class ContestsServlet extends HttpServlet {
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
             .map(
                 entity ->
-                    entity.isPresent() && addressDivisions.contains(entity.getProperty(Contest.DIVISION_ENTITY_KEYWORD))
+                    entity.isPresent()
+                            && finalAddressDivisions.contains(
+                                entity.get().getProperty(Contest.DIVISION_ENTITY_KEYWORD))
                         ? JsonParser.parseString(
                             Contest.fromEntity(entity.get()).toJsonString(datastore))
                         : JsonNull.INSTANCE)
@@ -95,7 +106,9 @@ public final class ContestsServlet extends HttpServlet {
             .map(key -> ServletUtils.getFromDatastore(datastore, key))
             .map(
                 entity ->
-                    entity.isPresent() && addressDivisions.contains(entity.getProperty(Referendum.DIVISION_ENTITY_KEYWORD))
+                    entity.isPresent()
+                            && finalAddressDivisions.contains(
+                                entity.get().getProperty(Referendum.DIVISION_ENTITY_KEYWORD))
                         ? JsonParser.parseString(Referendum.fromEntity(entity.get()).toJsonString())
                         : JsonNull.INSTANCE)
             .collect(Collectors.toList());
@@ -122,18 +135,20 @@ public final class ContestsServlet extends HttpServlet {
                 + "}");
   }
 
-  private static ImmutableSet<String> getAddressDivisionSetFromCookie(HttpServletRequest request) throws Exception{
+  private static ImmutableSet<String> getAddressDivisionSetFromCookie(HttpServletRequest request)
+      throws Exception {
     Cookie[] addressDivisionCookies = request.getCookies();
-    if (addressDivisionCookies.length <= 0){
+    if (addressDivisionCookies.length <= 0) {
       throw new Exception("Divisions information for address not found");
     }
 
     Cookie addressDivisionCookie = addressDivisionCookies[0];
     JSONArray addressDivisionsJson = new JSONArray(addressDivisionCookie.getValue());
-    ImmutableSet<String> addressDivisionsSet = ImmutableSet.copyOf(  
-        StreamSupport.stream(addressDivisionsJson.spliterator(), false)
-            .map(divisionString -> (String) divisionString)
-            .collect(Collectors.toSet()));
+    ImmutableSet<String> addressDivisionsSet =
+        ImmutableSet.copyOf(
+            StreamSupport.stream(addressDivisionsJson.spliterator(), false)
+                .map(divisionString -> (String) divisionString)
+                .collect(Collectors.toSet()));
     return addressDivisionsSet;
   }
 }

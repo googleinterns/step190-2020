@@ -15,14 +15,10 @@
 package com.google.sps.data;
 
 import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,7 +63,7 @@ public abstract class Election {
   // represents their Key names.
   public abstract Set<Long> getReferendums();
 
-  // This Election has 
+  // This Election has
   public abstract Set<String> getDivisions();
 
   public static Builder builder() {
@@ -122,7 +118,7 @@ public abstract class Election {
         .setScope(electionQueryData.getString(SCOPE_JSON_KEYWORD))
         .setContests(new HashSet<Long>())
         .setReferendums(new HashSet<Long>())
-        .setDivisions(new HashSet<Long>())
+        .setDivisions(new HashSet<String>())
         .build();
   }
 
@@ -137,7 +133,8 @@ public abstract class Election {
    * @param divisions the set of divisions which limit the contests to be added
    * @return the new Election object
    */
-  public Election fromVoterInfoQuery(DatastoreService datastore, JSONObject voterInfoQueryData, Set<String> divisions)
+  public Election fromVoterInfoQuery(
+      DatastoreService datastore, JSONObject voterInfoQueryData, Set<String> divisions)
       throws JSONException {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> referendumKeyList = this.getReferendums();
@@ -147,14 +144,16 @@ public abstract class Election {
       JSONArray contestListData = voterInfoQueryData.getJSONArray(CONTESTS_JSON_KEYWORD);
       for (Object contestObject : contestListData) {
         JSONObject contest = (JSONObject) contestObject;
-        String currentDivision = contest.getJSONObject(Contest.DISTRICT_JSON_KEYWORD).getString("id");
+        String currentDivision =
+            contest.getJSONObject(Contest.DIVISION_JSON_KEYWORD).getString("id");
         divisionsList.add(currentDivision);
 
         // Referendums are a separate contest type, so separate them out from the office positions
         // and put them in their own object field.
-        if(divisions.contains(currentDivision)){
+        if (divisions.contains(currentDivision)) {
           if (contest.getString(Contest.TYPE_JSON_KEYWORD).equals(Referendum.ENTITY_KIND)) {
-            long referendumEntityKeyId = Referendum.fromJSONObject(contest).addToDatastore(datastore);
+            long referendumEntityKeyId =
+                Referendum.fromJSONObject(contest).addToDatastore(datastore);
             referendumKeyList.add(referendumEntityKeyId);
           } else {
             long contestEntityKeyId =
@@ -177,8 +176,7 @@ public abstract class Election {
    * @return true if contests and Referendums contain elements, false otherwise
    */
   public boolean isPopulatedByVoterInfoQuery() {
-    return !getContests().isEmpty()
-        && !getReferendums().isEmpty();
+    return !getContests().isEmpty() && !getReferendums().isEmpty();
   }
 
   /**
@@ -202,9 +200,8 @@ public abstract class Election {
     }
 
     if (entity.getProperty(DIVISIONS_ENTITY_KEYWORD) != null) {
-      divisions = new Hashset<>((Collection<Long>) entity.getProperty(DIVISIONS_ENTITY_KEYWORD));   
+      divisions = new HashSet<>((Collection<String>) entity.getProperty(DIVISIONS_ENTITY_KEYWORD));
     }
-
 
     return Election.builder()
         .setId((String) entity.getProperty(ID_ENTITY_KEYWORD))

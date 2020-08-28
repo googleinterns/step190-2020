@@ -65,7 +65,7 @@ public abstract class Contest {
 
   public abstract String getSource();
 
-  public abstract String getDivisions();
+  public abstract String getDivision();
 
   public static Builder builder() {
     return new AutoValue_Contest.Builder();
@@ -81,7 +81,7 @@ public abstract class Contest {
 
     public abstract Builder setSource(String source);
 
-    public abstract Builder setDivision(String divisionId);
+    public abstract Builder setDivision(String division);
 
     public abstract Contest build();
   }

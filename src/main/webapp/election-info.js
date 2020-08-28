@@ -227,7 +227,7 @@ function initializeMap() {
   geocoder = new google.maps.Geocoder();
 
   const urlParams = new URLSearchParams(window.location.search);
-  let servletUrl = "/polling-stations?electionId=" + urlParams.get("electionId");
+  let servletUrl = "/polling-stations?electionId=" + urlParams.get("electionId") + "&address=" + urlParams.get("address");
 
   document.getElementById('polling-stations-map').style.height = '600px';
 
