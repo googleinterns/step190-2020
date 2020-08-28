@@ -68,7 +68,7 @@ public class ElectionListIT {
 
     String targetElectionID = "5018";
 
-    Thread.sleep(2000);
+    Thread.sleep(4000);
 
     Assert.assertEquals(
         String.format(

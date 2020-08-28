@@ -75,6 +75,22 @@ public class ElectionInfoIT {
         "http://localhost:9876/electionInfo.html?state=ca&electionId=2000", driver.getCurrentUrl());
   }
 
+  /**
+   * Tests if the deadlines appear upon page load, given that the user's state is present in the
+   * query parameters.
+   */
+  @Test
+  public void stateInQueryUrl_displayDatesAndDeadlinesOnScreen() throws InterruptedException {
+    driver.get("http://localhost:9876/electionInfo.html?state=ca&electionId=2000");
+    Thread.sleep(5000);
+
+    WebElement contentElement = driver.findElement(By.id("deadlines-template"));
+    WebElement paragraphElement =
+        contentElement.findElement(By.xpath("//h3[@id='general-deadlines-title']/b"));
+    Assert.assertEquals(
+        "Key deadlines in California for this national election:", paragraphElement.getText());
+  }
+
   @After
   public void tearDown() {
     driver.quit();

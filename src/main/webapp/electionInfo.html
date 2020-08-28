@@ -88,7 +88,7 @@
               <div class="row" id="deadlines-wrapper">
                 <div class="col-lg-12">
                   {{#if primaryDeadlines}}
-                    <h3 id="deadlines-title"><b>Key deadlines in {{this.state}} for this primary election: </b></h3>
+                    <h3 id="primary-deadlines-title"><b>Key deadlines in {{this.state}} for this primary election: </b></h3>
                     {{#each primaryDeadlines}}
                     <p>
                       {{processRule this.rule this.voting-request-type}} <b>{{formatDate this.date}}</b>
@@ -96,7 +96,7 @@
                     {{/each}}
                   {{/if}}
                   {{#if runOffDeadlines}}
-                    <h3 id="deadlines-title"><b>Key deadlines in {{this.state}} for this primary runoff election: </b></h3>
+                    <h3 id="runoff-deadlines-title"><b>Key deadlines in {{this.state}} for this primary runoff election: </b></h3>
                     {{#each runOffDeadlines}}
                     <p>
                       {{processRule this.rule this.voting-request-type}} <b>{{formatDate this.date}}</b>
@@ -104,7 +104,7 @@
                     {{/each}}
                   {{/if}}
                   {{#if generalDeadlines}}
-                    <h3 id="deadlines-title"><b>Key deadlines in {{this.state}} for this national election: </b></h3>
+                    <h3 id="general-deadlines-title"><b>Key deadlines in {{this.state}} for this national election: </b></h3>
                     {{#each generalDeadlines}}
                     <p>
                       {{processRule this.rule this.voting-request-type}} <b>{{formatDate this.date}}</b>
