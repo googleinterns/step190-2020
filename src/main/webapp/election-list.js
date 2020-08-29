@@ -1,13 +1,22 @@
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July',
                 'August', 'September', 'October', 'November', 'December'];
-
+const STATE_CODES = ['ak', 'al', 'ar', 'az', 'ca', 'co', 'ct', 'de', 'dc', 'fl', 'ga', 'hi', 'ia', 'id', 
+                     'il', 'in', 'ks', 'ky', 'la', 'ma', 'md', 'me', 'mi', 'mn', 'mo', 'ms', 'mt', 'nc', 
+                     'nd', 'ne', 'nh', 'nj', 'nm', 'nv', 'ny', 'oh', 'ok', 'or', 'pa', 'ri', 'sc', 'sd', 
+                     'tn', 'tx', 'ut', 'va', 'vt', 'wa', 'wi', 'wv', 'wy'];
 
 function onElectionListLoad(){
   let searchParams = new URLSearchParams(window.location.search);
   let selectedState = searchParams.get("state");
   if(selectedState != null){
     document.getElementById('select-state').value = selectedState;
-    listElections();
+    if (STATE_CODES.includes(selectedState)) {
+      listElections();
+    } else {
+      let template = Handlebars.compile(document.getElementById('election-list-template').innerHTML);
+      let electionListContainerElement = document.getElementById('election-list-content');
+      electionListContainerElement.innerHTML = template({ validElectionId: false });
+    }
   }
 }
 
@@ -60,7 +69,8 @@ function listElections() {
 
       let source = document.getElementById('election-list-template').innerHTML;
       let template = Handlebars.compile(source);
-      let context = { state: selectedStateName, 
+      let context = { validElectionId: true,
+                      state: selectedStateName, 
                       stateElections: stateElections, 
                       nationalElections: nationalElections };
 
