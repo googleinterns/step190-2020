@@ -27,17 +27,18 @@ import com.google.sps.data.Contest;
 import com.google.sps.data.Election;
 import com.google.sps.data.Referendum;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
 
 /**
  * This servlet is used to retrieve the information of all the contests present on the election
@@ -45,26 +46,21 @@ import org.json.JSONArray;
  */
 @WebServlet("/contests")
 public final class ContestsServlet extends HttpServlet {
+  private static final String SOURCE_CLASS = ContestsServlet.class.getName();
+  private static final Logger logger = Logger.getLogger(SOURCE_CLASS);
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Optional<String> electionIdOptional =
         ServletUtils.getRequestParam(request, response, "electionId");
 
+    System.out.println("Before optional");
+
     if (!electionIdOptional.isPresent()) {
       return;
     }
 
-    ImmutableSet<String> addressDivisions = ImmutableSet.of();
-    try {
-      addressDivisions = getAddressDivisionSetFromCookie(request);
-    } catch (Exception e) {
-      response.setContentType("text/html");
-      response.getWriter().println(e.getMessage());
-      response.setStatus(400);
-      return;
-    }
-
-    final ImmutableSet<String> finalAddressDivisions = ImmutableSet.copyOf(addressDivisions);
+    System.out.println("Made it past optional");
 
     String electionId = electionIdOptional.get();
 
@@ -77,10 +73,24 @@ public final class ContestsServlet extends HttpServlet {
       response.setContentType("text/html");
       response.getWriter().println("Election with id " + electionId + " was not found.");
       response.setStatus(400);
+      logger.logp(
+          Level.INFO, SOURCE_CLASS, "doGet", "Election with id " + electionId + " was not found.");
       return;
     }
 
     Election election = Election.fromEntity(electionEntityOptional.get());
+
+    ImmutableSet<String> addressDivisions = ImmutableSet.of();
+    try {
+      addressDivisions = getAddressDivisionSetFromCookie(request, response);
+    } catch (Exception e) {
+      response.setContentType("text/html");
+      response.getWriter().println(e.getMessage());
+      response.setStatus(400);
+      return;
+    }
+
+    final ImmutableSet<String> finalAddressDivisions = ImmutableSet.copyOf(addressDivisions);
 
     List<JsonElement> contestJsonList =
         election
@@ -135,20 +145,23 @@ public final class ContestsServlet extends HttpServlet {
                 + "}");
   }
 
-  private static ImmutableSet<String> getAddressDivisionSetFromCookie(HttpServletRequest request)
-      throws Exception {
+  private static ImmutableSet<String> getAddressDivisionSetFromCookie(
+      HttpServletRequest request, HttpServletResponse response) throws Exception {
     Cookie[] addressDivisionCookies = request.getCookies();
     if (addressDivisionCookies.length <= 0) {
       throw new Exception("Divisions information for address not found");
     }
 
     Cookie addressDivisionCookie = addressDivisionCookies[0];
-    JSONArray addressDivisionsJson = new JSONArray(addressDivisionCookie.getValue());
-    ImmutableSet<String> addressDivisionsSet =
-        ImmutableSet.copyOf(
-            StreamSupport.stream(addressDivisionsJson.spliterator(), false)
-                .map(divisionString -> (String) divisionString)
-                .collect(Collectors.toSet()));
+    System.out.println(addressDivisionCookie.getValue());
+    List<String> divisionsList = Arrays.asList(addressDivisionCookie.getValue().split("\\|"));
+    System.out.println(divisionsList);
+    ImmutableSet<String> addressDivisionsSet = ImmutableSet.copyOf(divisionsList);
+
+    // Delete cookie
+    addressDivisionCookie.setMaxAge(0);
+    response.addCookie(addressDivisionCookie);
+
     return addressDivisionsSet;
   }
 }

@@ -3,9 +3,6 @@ package com.google.sps.servlets;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.EmbeddedEntity;
 import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
@@ -13,8 +10,6 @@ import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestCo
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.After;
@@ -43,15 +38,6 @@ public class PollingStationServletTest {
   @Before
   public void setUp() {
     helper.setUp();
-    electionEntityOne = new Entity("Election");
-
-    electionEntityOne.setProperty("id", "9999");
-    electionEntityOne.setProperty("name", "myElection");
-    electionEntityOne.setProperty("scope", "myScope");
-    electionEntityOne.setProperty("date", "myDate");
-    electionEntityOne.setProperty("contests", new HashSet<Long>());
-    electionEntityOne.setProperty("propositions", new HashSet<Long>());
-    electionEntityOne.setProperty("pollingStations", new ArrayList<EmbeddedEntity>());
 
     pollingStationOne = new Entity("PollingStation");
     pollingStationOne.setProperty("name", "pollingStationOne");
@@ -64,49 +50,21 @@ public class PollingStationServletTest {
   }
 
   @Test
-  public void singleElection_singlePollingStation_testDoGet() throws Exception {
-    Entity electionEntity = new Entity("Election");
-    Entity pollingStationEntity = new Entity("PollingStation");
-
-    electionEntity.setPropertiesFrom(electionEntityOne);
-    pollingStationEntity.setPropertiesFrom(pollingStationOne);
-
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-
-    List<EmbeddedEntity> pollingStations =
-        (List<EmbeddedEntity>) electionEntity.getProperty("pollingStations");
-    EmbeddedEntity embeddedPollingStationEntity = new EmbeddedEntity();
-    embeddedPollingStationEntity.setPropertiesFrom(pollingStationEntity);
-    pollingStations.add(embeddedPollingStationEntity);
-    ds.put(electionEntity);
-
-    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
-    when(httpServletResponse.getWriter()).thenReturn(printWriter);
-
-    PollingStationServlet pollingStationServlet = new PollingStationServlet();
-    pollingStationServlet.doGet(httpServletRequest, httpServletResponse);
-
-    verify(printWriter)
-        .println(
-            "[{\"name\":\"pollingStationOne\",\"address\":\"addressOne\","
-                + "\"pollingHours\":\"-\",\"startDate\":\"today\",\"endDate\":\"never\","
-                + "\"locationType\":\"pollingLocation\",\"sources\":[]}]");
-  }
-
-  @Test
   public void noElectionEntityExists_testDoGet() throws IOException {
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletRequest.getParameter("address")).thenReturn("myAddress");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     PollingStationServlet pollingStationServlet = new PollingStationServlet();
     pollingStationServlet.doGet(httpServletRequest, httpServletResponse);
 
-    verify(printWriter).println("Election with id 9999 was not found.");
+    verify(printWriter).println("Polling locations for myAddress were not found.");
   }
 
   @Test
   public void queryParameterMissing_testDoGet() throws IOException {
     when(httpServletRequest.getParameter("electionId")).thenReturn(null);
+    when(httpServletRequest.getParameter("address")).thenReturn("myAddress");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     PollingStationServlet pollingStationServlet = new PollingStationServlet();

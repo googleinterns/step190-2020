@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashSet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.After;
@@ -52,18 +53,21 @@ public class ContestServletTest {
     electionEntityOne.setProperty("date", "myDate");
     electionEntityOne.setProperty("contests", new HashSet<Long>());
     electionEntityOne.setProperty("referendums", new HashSet<Long>());
+    electionEntityOne.setProperty("divisions", new HashSet<String>());
 
     contestEntityOne = new Entity("Contest");
     contestEntityOne.setProperty("name", "myFirstContest");
     contestEntityOne.setProperty("candidates", new HashSet<Long>());
     contestEntityOne.setProperty("description", "This contest is important.");
     contestEntityOne.setProperty("source", "Voter Information Project");
+    contestEntityOne.setProperty("division", "firstDistrict");
 
     contestEntityTwo = new Entity("Contest");
     contestEntityTwo.setProperty("name", "mySecondContest");
     contestEntityTwo.setProperty("candidates", new HashSet<Long>());
     contestEntityTwo.setProperty("description", "This contest is also important.");
     contestEntityTwo.setProperty("source", "Voter Information Project");
+    contestEntityTwo.setProperty("division", "secondDistrict");
 
     candidateEntityOne = new Entity("Candidate");
     candidateEntityOne.setProperty("name", "myFirstCandidate");
@@ -82,12 +86,14 @@ public class ContestServletTest {
     referendumEntityOne.setProperty("description", "This is a referendum.");
     referendumEntityOne.setProperty("source", "Voter Information Project");
     referendumEntityOne.setProperty("url", "testUrl");
+    referendumEntityOne.setProperty("division", "firstDistrict");
 
     referendumEntityTwo = new Entity("Referendum");
     referendumEntityTwo.setProperty("title", "mySecondReferendum");
     referendumEntityTwo.setProperty("description", "This is another referendum.");
     referendumEntityTwo.setProperty("source", "Voter Information Project");
     referendumEntityTwo.setProperty("url", "testUrl");
+    referendumEntityTwo.setProperty("division", "secondDistrict");
   }
 
   @Test
@@ -108,13 +114,15 @@ public class ContestServletTest {
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     ContestsServlet contestServlet = new ContestsServlet();
     contestServlet.doGet(httpServletRequest, httpServletResponse);
 
     verify(printWriter)
         .println(
             "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\","
-                + "\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
+                + "\"source\":\"Voter Information Project\",\"division\":\"firstDistrict\"}],\"referendums\":[]}");
   }
 
   @Test
@@ -138,6 +146,8 @@ public class ContestServletTest {
     contestSet.add(contestId);
     ds.put(electionEntity);
 
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
@@ -149,7 +159,7 @@ public class ContestServletTest {
             "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[{\"name\":\"myFirstCandidate\","
                 + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
                 + "\"This is a cool candidate.\",\"channels\":{}}],\"description\":\"This contest is important.\","
-                + "\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
+                + "\"source\":\"Voter Information Project\",\"division\":\"firstDistrict\"}],\"referendums\":[]}");
   }
 
   @Test
@@ -177,6 +187,8 @@ public class ContestServletTest {
     contestSet.add(contestId);
     ds.put(electionEntity);
 
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
@@ -189,7 +201,8 @@ public class ContestServletTest {
                 + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
                 + "\"This is a cool candidate.\",\"channels\":{}},{\"name\":\"mySecondCandidate\",\"partyAffiliation\":\"myOtherParty\","
                 + "\"campaignSite\":\"myOtherWebsite\",\"platformDescription\":\"But this is an even cooler candidate.\",\"channels\":{}}],"
-                + "\"description\":\"This contest is important.\",\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
+                + "\"description\":\"This contest is important.\",\"source\":\"Voter Information Project\",\"division\":\"firstDistrict\"}],"
+                + "\"referendums\":[]}");
   }
 
   @Test
@@ -211,6 +224,8 @@ public class ContestServletTest {
     contestSet.add(contestTwoId);
     ds.put(electionEntityOne);
 
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
@@ -220,9 +235,9 @@ public class ContestServletTest {
     verify(printWriter)
         .println(
             "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\","
-                + "\"source\":\"Voter Information Project\"},"
+                + "\"source\":\"Voter Information Project\",\"division\":\"firstDistrict\"},"
                 + "{\"name\":\"mySecondContest\",\"candidates\":[],\"description\":\"This contest is also important.\","
-                + "\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
+                + "\"source\":\"Voter Information Project\",\"division\":\"secondDistrict\"}],\"referendums\":[]}");
   }
 
   @Test
@@ -240,6 +255,8 @@ public class ContestServletTest {
     referendumSet.add(referendumId);
     ds.put(electionEntity);
 
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
@@ -250,7 +267,7 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[],"
                 + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
-                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"}]}");
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\",\"division\":\"firstDistrict\"}]}");
   }
 
   @Test
@@ -272,6 +289,8 @@ public class ContestServletTest {
     referendumSet.add(referendumTwoId);
     ds.put(electionEntityOne);
 
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
@@ -282,13 +301,15 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[],"
                 + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
-                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"},"
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\",\"division\":\"firstDistrict\"},"
                 + "{\"title\":\"mySecondReferendum\",\"description\":\"This is another referendum.\","
-                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"}]}");
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\",\"division\":\"secondDistrict\"}]}");
   }
 
   @Test
   public void noElectionEntityExists_testDoGet() throws IOException {
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
@@ -300,6 +321,8 @@ public class ContestServletTest {
 
   @Test
   public void queryParameterMissing_testDoGet() throws IOException {
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     when(httpServletRequest.getParameter("electionId")).thenReturn(null);
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
@@ -328,6 +351,8 @@ public class ContestServletTest {
     contestSet.add(contestTwoId);
     ds.put(electionEntityOne);
 
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
@@ -337,7 +362,7 @@ public class ContestServletTest {
     verify(printWriter)
         .println(
             "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\","
-                + "\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
+                + "\"source\":\"Voter Information Project\",\"division\":\"firstDistrict\"}],\"referendums\":[]}");
   }
 
   @Test
@@ -366,6 +391,8 @@ public class ContestServletTest {
     contestSet.add(contestId);
     ds.put(electionEntity);
 
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
@@ -377,7 +404,8 @@ public class ContestServletTest {
             "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[{\"name\":\"myFirstCandidate\","
                 + "\"partyAffiliation\":\"myParty\",\"campaignSite\":\"myWebsite\",\"platformDescription\":"
                 + "\"This is a cool candidate.\",\"channels\":{}}],"
-                + "\"description\":\"This contest is important.\",\"source\":\"Voter Information Project\"}],\"referendums\":[]}");
+                + "\"description\":\"This contest is important.\",\"source\":\"Voter Information Project\",\"division\":\"firstDistrict\"}],"
+                + "\"referendums\":[]}");
   }
 
   @Test
@@ -399,6 +427,8 @@ public class ContestServletTest {
     referendumSet.add(referendumTwoId);
     ds.put(electionEntityOne);
 
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
     when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
@@ -409,7 +439,7 @@ public class ContestServletTest {
         .println(
             "{\"contests\":[],"
                 + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
-                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\"}]}");
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\",\"division\":\"firstDistrict\"}]}");
   }
 
   @After

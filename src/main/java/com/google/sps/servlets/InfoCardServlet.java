@@ -25,12 +25,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -83,9 +84,10 @@ public final class InfoCardServlet extends HttpServlet {
 
     String divisionsCallUrl =
         String.format(
-            REPRESENTATIVE_QUERY_URL,
-            address,
-            ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID));
+                REPRESENTATIVE_QUERY_URL,
+                address,
+                ServletUtils.getApiKey(PROJECT_ID, SECRET_MANAGER_ID, VERSION_ID))
+            .replaceAll(" ", "%20");
     Optional<JSONObject> divisionsInfoData =
         ServletUtils.readFromApiUrl(divisionsCallUrl, /* isXml= */ false);
 
@@ -164,9 +166,12 @@ public final class InfoCardServlet extends HttpServlet {
   }
 
   private static Cookie generateDivisionsCookie(Set<String> divisions) {
-    String divisionsJsonArray = new JSONArray(divisions).toString();
-    Cookie divisionsCookie = new Cookie("addressDivisions", divisionsJsonArray);
+    String divisionsString =
+        StreamSupport.stream(divisions.spliterator(), false).collect(Collectors.joining("|"));
+    System.out.println(divisionsString);
+    Cookie divisionsCookie = new Cookie("addressDivisions", divisionsString);
     divisionsCookie.setPath("/contests");
+    divisionsCookie.setVersion(1);
     divisionsCookie.setMaxAge(SECONDS_PER_HOUR);
     divisionsCookie.setComment("Electoral divisions the queried address belongs to");
     return divisionsCookie;
