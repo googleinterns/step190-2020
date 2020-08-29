@@ -54,13 +54,9 @@ public final class ContestsServlet extends HttpServlet {
     Optional<String> electionIdOptional =
         ServletUtils.getRequestParam(request, response, "electionId");
 
-    System.out.println("Before optional");
-
     if (!electionIdOptional.isPresent()) {
       return;
     }
-
-    System.out.println("Made it past optional");
 
     String electionId = electionIdOptional.get();
 
@@ -153,9 +149,7 @@ public final class ContestsServlet extends HttpServlet {
     }
 
     Cookie addressDivisionCookie = addressDivisionCookies[0];
-    System.out.println(addressDivisionCookie.getValue());
     List<String> divisionsList = Arrays.asList(addressDivisionCookie.getValue().split("\\|"));
-    System.out.println(divisionsList);
     ImmutableSet<String> addressDivisionsSet = ImmutableSet.copyOf(divisionsList);
 
     // Delete cookie

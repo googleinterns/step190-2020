@@ -43,7 +43,8 @@ import org.json.JSONObject;
 @WebServlet("/info-cards")
 public final class InfoCardServlet extends HttpServlet {
   private static final String VOTER_QUERY_URL =
-      "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?address=%s&electionId=%s&key=%s";
+      "https://civicinfo.googleapis.com/civicinfo/v2/voterinfo?address=%s&electionId=%s"
+          + "&fields=contests(type,office,district,candidates,referendumTitle,referendumSubtitle,referendumUrl,sources)&key=%s";
   private static final String REPRESENTATIVE_QUERY_URL =
       "https://civicinfo.googleapis.com/civicinfo/v2/representatives?address=%s&fields=divisions&key=%s";
   private static final String PROJECT_ID = "112408856470";
@@ -168,7 +169,6 @@ public final class InfoCardServlet extends HttpServlet {
   private static Cookie generateDivisionsCookie(Set<String> divisions) {
     String divisionsString =
         StreamSupport.stream(divisions.spliterator(), false).collect(Collectors.joining("|"));
-    System.out.println(divisionsString);
     Cookie divisionsCookie = new Cookie("addressDivisions", divisionsString);
     divisionsCookie.setPath("/contests");
     divisionsCookie.setVersion(1);
