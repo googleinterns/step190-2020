@@ -1,6 +1,6 @@
-var electionScope;
-
 function onElectionInfoLoad(){
+  var electionScope;
+
   fetch('/election')
   .then(response => {
     if (response.ok) { // if HTTP-status is 200-299
@@ -38,7 +38,7 @@ function onElectionInfoLoad(){
     }
 
     titleTextElement.innerHTML = template(context);
-    populateDeadlines(searchParams.get("state"));
+    populateDeadlines(searchParams.get("state"), electionScope);
   })
   .catch(() => alert('There has been an error.'));
 }
@@ -47,10 +47,13 @@ function onElectionInfoLoad(){
  * Enable the submit button if this element contains text.
  */
 setInterval(function() {
-  if (document.getElementById('autocomplete').value == '' ) {
-    document.getElementById('submit-address-button').disabled = true;
-  } else { 
-    document.getElementById('submit-address-button').disabled = false;
+  if (document.getElementById('autocomplete') !== undefined &&
+      document.getElementById('autocomplete') != null) {
+    if (document.getElementById('autocomplete').value == '' ) {
+      document.getElementById('submit-address-button').disabled = true;
+    } else { 
+      document.getElementById('submit-address-button').disabled = false;
+    }
   }
 }, 500);
 
@@ -113,22 +116,26 @@ function callInfoCardServlet(electionId, address){
  * deadlines for the user and populate the information used in the Handlebars template
  * 
  * @param {String} state the user's state
+ * @param {String} electionScope the scope of the election (national or statewide)
  */
-function populateDeadlines(state) {
+function populateDeadlines(state, electionScope) {
   let primaryDeadlines = [];
   let runOffDeadlines = [];
   let generalDeadlines = [];
 
   let servletUrl = `/deadlines?state=${state}`;
+  console.log(servletUrl);
 
   fetch(servletUrl) 
     .then(response => response.json(servletUrl))
     .then((JSONobject) => {
       JSONobject.map.dates.myArrayList.forEach((deadline) => {
         let electionType = (deadline['map']['election-type']).replace("*", "");
+
         if (electionType == "General Election" &&
             electionScope == "ocd-division/country:us") {
           generalDeadlines.push(deadline.map);
+          console.log("added general election");
         } else if (electionType == "State Primary" &&
                    electionScope != "ocd-division/country:us") {
           primaryDeadlines.push(deadline.map);
@@ -149,6 +156,7 @@ function populateDeadlines(state) {
       deadlinesContainerElement.innerHTML = template(context);
       deadlinesContainerElement.style.display = 'block';
       console.log("processed deadlines");
+      console.log(document.getElementById('dates-and-deadlines'));
   });
 }
 
