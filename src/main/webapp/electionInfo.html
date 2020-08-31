@@ -154,6 +154,12 @@
                               {{/if}}
                               {{#each this.channels}}
                               <p><b>{{@key}}: </b><a href={{this}}>{{stripUrl this}}</a></p>
+                              {{else}}
+                              {{#if (and 
+                                      (not this.campaignSite)
+                                      (not this.platformDescription))}}
+                                  <p><em>No information to display for this candidate.</em></p>
+                              {{/if}}
                               {{/each}}
                             </div>
                           </div>
