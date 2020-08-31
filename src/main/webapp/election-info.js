@@ -1,5 +1,12 @@
 var electionScope;
 
+Handlebars.registerHelper({
+  not: (str) => str == "",
+  and() {
+    return Array.prototype.every.call(arguments, Boolean);
+  }
+});
+
 function onElectionInfoLoad(){
   fetch('/election')
   .then(response => {
