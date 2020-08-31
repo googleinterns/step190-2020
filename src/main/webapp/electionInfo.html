@@ -15,12 +15,15 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
 
-	<script type='text/javascript' src='config.js'></script>
-	<link rel="stylesheet" href="style.css">
+	  <script type='text/javascript' src='config.js'></script>
+	  <link rel="stylesheet" href="style.css">
       
     <script src="script.js"></script>
     <script src="auto-complete.js"></script>
     <script src="election-info.js"></script>
+
+    <link rel="shortcut icon" href="favicon.io" type="image/x-icon">
+    <link rel="icon" href="favicon.io" type="image/x-icon">
     
     </head>
 
@@ -65,7 +68,7 @@
                     </div>
                   </div>
 
-                  <div id="address-error-wrapper">
+                  <div class="error-text-wrapper">
                     <p style="display: none" id="address-error-text">Invalid address.</p>
                   </div>
 
@@ -157,6 +160,12 @@
                               {{/if}}
                               {{#each this.channels}}
                               <p><b>{{@key}}: </b><a href={{this}}>{{stripUrl this}}</a></p>
+                              {{else}}
+                              {{#if (and 
+                                      (not this.campaignSite)
+                                      (not this.platformDescription))}}
+                                  <p><em>No information to display for this candidate.</em></p>
+                              {{/if}}
                               {{/each}}
                             </div>
                           </div>
