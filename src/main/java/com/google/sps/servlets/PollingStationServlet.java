@@ -14,8 +14,6 @@
 
 package com.google.sps.servlets;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.gson.Gson;
 import com.google.sps.data.PollingStation;
 import java.io.IOException;
@@ -64,7 +62,6 @@ public final class PollingStationServlet extends HttpServlet {
 
     String electionId = electionIdOptional.get();
     String address = addressOptional.get();
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 
     String url =
         String.format(

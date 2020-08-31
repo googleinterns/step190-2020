@@ -125,12 +125,13 @@ public final class InfoCardServlet extends HttpServlet {
     response.addCookie(generateDivisionsCookie(addressDivisionsSet));
 
     if (divisionsQueried.containsAll(addressDivisionsSet)) {
+      logger.logp(
+          Level.INFO,
+          SOURCE_CLASS,
+          "doPut",
+          "Address ballot info already in datastore. Exiting doPut.");
       return;
     }
-
-    // TODO(gianelgado): Find solution to avoid repeated information in Datastore
-    //                   that ideally doesn't require deletion of all entities on each
-    //                   call to doPut().
 
     HashSet<String> updatedDivisions = new HashSet<>(divisionsQueried);
     ImmutableSet<String> newDivisions =
@@ -166,6 +167,7 @@ public final class InfoCardServlet extends HttpServlet {
     logger.logp(Level.INFO, SOURCE_CLASS, "doPut", "PUT /info-cards is complete.");
   }
 
+  /** Helper function that saves divisions returned by representative query in a cookie. */
   private static Cookie generateDivisionsCookie(Set<String> divisions) {
     String divisionsString =
         StreamSupport.stream(divisions.spliterator(), false).collect(Collectors.joining("|"));
@@ -177,6 +179,7 @@ public final class InfoCardServlet extends HttpServlet {
     return divisionsCookie;
   }
 
+  /** Returns the realtive complement of secondSet with respect to firstSet. */
   private static ImmutableSet<String> getRelativeComplementSet(
       Set<String> firstSet, Set<String> secondSet) {
     HashSet<String> copyOfFirstSet = new HashSet<>(firstSet);

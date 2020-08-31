@@ -206,7 +206,7 @@ public class ContestServletTest {
   }
 
   @Test
-  public void singleElection_twoContest_testDoGet() throws Exception {
+  public void singleElection_twoContest_twoDistricts_testDoGet() throws Exception {
     Entity electionEntity = new Entity("Election");
     Entity firstContestEntity = new Entity("Contest");
     Entity secondContestEntity = new Entity("Contest");
@@ -241,6 +241,39 @@ public class ContestServletTest {
   }
 
   @Test
+  public void singleElection_twoContest_oneDistrict_testDoGet() throws Exception {
+    Entity electionEntity = new Entity("Election");
+    Entity firstContestEntity = new Entity("Contest");
+    Entity secondContestEntity = new Entity("Contest");
+
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    firstContestEntity.setPropertiesFrom(contestEntityOne);
+    secondContestEntity.setPropertiesFrom(contestEntityTwo);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long contestOneId = ds.put(firstContestEntity).getId();
+    long contestTwoId = ds.put(secondContestEntity).getId();
+
+    HashSet<Long> contestSet = (HashSet<Long>) electionEntityOne.getProperty("contests");
+    contestSet.add(contestOneId);
+    contestSet.add(contestTwoId);
+    ds.put(electionEntityOne);
+
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "{\"contests\":[{\"name\":\"myFirstContest\",\"candidates\":[],\"description\":\"This contest is important.\","
+                + "\"source\":\"Voter Information Project\",\"division\":\"firstDistrict\"}],\"referendums\":[]}");
+  }
+
+  @Test
   public void singleElection_singleReferendum_testDoGet() throws Exception {
     Entity electionEntity = new Entity("Election");
     Entity referendumEntity = new Entity("Referendum");
@@ -271,7 +304,7 @@ public class ContestServletTest {
   }
 
   @Test
-  public void singleElection_twoReferendum_testDoGet() throws Exception {
+  public void singleElection_twoReferendum_twoDistricts_testDoGet() throws Exception {
     Entity electionEntity = new Entity("Election");
     Entity firstReferendumEntity = new Entity("Referendum");
     Entity secondReferendumEntity = new Entity("Referendum");
@@ -307,6 +340,40 @@ public class ContestServletTest {
   }
 
   @Test
+  public void singleElection_twoReferendum_oneDistrict_testDoGet() throws Exception {
+    Entity electionEntity = new Entity("Election");
+    Entity firstReferendumEntity = new Entity("Referendum");
+    Entity secondReferendumEntity = new Entity("Referendum");
+
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    firstReferendumEntity.setPropertiesFrom(referendumEntityOne);
+    secondReferendumEntity.setPropertiesFrom(referendumEntityTwo);
+
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    long referendumOneId = ds.put(firstReferendumEntity).getId();
+    long referendumTwoId = ds.put(secondReferendumEntity).getId();
+
+    HashSet<Long> referendumSet = (HashSet<Long>) electionEntityOne.getProperty("referendums");
+    referendumSet.add(referendumOneId);
+    referendumSet.add(referendumTwoId);
+    ds.put(electionEntityOne);
+
+    Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict")};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "{\"contests\":[],"
+                + "\"referendums\":[{\"title\":\"myFirstReferendum\",\"description\":\"This is a referendum.\","
+                + "\"source\":\"Voter Information Project\",\"url\":\"testUrl\",\"division\":\"firstDistrict\"}]}");
+  }
+
+  @Test
   public void noElectionEntityExists_testDoGet() throws IOException {
     Cookie[] returnedCookies = {new Cookie("addressDivisions", "firstDistrict|secondDistrict")};
     when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
@@ -330,6 +397,24 @@ public class ContestServletTest {
     contestServlet.doGet(httpServletRequest, httpServletResponse);
 
     verify(printWriter).println("No electionId in the query URL.");
+  }
+
+  @Test
+  public void divisionCookieMissing_testDoGet() throws IOException {
+    Entity electionEntity = new Entity("Election");
+    electionEntity.setPropertiesFrom(electionEntityOne);
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    ds.put(electionEntityOne);
+
+    Cookie[] returnedCookies = {};
+    when(httpServletRequest.getCookies()).thenReturn(returnedCookies);
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    ContestsServlet contestServlet = new ContestsServlet();
+    contestServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter).println("Divisions information for address not found");
   }
 
   @Test

@@ -119,6 +119,7 @@ public class ElectionTest {
     entity.setProperty("scope", "myScope");
     entity.setProperty("contests", someIds);
     entity.setProperty("referendums", someIds);
+    entity.setProperty("divisions", ImmutableSet.of("firstDistrict", "secondDistrict"));
 
     Election election = Election.fromEntity(entity);
 
@@ -128,13 +129,15 @@ public class ElectionTest {
     Assert.assertEquals(election.getScope(), "myScope");
     Assert.assertEquals(election.getContests(), someIds);
     Assert.assertEquals(election.getReferendums(), someIds);
-    Assert.assertEquals(election.getDivisions(), ImmutableSet.of());
+    Assert.assertEquals(
+        election.getDivisions(), ImmutableSet.of("firstDistrict", "secondDistrict"));
   }
 
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading
   // from it.
   @Test
-  public void testAddVoterInfoQueryData() throws Exception {
+  public void testAddVoterInfoQueryData_addTwoDistricts_AddBothContests_omitNothing()
+      throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Election election =
         Election.builder()
@@ -161,13 +164,80 @@ public class ElectionTest {
             ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict", "mySecondDistrict"));
 
     Assert.assertEquals(updatedElection.getContests().size(), 2);
-    Assert.assertEquals(updatedElection.getDivisions().size(), 2);
+    Assert.assertEquals(
+        updatedElection.getDivisions(), ImmutableSet.of("myFirstDistrict", "mySecondDistrict"));
+  }
+
+  @Test
+  public void testAddVoterInfoQueryData_noInitialDistrict_addOneDistrict_omitOneContest()
+      throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Election election =
+        Election.builder()
+            .setId("9999")
+            .setName("myElection")
+            .setDate("myDate")
+            .setScope("myScope")
+            .setContests(new HashSet<Long>())
+            .setReferendums(new HashSet<Long>())
+            .setDivisions(new HashSet<String>())
+            .build();
+    JSONObject voterInfoQueryJson =
+        new JSONObject(
+            "{\"election\": {\"id\": \"9999\"},"
+                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\", \"district\":{\"id\": \"myFirstDistrict\"},"
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteOne.com\"}]},"
+                + "{\"type\": \"type2\",\"office\": \"officeName\", \"district\":{\"id\": \"mySecondDistrict\"},"
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\":\"www.siteOne.com\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\":\"www.siteTwo.com\"}]}]}");
+
+    Election updatedElection =
+        election.fromVoterInfoQuery(ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict"));
+
+    Assert.assertEquals(updatedElection.getContests().size(), 1);
+    Assert.assertEquals(updatedElection.getDivisions(), ImmutableSet.of("myFirstDistrict"));
+  }
+
+  @Test
+  public void testAddVoterInfoQueryData_oneInitialdistrict_addOneDistrict_omitOneContest()
+      throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    HashSet<String> initialDistricts = new HashSet<>();
+    initialDistricts.add("mySecondDistrict");
+    Election election =
+        Election.builder()
+            .setId("9999")
+            .setName("myElection")
+            .setDate("myDate")
+            .setScope("myScope")
+            .setContests(new HashSet<Long>())
+            .setReferendums(new HashSet<Long>())
+            .setDivisions(initialDistricts)
+            .build();
+    JSONObject voterInfoQueryJson =
+        new JSONObject(
+            "{\"election\": {\"id\": \"9999\"},"
+                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\", \"district\":{\"id\": \"myFirstDistrict\"},"
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteOne.com\"}]},"
+                + "{\"type\": \"type2\",\"office\": \"officeName\", \"district\":{\"id\": \"mySecondDistrict\"},"
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\":\"www.siteOne.com\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\":\"www.siteTwo.com\"}]}]}");
+
+    Election updatedElection =
+        election.fromVoterInfoQuery(ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict"));
+
+    Assert.assertEquals(updatedElection.getContests().size(), 1);
+    Assert.assertEquals(
+        updatedElection.getDivisions(), ImmutableSet.of("myFirstDistrict", "mySecondDistrict"));
   }
 
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading
   // from it.
   @Test
-  public void testAddReferendumsToElection() throws Exception {
+  public void testAddReferendumsToElection_addTwoDistricts_addTwoReferendums_omitNothing()
+      throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Election election =
         Election.builder()
@@ -194,12 +264,45 @@ public class ElectionTest {
             ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict", "mySecondDistrict"));
 
     Assert.assertEquals(updatedElection.getReferendums().size(), 2);
+    Assert.assertEquals(
+        updatedElection.getDivisions(), ImmutableSet.of("myFirstDistrict", "mySecondDistrict"));
+  }
+
+  @Test
+  public void testAddReferendumsToElection_addOneDistricts_addOneReferendum_omitOneReferendum()
+      throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Election election =
+        Election.builder()
+            .setId("9999")
+            .setName("myElection")
+            .setDate("myDate")
+            .setScope("myScope")
+            .setContests(new HashSet<Long>())
+            .setReferendums(new HashSet<Long>())
+            .setDivisions(new HashSet<String>())
+            .build();
+    JSONObject voterInfoQueryJson =
+        new JSONObject(
+            "{\"election\": {\"id\": \"9999\"},"
+                + "\"contests\": [{\"type\": \"Referendum\", \"district\":{\"id\": \"myFirstDistrict\"},"
+                + "\"referendumTitle\": \"Proposition 1\","
+                + "\"referendumSubtitle\": \"Subtitle text for Prop 1.\"},"
+                + "{\"type\": \"Referendum\", \"district\":{\"id\": \"mySecondDistrict\"},"
+                + "\"referendumTitle\": \"Proposition 2\","
+                + "\"referendumSubtitle\": \"Subtitle text for Prop 2.\"}]}]}");
+
+    Election updatedElection =
+        election.fromVoterInfoQuery(ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict"));
+
+    Assert.assertEquals(updatedElection.getReferendums().size(), 1);
+    Assert.assertEquals(updatedElection.getDivisions(), ImmutableSet.of("myFirstDistrict"));
   }
 
   // Test putting voterInfoQuery JSON response for one election in an Election object and reading
   // from it.
   @Test
-  public void testAddAllFieldsToElection() throws Exception {
+  public void testAddAllFieldsToElection_addTwoDistricts_omitNothing() throws Exception {
     DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
     Election election =
         Election.builder()
@@ -217,22 +320,63 @@ public class ElectionTest {
                 + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
                 + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteTwo.com\"}]},"
-                + "{\"type\": \"type2\",\"office\": \"officeName\", \"district\":{\"id\": \"myFirstDistrict\"},"
+                + "{\"type\": \"type2\",\"office\": \"officeName\", \"district\":{\"id\": \"mySecondDistrict\"},"
                 + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
                 + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteOne.com\"}]},"
                 + "{\"type\": \"Referendum\", \"district\":{\"id\": \"myFirstDistrict\"},"
                 + "\"referendumTitle\": \"Proposition 1\","
                 + "\"referendumSubtitle\": \"Subtitle text for Prop 1.\"},"
+                + "{\"type\": \"Referendum\", \"district\":{\"id\": \"mySecondDistrict\"},"
+                + "\"referendumTitle\": \"Proposition 2\","
+                + "\"referendumSubtitle\": \"Subtitle text for Prop 2.\"}]}]}");
+
+    Election updatedElection =
+        election.fromVoterInfoQuery(
+            ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict", "mySecondDistrict"));
+
+    Assert.assertEquals(updatedElection.getContests().size(), 2);
+    Assert.assertEquals(updatedElection.getReferendums().size(), 2);
+    Assert.assertEquals(
+        updatedElection.getDivisions(), ImmutableSet.of("myFirstDistrict", "mySecondDistrict"));
+    Assert.assertTrue(updatedElection.isPopulatedByVoterInfoQuery());
+  }
+
+  @Test
+  public void testAddAllFieldsToElection_addOneDistrict_omitOneContest_omitOneReferendum()
+      throws Exception {
+    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
+    Election election =
+        Election.builder()
+            .setId("9999")
+            .setName("myElection")
+            .setDate("myDate")
+            .setScope("myScope")
+            .setContests(new HashSet<Long>())
+            .setReferendums(new HashSet<Long>())
+            .setDivisions(new HashSet<String>())
+            .build();
+    JSONObject voterInfoQueryJson =
+        new JSONObject(
+            "{\"election\": {\"id\": \"9999\"},"
+                + "\"contests\": [{\"type\": \"type1\",\"office\": \"officeName\", \"district\":{\"id\": \"myFirstDistrict\"},"
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteTwo.com\"}]},"
+                + "{\"type\": \"type2\",\"office\": \"officeName\", \"district\":{\"id\": \"mySecondDistrict\"},"
+                + "\"candidates\": [{\"name\": \"name1\",\"party\": \"party1\",\"candidateUrl\": \"www.siteOne.com\"},"
+                + "{\"name\": \"name2\",\"party\": \"party2\",\"candidateUrl\": \"www.siteOne.com\"}]},"
                 + "{\"type\": \"Referendum\", \"district\":{\"id\": \"myFirstDistrict\"},"
+                + "\"referendumTitle\": \"Proposition 1\","
+                + "\"referendumSubtitle\": \"Subtitle text for Prop 1.\"},"
+                + "{\"type\": \"Referendum\", \"district\":{\"id\": \"mySecondDistrict\"},"
                 + "\"referendumTitle\": \"Proposition 2\","
                 + "\"referendumSubtitle\": \"Subtitle text for Prop 2.\"}]}]}");
 
     Election updatedElection =
         election.fromVoterInfoQuery(ds, voterInfoQueryJson, ImmutableSet.of("myFirstDistrict"));
 
-    Assert.assertEquals(updatedElection.getContests().size(), 2);
-    Assert.assertEquals(updatedElection.getReferendums().size(), 2);
-    Assert.assertEquals(updatedElection.getDivisions().size(), 1);
+    Assert.assertEquals(updatedElection.getContests().size(), 1);
+    Assert.assertEquals(updatedElection.getReferendums().size(), 1);
+    Assert.assertEquals(updatedElection.getDivisions(), ImmutableSet.of("myFirstDistrict"));
     Assert.assertTrue(updatedElection.isPopulatedByVoterInfoQuery());
   }
 

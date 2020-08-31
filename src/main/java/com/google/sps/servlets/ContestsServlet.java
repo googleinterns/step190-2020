@@ -86,6 +86,7 @@ public final class ContestsServlet extends HttpServlet {
       return;
     }
 
+    // Need to make final copy to use in lambda expressions later on.
     final ImmutableSet<String> finalAddressDivisions = ImmutableSet.copyOf(addressDivisions);
 
     List<JsonElement> contestJsonList =
@@ -141,6 +142,10 @@ public final class ContestsServlet extends HttpServlet {
                 + "}");
   }
 
+  /**
+   * Helper function that returns the set of divisions returned by voterInfoQuery in
+   * InfoCardServlet.
+   */
   private static ImmutableSet<String> getAddressDivisionSetFromCookie(
       HttpServletRequest request, HttpServletResponse response) throws Exception {
     Cookie[] addressDivisionCookies = request.getCookies();

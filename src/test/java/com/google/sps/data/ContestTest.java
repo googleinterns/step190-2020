@@ -147,6 +147,7 @@ public class ContestTest {
     Assert.assertEquals(idSet, newContest.getCandidates());
     Assert.assertEquals("Race for California Governer", newContest.getDescription());
     Assert.assertEquals("Voter Information Project", newContest.getSource());
+    Assert.assertEquals("myFirstDistrict", newContest.getDivision());
   }
 
   @Test
@@ -175,5 +176,7 @@ public class ContestTest {
             (Collection<Long>) contestEntity.getProperty(Contest.CANDIDATES_ENTITY_KEYWORD)));
     Assert.assertEquals(
         newContest.getDescription(), contestEntity.getProperty(Contest.DESCRIPTION_ENTITY_KEYWORD));
+    Assert.assertEquals(
+        newContest.getDivision(), contestEntity.getProperty(Contest.DIVISION_ENTITY_KEYWORD));
   }
 }

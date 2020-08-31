@@ -63,7 +63,7 @@ public abstract class Election {
   // represents their Key names.
   public abstract Set<Long> getReferendums();
 
-  // This Election has
+  // All the divisions that have been queried with this election.
   public abstract Set<String> getDivisions();
 
   public static Builder builder() {
@@ -139,6 +139,7 @@ public abstract class Election {
     Set<Long> contestKeyList = this.getContests();
     Set<Long> referendumKeyList = this.getReferendums();
     Set<String> divisionsList = this.getDivisions();
+    divisionsList.addAll(divisions);
 
     if (voterInfoQueryData.has(CONTESTS_JSON_KEYWORD)) {
       JSONArray contestListData = voterInfoQueryData.getJSONArray(CONTESTS_JSON_KEYWORD);
@@ -146,7 +147,6 @@ public abstract class Election {
         JSONObject contest = (JSONObject) contestObject;
         String currentDivision =
             contest.getJSONObject(Contest.DIVISION_JSON_KEYWORD).getString("id");
-        divisionsList.add(currentDivision);
 
         // Referendums are a separate contest type, so separate them out from the office positions
         // and put them in their own object field.
@@ -176,7 +176,7 @@ public abstract class Election {
    * @return true if contests and Referendums contain elements, false otherwise
    */
   public boolean isPopulatedByVoterInfoQuery() {
-    return !getContests().isEmpty() && !getReferendums().isEmpty();
+    return !getContests().isEmpty() && !getReferendums().isEmpty() && !getDivisions().isEmpty();
   }
 
   /**
