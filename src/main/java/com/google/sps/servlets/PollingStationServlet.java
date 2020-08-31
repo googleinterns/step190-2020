@@ -84,7 +84,7 @@ public final class PollingStationServlet extends HttpServlet {
     JSONObject pollingInfo = pollingInfoData.get();
 
     addToPollingStationList(pollingStations, "earlyVoteSites", pollingInfo);
-    addToPollingStationList(pollingStations, "dropOffLocation", pollingInfo);
+    addToPollingStationList(pollingStations, "dropOffLocations", pollingInfo);
     addToPollingStationList(pollingStations, "pollingLocations", pollingInfo);
 
     Gson gson = new Gson();

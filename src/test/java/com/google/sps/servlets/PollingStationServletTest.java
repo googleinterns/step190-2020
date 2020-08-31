@@ -91,6 +91,76 @@ public class PollingStationServletTest {
   }
 
   @Test
+  public void onePollingStationReturned_oneEarlyVoteSiteReturned_testDoGet() throws Exception {
+    mockStatic(ServletUtils.class);
+    when(ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "electionId"))
+        .thenReturn(Optional.of("2000"));
+    when(ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "address"))
+        .thenReturn(Optional.of("myAddress"));
+    String returnString =
+        "{\"pollingLocations\": ["
+            + "{"
+            + "\"address\": {"
+            + "\"line1\": \"555 Main St\","
+            + "\"city\": \"Plainville\","
+            + "\"state\": \"MN\","
+            + "\"zip\": \"1111\""
+            + "},"
+            + "\"pollingHours\": \"myPollingHours\","
+            + "\"name\": \"myPollingStation\","
+            + "\"startDate\": \"myStartDate\","
+            + "\"endDate\": \"myEndDate\","
+            + "\"sources\": ["
+            + "{"
+            + "\"name\": \"sourceOne\","
+            + "\"official\": \"true\""
+            + "}"
+            + "]"
+            + "}"
+            + "],"
+            + "\"earlyVoteSites\": ["
+            + "{"
+            + "\"address\": {"
+            + "\"line1\": \"556 Main St\","
+            + "\"city\": \"Plainville\","
+            + "\"state\": \"MN\","
+            + "\"zip\": \"1111\""
+            + "},"
+            + "\"pollingHours\": \"myPollingHours\","
+            + "\"name\": \"myEarlyVoteSite\","
+            + "\"startDate\": \"myStartDate\","
+            + "\"endDate\": \"myEndDate\","
+            + "\"sources\": ["
+            + "{"
+            + "\"name\": \"sourceOne\","
+            + "\"official\": \"true\""
+            + "}"
+            + "]"
+            + "}"
+            + "]"
+            + "}";
+
+    when(ServletUtils.readFromApiUrl(anyString(), anyBoolean()))
+        .thenReturn(Optional.of(new JSONObject(returnString)));
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("2000");
+    when(httpServletRequest.getParameter("address")).thenReturn("myAddress");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+
+    PollingStationServlet pollingStationServlet = new PollingStationServlet();
+    pollingStationServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter)
+        .println(
+            "[{\"name\":\"myEarlyVoteSite\",\"address\":\"556 Main St, Plainville, MN 1111\","
+                + "\"pollingHours\":\"myPollingHours\",\"startDate\":\"myStartDate\",\"endDate\":\"myEndDate\","
+                + "\"locationType\":\"earlyVoteSites\",\"sources\":[\"sourceOne\"]},"
+                + "{\"name\":\"myPollingStation\",\"address\":\"555 Main St, Plainville, MN 1111\","
+                + "\"pollingHours\":\"myPollingHours\",\"startDate\":\"myStartDate\",\"endDate\":\"myEndDate\","
+                + "\"locationType\":\"pollingLocations\",\"sources\":[\"sourceOne\"]}]");
+  }
+
+  @Test
   public void failedQuery_returnEmptyOptional_testDoGet() throws IOException {
     mockStatic(ServletUtils.class);
     when(ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "electionId"))
