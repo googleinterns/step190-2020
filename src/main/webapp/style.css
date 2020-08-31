@@ -306,7 +306,7 @@ body{
   text-decoration: none;
 }
 
-#address-error-wrapper {
+.error-text-wrapper {
   height: 5px;
   margin: 10px;
 }
@@ -317,9 +317,10 @@ body{
   margin: 10px;
 }
 
-#address-error-text {
+.error-text-wrapper p {
   color: red;
   font-style: italic;
+  text-align: center;
 }
 
 .noborder {
