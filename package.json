@@ -1,0 +1,24 @@
+{
+    "name": "testKarma",
+    "private": true,
+    "devDependencies": {
+        "@babel/core": "^7.11.5",
+        "@babel/preset-env": "^7.11.5",
+        "karma": "^5.2.0",
+        "karma-babel-preprocessor": "^8.0.1",
+        "karma-chrome-launcher": "^3.1.0",
+        "karma-coverage": "^2.0.3",
+        "karma-handlebars-preprocessor": "^0.3.0",
+        "karma-jasmine": "^0.2.2",
+        "karma-jasmine-es6": "0.0.3",
+        "karma-junit-reporter": "^2.0.1",
+        "karma-phantomjs-launcher": "^1.0.4"
+    },
+    "dependencies": {
+        "babel-cli": "^6.26.0",
+        "bufferutil": "^4.0.1",
+        "handlebars": "^4.7.6",
+        "phantomjs-prebuilt": "^2.1.16",
+        "utf-8-validate": "^5.0.2"
+    }
+}

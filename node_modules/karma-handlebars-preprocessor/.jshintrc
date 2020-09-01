@@ -1,0 +1,8 @@
+{
+  "trailing": true,
+  "curly": true,
+  "undef": true,
+  "node": true,
+  "unused": true,
+  "es3": true
+}

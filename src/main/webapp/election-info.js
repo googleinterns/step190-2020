@@ -1,6 +1,6 @@
 var electionScope;
 
-Handlebars.registerHelper({
+registerHelper({
   not: (str) => str == "",
   and() {
     return Array.prototype.every.call(arguments, Boolean);
@@ -23,7 +23,7 @@ function onElectionInfoLoad(){
     let titleTextElement = document.getElementById('election-info-page-title');
     let electionInfoWrapperElement = document.getElementById('election-info-wrapper');
     let source = document.getElementById('election-name-template').innerHTML;
-    let template = Handlebars.compile(source);
+    let template = compile(source);
     let context = null;
 
     electionList.forEach((election) => {
@@ -146,7 +146,7 @@ function populateDeadlines(state) {
       });
 
       let source = document.getElementById('deadlines-template').innerHTML;
-      let template = Handlebars.compile(source);
+      let template = compile(source);
       let context = {state: JSONobject.map.state,
                      generalDeadlines: generalDeadlines,
                      runOffDeadlines: runOffDeadlines,
@@ -190,7 +190,7 @@ function populateClassesForTemplate(electionId){
       referendums.sort(function(a, b){return (a.title < b.title) ? -1 : ((a.title > b.title) ? 1 : 0)});
 
       let source = document.getElementById('contests-referendums-template').innerHTML;
-      let template = Handlebars.compile(source);
+      let template = compile(source);
       let context = { contests: contests, 
                       candidates: candidates, 
                       referendums: referendums };
@@ -287,7 +287,7 @@ function initializeMap() {
                 </div>
               </div>`;
 
-            let template = Handlebars.compile(descriptionTemplate);
+            let template = compile(descriptionTemplate);
             let context = {pollingStation: pollingStation};
             let description = template(context);
     
@@ -346,7 +346,7 @@ function addPollingStationMarker(map, position, title, description) {
  * 
  * @param {String} URL to be stripped.
  */
-Handlebars.registerHelper('stripUrl', function(urlString){
+registerHelper('stripUrl', function(urlString){
   urlString = urlString.replace(/(^\w+:|^)\/\/(www\.)?/, '');
   if(urlString[urlString.length - 1] == '/'){
     urlString = urlString.slice(0, -1);
@@ -359,7 +359,7 @@ Handlebars.registerHelper('stripUrl', function(urlString){
  * 
  * @param {Array} array to be converted
  */
-Handlebars.registerHelper('withCommas', function(sourcesList){
+registerHelper('withCommas', function(sourcesList){
   return sourcesList.join(", ");
 })
 
@@ -369,7 +369,7 @@ Handlebars.registerHelper('withCommas', function(sourcesList){
  * 
  * @param {String} the locationType
  */
-Handlebars.registerHelper('findType', function(locationType){
+registerHelper('findType', function(locationType){
   if (locationType == "dropOffLocation") {
     return "Drop off only.";
   } else if (locationType == "earlyVoteSite") {
@@ -390,7 +390,7 @@ Handlebars.registerHelper('findType', function(locationType){
  * 
  * @return {String} a statement summarizing the rule for the user
  */
-Handlebars.registerHelper('processRule', function(rule, votingType){
+registerHelper('processRule', function(rule, votingType){
 
   let submissionType = "";
   let dueDateType =  "";
@@ -441,7 +441,7 @@ Handlebars.registerHelper('processRule', function(rule, votingType){
  * 
  * @return {String} a formatted version of the date
  */
-Handlebars.registerHelper('formatDate', function(date){
+registerHelper('formatDate', function(date){
   if (date == undefined) {
     return 'Invalid date';
   }
