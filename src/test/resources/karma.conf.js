@@ -6,6 +6,7 @@ module.exports = function ( config ) {
         ],
         files            : [
             'src/main/webapp/**/*.js',
+            'src/main/webapp/**/*.html',
             'src/test/js/**/*.js'
         ],
         exclude          : [],

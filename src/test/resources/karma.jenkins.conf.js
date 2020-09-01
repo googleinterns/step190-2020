@@ -4,6 +4,7 @@ module.exports = function ( config ) {
         frameworks       : ['jasmine'],
         files            : [
             'src/main/webapp/**/*.js',
+            'src/main/webapp/**/*.html',
             'src/test/js/**/*.js'
         ],
         exclude          : [],
@@ -11,6 +12,7 @@ module.exports = function ( config ) {
             'src/main/webapp/**/*.js' : ['coverage'],
             'src/main/webapp/**/*.js' : ['babel'],
             'src/test/js/**/*.js' : ['babel'],
+            'src/main/webapp/**/*.html' : ['html2js'],
             '**/*.hbs': ['handlebars']
         },
         babelPreprocessor: {
@@ -23,6 +25,19 @@ module.exports = function ( config ) {
             },
             sourceFileName: function (file) {
               return file.originalPath;
+            }
+        },
+        html2JsPreprocessor: {
+            // strip this from the file path
+            stripPrefix: 'public/',
+          
+            // prepend this to the file path
+            prependPrefix: 'served/',
+          
+            // or define a custom transform function
+            processPath: function(filePath) {
+              // Drop the file extension
+              return filePath.replace(/\.html$/, '');
             }
         },
         handlebarsPreprocessor: {
@@ -58,7 +73,8 @@ module.exports = function ( config ) {
             'karma-junit-reporter',
             'karma-coverage',
             'karma-babel-preprocessor',
-            'karma-handlebars-preprocessor'
+            'karma-handlebars-preprocessor',
+            'karma-html2js-preprocessor'
         ],
         // changes type to `cobertura`
         coverageReporter : {
