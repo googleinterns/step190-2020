@@ -17,6 +17,7 @@ package com.google.sps.data;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.Entity;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -57,14 +58,14 @@ public abstract class Election {
 
   // This Election references a collection of Contest entities in Datastore. This HashSet represents
   // their Key names.
-  public abstract Set<Long> getContests();
+  public abstract ImmutableSet<Long> getContests();
 
   // This Election references a collection of Referendum entities in Datastore. This HashSet
   // represents their Key names.
-  public abstract Set<Long> getReferendums();
+  public abstract ImmutableSet<Long> getReferendums();
 
   // All the divisions that have been queried with this election.
-  public abstract Set<String> getDivisions();
+  public abstract ImmutableSet<String> getDivisions();
 
   public static Builder builder() {
     return new AutoValue_Election.Builder();
@@ -136,30 +137,30 @@ public abstract class Election {
   public Election fromVoterInfoQuery(
       DatastoreService datastore, JSONObject voterInfoQueryData, Set<String> divisions)
       throws JSONException {
-    Set<Long> contestKeyList = this.getContests();
-    Set<Long> referendumKeyList = this.getReferendums();
-    Set<String> divisionsList = this.getDivisions();
+    Set<Long> contestKeyList = new HashSet<>(this.getContests());
+    Set<Long> referendumKeyList = new HashSet<>(this.getReferendums());
+    Set<String> divisionsList = new HashSet<>(this.getDivisions());
     divisionsList.addAll(divisions);
 
-    if (voterInfoQueryData.has(CONTESTS_JSON_KEYWORD)) {
-      JSONArray contestListData = voterInfoQueryData.getJSONArray(CONTESTS_JSON_KEYWORD);
-      for (Object contestObject : contestListData) {
-        JSONObject contest = (JSONObject) contestObject;
-        String currentDivision =
-            contest.getJSONObject(Contest.DIVISION_JSON_KEYWORD).getString("id");
+    if (!voterInfoQueryData.has(CONTESTS_JSON_KEYWORD)) {
+      return this.withDivisions(divisionsList);
+    }
 
-        // Referendums are a separate contest type, so separate them out from the office positions
-        // and put them in their own object field.
-        if (divisions.contains(currentDivision)) {
-          if (contest.getString(Contest.TYPE_JSON_KEYWORD).equals(Referendum.ENTITY_KIND)) {
-            long referendumEntityKeyId =
-                Referendum.fromJSONObject(contest).addToDatastore(datastore);
-            referendumKeyList.add(referendumEntityKeyId);
-          } else {
-            long contestEntityKeyId =
-                Contest.fromJSONObject(datastore, contest).addToDatastore(datastore);
-            contestKeyList.add(contestEntityKeyId);
-          }
+    JSONArray contestListData = voterInfoQueryData.getJSONArray(CONTESTS_JSON_KEYWORD);
+    for (Object contestObject : contestListData) {
+      JSONObject contest = (JSONObject) contestObject;
+      String currentDivision = contest.getJSONObject(Contest.DIVISION_JSON_KEYWORD).getString("id");
+
+      // Referendums are a separate contest type, so separate them out from the office positions
+      // and put them in their own object field.
+      if (divisions.contains(currentDivision)) {
+        if (contest.getString(Contest.TYPE_JSON_KEYWORD).equals(Referendum.ENTITY_KIND)) {
+          long referendumEntityKeyId = Referendum.fromJSONObject(contest).addToDatastore(datastore);
+          referendumKeyList.add(referendumEntityKeyId);
+        } else {
+          long contestEntityKeyId =
+              Contest.fromJSONObject(datastore, contest).addToDatastore(datastore);
+          contestKeyList.add(contestEntityKeyId);
         }
       }
     }
@@ -173,7 +174,7 @@ public abstract class Election {
    * Checks if an Election object has been populated by the output of a voterInfoQuery call from the
    * Google Civic Information API.
    *
-   * @return true if contests and Referendums contain elements, false otherwise
+   * @return true if contests, referendums, and divisions contain elements, false otherwise
    */
   public boolean isPopulatedByVoterInfoQuery() {
     return !getContests().isEmpty() && !getReferendums().isEmpty() && !getDivisions().isEmpty();

@@ -179,7 +179,7 @@ public final class InfoCardServlet extends HttpServlet {
     return divisionsCookie;
   }
 
-  /** Returns the realtive complement of secondSet with respect to firstSet. */
+  /** Returns the relative complement of secondSet with respect to firstSet. */
   private static ImmutableSet<String> getRelativeComplementSet(
       Set<String> firstSet, Set<String> secondSet) {
     HashSet<String> copyOfFirstSet = new HashSet<>(firstSet);
