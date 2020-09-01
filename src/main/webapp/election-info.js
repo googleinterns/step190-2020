@@ -1,4 +1,5 @@
 var electionScope;
+import { registerHelper, compile } from "handlebars";
 
 registerHelper({
   not: (str) => str == "",
