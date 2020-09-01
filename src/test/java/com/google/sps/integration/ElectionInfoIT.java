@@ -33,10 +33,11 @@ public class ElectionInfoIT {
    * Tests that address form is not displayed.
    */
   @Test
-  public void noElectionIdInQueryUrl_displayErrorText() {
+  public void noElectionIdInQueryUrl_displayErrorText() throws InterruptedException {
     driver.get("http://localhost:9876/electionInfo.html");
-    WebElement contentElement = driver.findElement(By.id("election-name-template"));
-    WebElement paragraphElement = contentElement.findElement(By.xpath("//p[@id='title-text']"));
+    Thread.sleep(5000);
+
+    WebElement paragraphElement = driver.findElement(By.id("title-text"));
     Assert.assertEquals("Error! No election selected.", paragraphElement.getText());
 
     WebElement wrapperElement = driver.findElement(By.id("election-info-wrapper"));
@@ -48,10 +49,10 @@ public class ElectionInfoIT {
    * parameter. Tests that address form does display.
    */
   @Test
-  public void electionIdInQueryUrl_displayRegularInfoCardScreen() {
+  public void electionIdInQueryUrl_displayRegularInfoCardScreen() throws InterruptedException {
     driver.get("http://localhost:9876/electionInfo.html?state=ca&electionId=2000");
-    WebElement contentElement = driver.findElement(By.id("election-name-template"));
-    WebElement paragraphElement = contentElement.findElement(By.xpath("//p[@id='title-text']/b"));
+    Thread.sleep(5000);
+    WebElement paragraphElement = driver.findElement(By.id("title-text"));
     Assert.assertEquals(
         "To show you polling locations and ballot items from the VIP Test Election, "
             + "we\'ll need your registered voter address:",

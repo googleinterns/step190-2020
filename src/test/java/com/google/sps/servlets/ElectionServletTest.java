@@ -59,6 +59,6 @@ public class ElectionServletTest {
     electionServlet.doGet(httpServletRequest, httpServletResponse);
     verify(printWriter)
         .println(
-            "[{\"id\":\"9999\",\"name\":\"myElection\",\"date\":\"myDate\",\"scope\":\"myScope\",\"contests\":[],\"referendums\":[],\"pollingStations\":[]}]");
+            "[{\"id\":\"9999\",\"name\":\"myElection\",\"date\":\"myDate\",\"scope\":\"myScope\",\"contests\":[],\"referendums\":[],\"divisions\":[]}]");
   }
 }

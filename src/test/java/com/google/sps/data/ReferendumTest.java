@@ -111,6 +111,7 @@ public class ReferendumTest {
             .setDescription("myDescription")
             .setSource("mySource")
             .setUrl("myUrl")
+            .setDivision("myFirstDistrict")
             .build();
 
     long entityKeyId = referendum.addToDatastore(ds);
@@ -128,6 +129,7 @@ public class ReferendumTest {
     entity.setProperty("description", "myDescription");
     entity.setProperty("source", "mySource");
     entity.setProperty("url", "myUrl");
+    entity.setProperty("division", "myFirstDivision");
 
     Referendum referendum = Referendum.fromEntity(entity);
 

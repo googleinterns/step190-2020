@@ -1,30 +1,33 @@
 package com.google.sps.servlets;
 
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
 
-import com.google.appengine.api.datastore.DatastoreService;
-import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.EmbeddedEntity;
-import com.google.appengine.api.datastore.Entity;
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import com.google.appengine.tools.development.testing.LocalURLFetchServiceTestConfig;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(ServletUtils.class)
 public class PollingStationServletTest {
   private static final LocalServiceTestHelper helper =
       new LocalServiceTestHelper(
@@ -34,53 +37,47 @@ public class PollingStationServletTest {
   @Mock HttpServletResponse httpServletResponse;
   @Mock PrintWriter printWriter;
 
-  private Entity electionEntityOne;
-  private Entity pollingStationOne;
-  private Entity pollingStationTwo;
-
   @Rule public MockitoRule mockitoRule = MockitoJUnit.rule();
 
   @Before
   public void setUp() {
     helper.setUp();
-    electionEntityOne = new Entity("Election");
-
-    electionEntityOne.setProperty("id", "9999");
-    electionEntityOne.setProperty("name", "myElection");
-    electionEntityOne.setProperty("scope", "myScope");
-    electionEntityOne.setProperty("date", "myDate");
-    electionEntityOne.setProperty("contests", new HashSet<Long>());
-    electionEntityOne.setProperty("propositions", new HashSet<Long>());
-    electionEntityOne.setProperty("pollingStations", new ArrayList<EmbeddedEntity>());
-
-    pollingStationOne = new Entity("PollingStation");
-    pollingStationOne.setProperty("name", "pollingStationOne");
-    pollingStationOne.setProperty("address", "addressOne");
-    pollingStationOne.setProperty("pollingHours", "-");
-    pollingStationOne.setProperty("startDate", "today");
-    pollingStationOne.setProperty("endDate", "never");
-    pollingStationOne.setProperty("locationType", "pollingLocation");
-    pollingStationOne.setProperty("sources", new ArrayList<String>());
   }
 
   @Test
-  public void singleElection_singlePollingStation_testDoGet() throws Exception {
-    Entity electionEntity = new Entity("Election");
-    Entity pollingStationEntity = new Entity("PollingStation");
+  public void singlePollingStationReturned_testDoGet() throws Exception {
+    mockStatic(ServletUtils.class);
+    when(ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "electionId"))
+        .thenReturn(Optional.of("2000"));
+    when(ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "address"))
+        .thenReturn(Optional.of("myAddress"));
+    String returnString =
+        "{\"pollingLocations\": ["
+            + "{"
+            + "\"address\": {"
+            + "\"line1\": \"555 Main St\","
+            + "\"city\": \"Plainville\","
+            + "\"state\": \"MN\","
+            + "\"zip\": \"1111\""
+            + "},"
+            + "\"pollingHours\": \"myPollingHours\","
+            + "\"name\": \"myPollingStation\","
+            + "\"startDate\": \"myStartDate\","
+            + "\"endDate\": \"myEndDate\","
+            + "\"sources\": ["
+            + "{"
+            + "\"name\": \"sourceOne\","
+            + "\"official\": \"true\""
+            + "}"
+            + "]"
+            + "}"
+            + "]}";
 
-    electionEntity.setPropertiesFrom(electionEntityOne);
-    pollingStationEntity.setPropertiesFrom(pollingStationOne);
+    when(ServletUtils.readFromApiUrl(anyString(), anyBoolean()))
+        .thenReturn(Optional.of(new JSONObject(returnString)));
 
-    DatastoreService ds = DatastoreServiceFactory.getDatastoreService();
-
-    List<EmbeddedEntity> pollingStations =
-        (List<EmbeddedEntity>) electionEntity.getProperty("pollingStations");
-    EmbeddedEntity embeddedPollingStationEntity = new EmbeddedEntity();
-    embeddedPollingStationEntity.setPropertiesFrom(pollingStationEntity);
-    pollingStations.add(embeddedPollingStationEntity);
-    ds.put(electionEntity);
-
-    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletRequest.getParameter("electionId")).thenReturn("2000");
+    when(httpServletRequest.getParameter("address")).thenReturn("myAddress");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     PollingStationServlet pollingStationServlet = new PollingStationServlet();
@@ -88,25 +85,103 @@ public class PollingStationServletTest {
 
     verify(printWriter)
         .println(
-            "[{\"name\":\"pollingStationOne\",\"address\":\"addressOne\","
-                + "\"pollingHours\":\"-\",\"startDate\":\"today\",\"endDate\":\"never\","
-                + "\"locationType\":\"pollingLocation\",\"sources\":[]}]");
+            "[{\"name\":\"myPollingStation\",\"address\":\"555 Main St, Plainville, MN 1111\","
+                + "\"pollingHours\":\"myPollingHours\",\"startDate\":\"myStartDate\",\"endDate\":\"myEndDate\","
+                + "\"locationType\":\"pollingLocations\",\"sources\":[\"sourceOne\"]}]");
   }
 
   @Test
-  public void noElectionEntityExists_testDoGet() throws IOException {
-    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+  public void onePollingStationReturned_oneEarlyVoteSiteReturned_testDoGet() throws Exception {
+    mockStatic(ServletUtils.class);
+    when(ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "electionId"))
+        .thenReturn(Optional.of("2000"));
+    when(ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "address"))
+        .thenReturn(Optional.of("myAddress"));
+    String returnString =
+        "{\"pollingLocations\": ["
+            + "{"
+            + "\"address\": {"
+            + "\"line1\": \"555 Main St\","
+            + "\"city\": \"Plainville\","
+            + "\"state\": \"MN\","
+            + "\"zip\": \"1111\""
+            + "},"
+            + "\"pollingHours\": \"myPollingHours\","
+            + "\"name\": \"myPollingStation\","
+            + "\"startDate\": \"myStartDate\","
+            + "\"endDate\": \"myEndDate\","
+            + "\"sources\": ["
+            + "{"
+            + "\"name\": \"sourceOne\","
+            + "\"official\": \"true\""
+            + "}"
+            + "]"
+            + "}"
+            + "],"
+            + "\"earlyVoteSites\": ["
+            + "{"
+            + "\"address\": {"
+            + "\"line1\": \"556 Main St\","
+            + "\"city\": \"Plainville\","
+            + "\"state\": \"MN\","
+            + "\"zip\": \"1111\""
+            + "},"
+            + "\"pollingHours\": \"myPollingHours\","
+            + "\"name\": \"myEarlyVoteSite\","
+            + "\"startDate\": \"myStartDate\","
+            + "\"endDate\": \"myEndDate\","
+            + "\"sources\": ["
+            + "{"
+            + "\"name\": \"sourceOne\","
+            + "\"official\": \"true\""
+            + "}"
+            + "]"
+            + "}"
+            + "]"
+            + "}";
+
+    when(ServletUtils.readFromApiUrl(anyString(), anyBoolean()))
+        .thenReturn(Optional.of(new JSONObject(returnString)));
+
+    when(httpServletRequest.getParameter("electionId")).thenReturn("2000");
+    when(httpServletRequest.getParameter("address")).thenReturn("myAddress");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     PollingStationServlet pollingStationServlet = new PollingStationServlet();
     pollingStationServlet.doGet(httpServletRequest, httpServletResponse);
 
-    verify(printWriter).println("Election with id 9999 was not found.");
+    verify(printWriter)
+        .println(
+            "[{\"name\":\"myEarlyVoteSite\",\"address\":\"556 Main St, Plainville, MN 1111\","
+                + "\"pollingHours\":\"myPollingHours\",\"startDate\":\"myStartDate\",\"endDate\":\"myEndDate\","
+                + "\"locationType\":\"earlyVoteSites\",\"sources\":[\"sourceOne\"]},"
+                + "{\"name\":\"myPollingStation\",\"address\":\"555 Main St, Plainville, MN 1111\","
+                + "\"pollingHours\":\"myPollingHours\",\"startDate\":\"myStartDate\",\"endDate\":\"myEndDate\","
+                + "\"locationType\":\"pollingLocations\",\"sources\":[\"sourceOne\"]}]");
+  }
+
+  @Test
+  public void failedQuery_returnEmptyOptional_testDoGet() throws IOException {
+    mockStatic(ServletUtils.class);
+    when(ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "electionId"))
+        .thenReturn(Optional.of("2000"));
+    when(ServletUtils.getRequestParam(httpServletRequest, httpServletResponse, "address"))
+        .thenReturn(Optional.of("myAddress"));
+    when(httpServletRequest.getParameter("electionId")).thenReturn("9999");
+    when(httpServletRequest.getParameter("address")).thenReturn("myAddress");
+    when(httpServletResponse.getWriter()).thenReturn(printWriter);
+    when(ServletUtils.readFromApiUrl(anyString(), anyBoolean())).thenReturn(Optional.empty());
+
+    PollingStationServlet pollingStationServlet = new PollingStationServlet();
+    pollingStationServlet.doGet(httpServletRequest, httpServletResponse);
+
+    verify(printWriter).println("Polling locations for myAddress were not found.");
   }
 
   @Test
   public void queryParameterMissing_testDoGet() throws IOException {
     when(httpServletRequest.getParameter("electionId")).thenReturn(null);
+    when(httpServletRequest.getParameter("address")).thenReturn("myAddress");
     when(httpServletResponse.getWriter()).thenReturn(printWriter);
 
     PollingStationServlet pollingStationServlet = new PollingStationServlet();
