@@ -7,6 +7,9 @@ src/main/webapp/config.js
 # API keys
 **/config.js
 
+# packages used for Karma
+node_modules/
+
 # IntelliJ specific project files
 .idea/
 portfolio.iml
