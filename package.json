@@ -12,6 +12,7 @@
         "karma-html2js-preprocessor": "^1.1.0",
         "karma-jasmine": "^0.2.2",
         "karma-jasmine-es6": "0.0.3",
+        "karma-jquery": "^0.2.4",
         "karma-junit-reporter": "^2.0.1",
         "karma-phantomjs-launcher": "^1.0.4"
     },

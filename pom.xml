@@ -190,6 +190,23 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.kelveden</groupId>
+        <artifactId>maven-karma-plugin</artifactId>
+        <version>1.6</version>
+        <executions>
+            <execution>
+                <phase>process-test-classes</phase>
+                <goals>
+                    <goal>start</goal>
+                </goals>
+            </execution>
+        </executions>
+        <configuration>
+            <karmaExecutable>${basedir}/node_modules/karma/bin/karma</karmaExecutable>
+            <configFile>src/test/resources/karma.jenkins.conf.js</configFile>
+        </configuration>
+        </plugin>
       <!-- Provides `mvn package appengine:run` for local testing
            and `mvn package appengine:deploy` for deploying. -->
       <plugin>

@@ -1,7 +1,7 @@
 module.exports = function ( config ) {
     config.set( {
         basePath         : '../../../',
-        frameworks       : ['jasmine'],
+        frameworks       : ['jasmine', 'jquery-1.8.3'],
         files            : [
             'src/main/webapp/**/*.js',
             'src/main/webapp/**/*.html',
@@ -28,13 +28,6 @@ module.exports = function ( config ) {
             }
         },
         html2JsPreprocessor: {
-            // strip this from the file path
-            stripPrefix: 'public/',
-          
-            // prepend this to the file path
-            prependPrefix: 'served/',
-          
-            // or define a custom transform function
             processPath: function(filePath) {
               // Drop the file extension
               return filePath.replace(/\.html$/, '');
@@ -62,7 +55,7 @@ module.exports = function ( config ) {
         // don't watch for file change
         autoWatch        : false,
         // only runs on headless browser
-        browsers         : ['PhantomJS'],
+        browsers         : [], // ['PhantomJS'],
         // just run one time
         singleRun        : true,
         // remove `karma-chrome-launcher` because we will be running on headless
@@ -74,7 +67,8 @@ module.exports = function ( config ) {
             'karma-coverage',
             'karma-babel-preprocessor',
             'karma-handlebars-preprocessor',
-            'karma-html2js-preprocessor'
+            'karma-html2js-preprocessor',
+            'karma-jquery'
         ],
         // changes type to `cobertura`
         coverageReporter : {
